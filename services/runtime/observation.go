@@ -207,6 +207,14 @@ func (s *server) observeRelease(w http.ResponseWriter, r *http.Request) {
 			container, inspectErr := s.inspectTLSContainer(ctx, active.Container, in.AppID, in.AppID, active.Image)
 			if inspectErr == nil {
 				result.Status, result.Detail = s.healthObservation(ctx, container, manifest)
+				if result.Status != "healthy" {
+					if changed, diagnosisErr := s.publishedServiceHostDrift(ctx, in.AppID, container, manifest); diagnosisErr == nil && len(changed) > 0 {
+						// Infrastructure drift is not evidence that an older application
+						// version would help. Keep it out of automatic code rollback.
+						result.Status = "unavailable"
+						result.Detail = "The app's saved network addresses no longer match its verified services: " + strings.Join(changed, ", ") + ". Ask your platform operator to repair the service connections. This check made no changes to the app or its data."
+					}
+				}
 			} else {
 				result.Detail = "The exact managed container and immutable image could not be independently verified."
 			}

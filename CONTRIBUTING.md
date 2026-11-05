@@ -36,6 +36,11 @@ native Linux acceptance checks. Tests with simulated providers do not establish
 working customer installation or real provider behavior. Do not use real model
 credentials in CI or make paid requests from pull requests.
 
+Public source checks run on pull requests and updates to `main`, and can also
+be started manually. They check source hygiene, build and tests, public package
+advisories, and the Go runtime. Passing CI does not qualify VM installation,
+container images or recovery behavior.
+
 Run the historical backend controls through their
 [documented runner](docs/backend-history-tests.md), which supplies each original
 test with its exact pinned source fixture. Directly running an old test against

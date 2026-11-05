@@ -61,6 +61,25 @@ test('cached membership expires, group revocation loses permissions and changed 
     await f.store.transaction(state => { state.secrets[f.connectionId] = f.encrypted(); }); assert.equal((await f.authorize()).statusCode, 409);
   } finally { await f.close(); }
 });
+test('directory evidence remains usable across clock ticks without extending its authorization lifetime', async t => {
+  const f = await fixture();
+  try {
+    await f.activate();
+    t.mock.timers.enable({ apis: ['Date'], now: Date.now() });
+    const timerNow = Date.now.bind(Date); let clockReads = 0;
+    // Advance between clock reads while keeping no-argument Date construction
+    // on the preceding tick, deterministically exposing a timestamp boundary.
+    t.mock.method(Date, 'now', () => timerNow() + ++clockReads);
+    const first = await f.authorize(); assert.equal(first.statusCode, 200, first.body);
+    const cached = await f.authorize(); assert.equal(cached.statusCode, 200, cached.body);
+    assert.deepEqual(cached.json().permissions, ['dms.read']); assert.equal(f.membershipCalls(), 1);
+    assert.equal(cached.json().validUntil, first.json().validUntil);
+    t.mock.timers.tick(60001); f.groups([]);
+    const expired = await f.authorize(); assert.equal(expired.statusCode, 200, expired.body);
+    assert.deepEqual(expired.json().permissions, []); assert.equal(f.membershipCalls(), 2);
+  } finally { t.mock.restoreAll(); t.mock.timers.reset(); await f.close(); }
+});
+
 test('an async revocation or policy change cannot return or persist a previously positive membership grant', async () => {
   for (const change of ['activation', 'registry', 'policy']) {
     const f = await fixture(); try { const activation = await f.activate(); f.memberRead(async () => {

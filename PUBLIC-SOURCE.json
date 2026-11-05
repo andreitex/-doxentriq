@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "status": "source_candidate_not_published",
   "licenseSelected": true,
-  "fileCount": 628,
+  "fileCount": 631,
   "excludedFileCount": 709,
   "transformedFileCount": 29,
   "publicSourceCheck": {
     "schemaVersion": 1,
     "ready": true,
-    "candidateFiles": 628,
-    "scannedFiles": 628,
+    "candidateFiles": 631,
+    "scannedFiles": 631,
     "reviewedFixtureFindings": 12,
     "findingCounts": {},
     "findings": [],
@@ -31,8 +31,8 @@
     },
     {
       "path": ".github/workflows/public-source-readiness.yml",
-      "sourceSha256": "2b8028796d5acb2f08154c1974c059b978f8d053a1be7d66056f0da5856ef01c",
-      "exportSha256": "2b8028796d5acb2f08154c1974c059b978f8d053a1be7d66056f0da5856ef01c",
+      "sourceSha256": "7136ff11935887a9f8dc26c833ef73404852e2758ce8dc8e02800c105f417b3e",
+      "exportSha256": "7136ff11935887a9f8dc26c833ef73404852e2758ce8dc8e02800c105f417b3e",
       "transformations": []
     },
     {
@@ -43,8 +43,8 @@
     },
     {
       "path": "CONTRIBUTING.md",
-      "sourceSha256": "5c6c223c267f6a38e606e92719575739f8442e5b6d7c0ddc75764ee0fe7ad814",
-      "exportSha256": "5c6c223c267f6a38e606e92719575739f8442e5b6d7c0ddc75764ee0fe7ad814",
+      "sourceSha256": "795fbd6202750ab5c70bd13e36274090869a1671ce24a665adb662e1be9dbc8b",
+      "exportSha256": "795fbd6202750ab5c70bd13e36274090869a1671ce24a665adb662e1be9dbc8b",
       "transformations": []
     },
     {
@@ -487,8 +487,8 @@
     },
     {
       "path": "apps/control/src/directory.ts",
-      "sourceSha256": "9abbf8e030da9e091cdf094e06e8c133633994e7999597bf4bf8cade42999272",
-      "exportSha256": "9abbf8e030da9e091cdf094e06e8c133633994e7999597bf4bf8cade42999272",
+      "sourceSha256": "5a124c1dcc94818b9e4b6fae8d5b012006b2210f123415666e772faf159cf629",
+      "exportSha256": "5a124c1dcc94818b9e4b6fae8d5b012006b2210f123415666e772faf159cf629",
       "transformations": []
     },
     {
@@ -721,8 +721,8 @@
     },
     {
       "path": "apps/control/test/directory.test.ts",
-      "sourceSha256": "8f92f58e5beb898e1566702771e0e1431c715d168b7f70f619462a99d4f132e5",
-      "exportSha256": "8f92f58e5beb898e1566702771e0e1431c715d168b7f70f619462a99d4f132e5",
+      "sourceSha256": "1e59a71f3e745f97dd4860bddbab252b4a0e3748c2813bde2c96d9fe77dfa94e",
+      "exportSha256": "1e59a71f3e745f97dd4860bddbab252b4a0e3748c2813bde2c96d9fe77dfa94e",
       "transformations": []
     },
     {
@@ -907,8 +907,8 @@
     },
     {
       "path": "deploy/Dockerfile.runtime",
-      "sourceSha256": "381f6e45164f5d77e7ce539bb40e8d1c26483f68bda9ef65d82a2ded993a3ee5",
-      "exportSha256": "381f6e45164f5d77e7ce539bb40e8d1c26483f68bda9ef65d82a2ded993a3ee5",
+      "sourceSha256": "f579109ffb376375eea7ae42bcbbb7d76ae6707085c0472c246866548407854b",
+      "exportSha256": "f579109ffb376375eea7ae42bcbbb7d76ae6707085c0472c246866548407854b",
       "transformations": []
     },
     {
@@ -1627,6 +1627,12 @@
       "path": "docs/runtime-layout.md",
       "sourceSha256": "93cf7560375c25eff023887df70e2f160828dbc8e42b869bf3600e51ecc35496",
       "exportSha256": "93cf7560375c25eff023887df70e2f160828dbc8e42b869bf3600e51ecc35496",
+      "transformations": []
+    },
+    {
+      "path": "docs/runtime-network-recovery.md",
+      "sourceSha256": "01bbf470ea8aa754da878b3de2c785d6d74c7aa2f190bc166b0dab24e10365cb",
+      "exportSha256": "01bbf470ea8aa754da878b3de2c785d6d74c7aa2f190bc166b0dab24e10365cb",
       "transformations": []
     },
     {
@@ -2415,8 +2421,8 @@
     },
     {
       "path": "scripts/test-company-linux.sh",
-      "sourceSha256": "3cfc491af77d195cc11a0cfc0842dc20073695669ffddad4ebd067deecfca838",
-      "exportSha256": "3cfc491af77d195cc11a0cfc0842dc20073695669ffddad4ebd067deecfca838",
+      "sourceSha256": "ebea644a99e42c55644053ad7c06a7281b34c19c1710bc43fe59f34766951613",
+      "exportSha256": "ebea644a99e42c55644053ad7c06a7281b34c19c1710bc43fe59f34766951613",
       "transformations": []
     },
     {
@@ -2770,6 +2776,18 @@
       "transformations": []
     },
     {
+      "path": "services/runtime/app_host_diagnostics.go",
+      "sourceSha256": "5f1429b98be94df7544e9c70bc72ba334f1e4c71d59b22451fcd0b9d27d9b846",
+      "exportSha256": "5f1429b98be94df7544e9c70bc72ba334f1e4c71d59b22451fcd0b9d27d9b846",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/app_host_diagnostics_test.go",
+      "sourceSha256": "d896b8103e3cb14dc45905ea2a5f0a2a2eae5837bb1b2b23a74eb11647cd5412",
+      "exportSha256": "d896b8103e3cb14dc45905ea2a5f0a2a2eae5837bb1b2b23a74eb11647cd5412",
+      "transformations": []
+    },
+    {
       "path": "services/runtime/app_hosts_test.go",
       "sourceSha256": "a6bf781f7c02039288f196e354eaecea20cca42bc17291df4175eadad08e205f",
       "exportSha256": "a6bf781f7c02039288f196e354eaecea20cca42bc17291df4175eadad08e205f",
@@ -2951,8 +2969,8 @@
     },
     {
       "path": "services/runtime/go.mod",
-      "sourceSha256": "76f415b859fbd4014464d7a29fdaef23d05053774595145beb8080cf789e3fd0",
-      "exportSha256": "76f415b859fbd4014464d7a29fdaef23d05053774595145beb8080cf789e3fd0",
+      "sourceSha256": "d37f2a4cd290928b40b6ca289906863100d22040aea15a8509450deff38cf2ff",
+      "exportSha256": "d37f2a4cd290928b40b6ca289906863100d22040aea15a8509450deff38cf2ff",
       "transformations": []
     },
     {
@@ -3065,8 +3083,8 @@
     },
     {
       "path": "services/runtime/observation.go",
-      "sourceSha256": "22751998532ca901cf821427d3e31f848845288c7ae20d6c0a8729b8d5c669e1",
-      "exportSha256": "22751998532ca901cf821427d3e31f848845288c7ae20d6c0a8729b8d5c669e1",
+      "sourceSha256": "c1b434b8db70488c053283c7e1727ed95ef78e2638ecd2bcea6b701913b34882",
+      "exportSha256": "c1b434b8db70488c053283c7e1727ed95ef78e2638ecd2bcea6b701913b34882",
       "transformations": []
     },
     {
