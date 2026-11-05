@@ -28,9 +28,12 @@ func testJWKSBundle(appID, resourceID, issuer, kid string, checked time.Time) ap
 
 type jwksFixture struct {
 	observation                                                *observationFixture
+	services                                                   *serviceHostsFixture
+	hosts                                                      []string
+	network                                                    string
 	realm, issuer, resourceID, directory, policyHash, kid      string
 	unavailable, wrongIssuer, unowned, redirect, failNewHealth bool
-	stops, restarts, identityWrites                            int
+	stops, restarts, healthChecks, identityWrites              int
 	loadedHash, oldHash                                        string
 	onNewHealthFailure                                         func()
 }
@@ -50,6 +53,18 @@ func newJWKSFixture(t *testing.T, preview bool) *jwksFixture {
 		f.resourceID += "_preview"
 		o.current.Container = "as-preview-app1"
 	}
+	o.inspected.ID = strings.Repeat("1", 64)
+	f.services = newServiceHostsFixture(t)
+	f.network = "autosoft_app_" + hashBytes([]byte(f.resourceID))[:24]
+	f.hosts = []string{"mysql:172.30.2.2", "redis:172.30.2.3", "rabbitmq:172.30.2.4"}
+	f.services.network.Name = f.network
+	for name, service := range f.services.containers {
+		endpoint := service.NetworkSettings.Networks["autosoft_app_1234"]
+		delete(service.NetworkSettings.Networks, "autosoft_app_1234")
+		service.NetworkSettings.Networks[f.network] = endpoint
+		f.services.containers[name] = service
+	}
+	o.server.manifest.ServiceImages = f.services.server.manifest.ServiceImages
 	o.inspected.Name = "/" + o.current.Container
 	o.inspected.Mounts[0].Source = filepath.Join(o.server.hostRuntime, "secrets", f.resourceID)
 	if err := atomicJSON(filepath.Join(o.server.data, "active", "app1.json"), o.current); err != nil {
@@ -130,6 +145,9 @@ func newJWKSFixture(t *testing.T, preview bool) *jwksFixture {
 		if command != "docker" {
 			t.Fatal("Arbitrary host executable")
 		}
+		if args[0] == "network" || args[0] == "ps" && strings.Contains(strings.Join(args, " "), "label=com.docker.compose.service=") {
+			return f.services.server.runner(ctx, command, args...)
+		}
 		switch args[0] {
 		case "ps":
 			if preview {
@@ -137,10 +155,14 @@ func newJWKSFixture(t *testing.T, preview bool) *jwksFixture {
 			}
 			return "", nil
 		case "inspect":
-			if args[len(args)-1] != o.current.Container {
-				t.Fatal("Container inspection escaped scope")
+			if args[len(args)-1] != o.current.Container && args[len(args)-1] != o.inspected.ID {
+				return f.services.server.runner(ctx, command, args...)
 			}
 			body, _ := json.Marshal(o.inspected)
+			var actual map[string]any
+			_ = json.Unmarshal(body, &actual)
+			actual["HostConfig"] = map[string]any{"NetworkMode": f.network, "ExtraHosts": f.hosts}
+			body, _ = json.Marshal(actual)
 			return string(body), nil
 		case "restart":
 			if len(args) != 4 || args[3] != o.inspected.ID {
@@ -162,6 +184,7 @@ func newJWKSFixture(t *testing.T, preview bool) *jwksFixture {
 			o.inspected.State.Running = false
 			return "", nil
 		case "exec":
+			f.healthChecks++
 			if args[1] != o.inspected.ID {
 				t.Fatal("Health probe escaped immutable scope")
 			}
@@ -256,6 +279,126 @@ func TestAppJWKSUnavailableRetainsFreshKeysThenStopsStaleAndResumesOnlyOwnedStop
 	if result.Status != "not_running" || f.restarts != 1 {
 		t.Fatal("A manually stopped app was restarted")
 	}
+}
+
+func stoppedJWKSRecoveryFixture(t *testing.T, preview bool) (*jwksFixture, map[string][]byte) {
+	t.Helper()
+	f := newJWKSFixture(t, preview)
+	f.observation.inspected.State.Running = false
+	f.kid = "rotated"
+	old := testJWKSBundle("app1", f.resourceID, f.issuer, "original", time.Now().Add(-2*time.Hour))
+	candidate := testJWKSBundle("app1", f.resourceID, f.issuer, f.kid, time.Now())
+	journal := appJWKSJournal{Version: 1, AppID: "app1", ResourceID: f.resourceID, ContainerID: f.observation.inspected.ID, Image: f.observation.current.Image, Issuer: f.issuer, Phase: "installed", UpdatedAt: time.Now().Format(time.RFC3339Nano), Old: old, Candidate: candidate}
+	stopped := appJWKSStop{Version: 1, AppID: "app1", ResourceID: f.resourceID, ContainerID: f.observation.inspected.ID, Image: f.observation.current.Image, Issuer: f.issuer, Phase: "resuming", UpdatedAt: time.Now().Format(time.RFC3339Nano)}
+	journalFile := filepath.Join(f.observation.server.data, "jwks-rotations", f.resourceID+".json")
+	stopFile := filepath.Join(f.observation.server.data, "jwks-stops", f.resourceID+".json")
+	if atomicJSON(journalFile, journal) != nil || atomicJSON(stopFile, stopped) != nil || installAppJWKS(f.directory, candidate) != nil {
+		t.Fatal("Cannot create stopped interrupted refresh fixture")
+	}
+	snapshot := map[string][]byte{}
+	for _, file := range []string{journalFile, stopFile, filepath.Join(f.directory, "jwks.json")} {
+		body, err := os.ReadFile(file)
+		if err != nil {
+			t.Fatal(err)
+		}
+		snapshot[file] = body
+	}
+	return f, snapshot
+}
+
+func assertJWKSRecoveryRetained(t *testing.T, f *jwksFixture, snapshot map[string][]byte, result appJWKSRefreshResult) {
+	t.Helper()
+	if result.Status != "unavailable" || !strings.Contains(result.Detail, "platform operator") || strings.Contains(result.Detail, "172.30.") || f.stops != 0 || f.restarts != 0 || f.healthChecks != 0 || f.observation.inspected.State.Running {
+		t.Fatalf("Unverified stopped target was mutated or entered health retries: %+v", result)
+	}
+	for file, before := range snapshot {
+		after, err := os.ReadFile(file)
+		if err != nil || !bytes.Equal(before, after) {
+			t.Fatal("Read-only preflight changed retained keys or recovery records", filepath.Base(file), err)
+		}
+	}
+}
+
+func TestAppJWKSOwnedResumeRequiresVerifiedCurrentServiceHosts(t *testing.T) {
+	for _, preview := range []bool{false, true} {
+		for _, failure := range []string{"stale_host", "missing_host", "service_image", "wrong_resource_network", "unavailable_inspection"} {
+			t.Run(map[bool]string{false: "published", true: "preview"}[preview]+"/"+failure, func(t *testing.T) {
+				f, snapshot := stoppedJWKSRecoveryFixture(t, preview)
+				originalHosts := append([]string(nil), f.hosts...)
+				originalNetwork := f.network
+				originalService := f.services.containers["mysql"]
+				originalRunner := f.observation.server.runner
+				switch failure {
+				case "stale_host":
+					f.hosts[0] = "mysql:172.30.2.9"
+				case "missing_host":
+					f.hosts = f.hosts[1:]
+				case "service_image":
+					service := originalService
+					service.Config.Image = "registry:5000/mysql@sha256:" + strings.Repeat("0", 64)
+					f.services.containers["mysql"] = service
+				case "wrong_resource_network":
+					otherResource := "app1_preview"
+					if preview {
+						otherResource = "app1"
+					}
+					f.network = "autosoft_app_" + hashBytes([]byte(otherResource))[:24]
+				case "unavailable_inspection":
+					f.observation.server.runner = func(ctx context.Context, executable string, args ...string) (string, error) {
+						if args[0] == "network" {
+							return "", errors.New("Synthetic inspection unavailable")
+						}
+						return originalRunner(ctx, executable, args...)
+					}
+				}
+				result := f.observation.server.reconcileAppJWKS(context.Background(), "app1", preview)
+				assertJWKSRecoveryRetained(t, f, snapshot, result)
+				confirmedDrift := failure == "stale_host" || failure == "missing_host"
+				if strings.Contains(result.Detail, "outdated saved network") != confirmedDrift {
+					t.Fatal("Unknown infrastructure state was confused with confirmed drift", result.Detail)
+				}
+
+				f.hosts, f.network = originalHosts, originalNetwork
+				f.services.containers["mysql"] = originalService
+				f.observation.server.runner = originalRunner
+				result = f.observation.server.reconcileAppJWKS(context.Background(), "app1", preview)
+				if result.Status != "refreshed" || f.restarts != 1 || f.healthChecks != 1 || f.stops != 0 || !f.observation.inspected.State.Running {
+					t.Fatalf("Verified exact target did not resume after service evidence was restored: %+v", result)
+				}
+				var stopped appJWKSStop
+				var journal appJWKSJournal
+				if readBoundedJSON(filepath.Join(f.observation.server.data, "jwks-stops", f.resourceID+".json"), &stopped) != nil || stopped.Phase != "resumed" || stopped.ContainerID != f.observation.inspected.ID || readBoundedJSON(filepath.Join(f.observation.server.data, "jwks-rotations", f.resourceID+".json"), &journal) != nil || journal.Phase != "completed" || journal.ContainerID != f.observation.inspected.ID {
+					t.Fatal("Resume did not complete exact-container recovery records")
+				}
+			})
+		}
+	}
+}
+
+func TestAppJWKSOwnedResumeInspectionIsBoundedAndHonorsCancellation(t *testing.T) {
+	f, snapshot := stoppedJWKSRecoveryFixture(t, true)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	base := f.observation.server.runner
+	inspected := false
+	f.observation.server.runner = func(ctx context.Context, executable string, args ...string) (string, error) {
+		if args[0] == "inspect" && args[len(args)-1] == f.observation.inspected.ID {
+			deadline, bounded := ctx.Deadline()
+			if !bounded || time.Until(deadline) > 10*time.Second {
+				t.Fatal("Stopped-target preflight inherited an unbounded maintenance wait")
+			}
+			inspected = true
+			cancel()
+			<-ctx.Done()
+			return "", ctx.Err()
+		}
+		return base(ctx, executable, args...)
+	}
+	result := f.observation.server.reconcileAppJWKS(ctx, "app1", true)
+	if !inspected || ctx.Err() != context.Canceled {
+		t.Fatal("Preflight did not observe caller cancellation")
+	}
+	assertJWKSRecoveryRetained(t, f, snapshot, result)
 }
 
 func TestAppJWKSRefreshRejectsForeignIssuerRedirectRealmAndContainer(t *testing.T) {

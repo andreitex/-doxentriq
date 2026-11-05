@@ -538,6 +538,22 @@ func (s *server) reconcileAppJWKS(ctx context.Context, appID string, preview boo
 		stopOwned = true
 		container.State.Running = false
 	}
+	if stopOwned && !container.State.Running {
+		// A broker-owned stop permits an exact-container resume, not a retry with
+		// stale infrastructure addresses. Diagnose before changing keys or journals
+		// and bound Docker inspection while the app serialization lock is held.
+		preflightCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		drift, hostErr := s.appServiceHostDrift(preflightCtx, appID, resourceID, container, manifest)
+		cancel()
+		if hostErr != nil {
+			result.Detail = "Stopped app service mappings could not be independently verified; signing-key recovery is retained. Contact the platform operator for network recovery"
+			return result
+		}
+		if len(drift) != 0 {
+			result.Detail = "Stopped app has outdated saved network addresses for " + strings.Join(drift, ", ") + "; signing-key recovery is retained. Contact the platform operator for network recovery"
+			return result
+		}
+	}
 	candidate, refreshErr := s.ownedAppJWKS(ctx, manifest, resourceID, preview)
 	if refreshErr != nil {
 		result.Detail = "Owned issuer signing-key refresh is unavailable; previous evidence is retained"

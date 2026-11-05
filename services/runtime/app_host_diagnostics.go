@@ -28,10 +28,20 @@ type appHostInspection struct {
 // company services on the app's derived private network. No resource secrets
 // need to be opened and no observed address is returned to the administrator.
 func (s *server) publishedServiceHostDrift(ctx context.Context, appID string, container tlsContainer, manifest AppManifest) ([]string, error) {
-	if !identity.MatchString(appID) || manifest.ID != appID || !exactDockerID.MatchString(container.ID) || !digestImage.MatchString(container.Config.Image) || !strings.HasPrefix(container.Name, "/as-app-"+appID+"-") {
-		return nil, errors.New("Exact published application identity is required for network diagnosis")
+	return s.appServiceHostDrift(ctx, appID, appID, container, manifest)
+}
+
+// Resource scope is explicit: a preview has a distinct name and private network.
+// This check does not establish whether a preview is still authorized for use.
+func (s *server) appServiceHostDrift(ctx context.Context, appID, resourceID string, container tlsContainer, manifest AppManifest) ([]string, error) {
+	validName := resourceID == appID && strings.HasPrefix(container.Name, "/as-app-"+appID+"-")
+	if resourceID == appID+"_preview" {
+		validName = container.Name == "/as-preview-"+appID
 	}
-	network := "autosoft_app_" + hashBytes([]byte(appID))[:24]
+	if !identity.MatchString(appID) || manifest.ID != appID || !exactDockerID.MatchString(container.ID) || !digestImage.MatchString(container.Config.Image) || !validName {
+		return nil, errors.New("Exact application and resource identity are required for network diagnosis")
+	}
+	network := "autosoft_app_" + hashBytes([]byte(resourceID))[:24]
 	inspect := func() (appHostInspection, error) {
 		var actual appHostInspection
 		output, err := s.runner(ctx, "docker", "inspect", "--format", "{{json .}}", container.ID)

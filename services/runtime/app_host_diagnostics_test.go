@@ -206,3 +206,35 @@ func TestHostDriftDiagnosisDoesNotInventCauseWhenDockerIsUnavailable(t *testing.
 		t.Fatal("Unavailable infrastructure evidence became a confirmed network cause")
 	}
 }
+
+func TestHostDriftPreviewRequiresItsExactResourceNameAndNetwork(t *testing.T) {
+	f := newAppHostDiagnosticsFixture(t)
+	previousNetwork := f.network
+	f.network = "autosoft_app_" + hashBytes([]byte("app1_preview"))[:24]
+	f.services.network.Name = f.network
+	for name, service := range f.services.containers {
+		endpoint := service.NetworkSettings.Networks[previousNetwork]
+		delete(service.NetworkSettings.Networks, previousNetwork)
+		service.NetworkSettings.Networks[f.network] = endpoint
+		f.services.containers[name] = service
+	}
+	f.observation.inspected.Name = "/as-preview-app1"
+	f.observation.inspected.State.Running = false
+	f.hosts[0] = "mysql:172.30.2.9"
+	changed, err := f.observation.server.appServiceHostDrift(context.Background(), "app1", "app1_preview", f.observation.inspected, f.manifest)
+	if err != nil || !reflect.DeepEqual(changed, []string{"mysql"}) {
+		t.Fatalf("Exact preview scope did not use its own service network: %v %v", changed, err)
+	}
+	if _, err = f.observation.server.publishedServiceHostDrift(context.Background(), "app1", f.observation.inspected, f.manifest); err == nil {
+		t.Fatal("Published-only diagnosis accepted a preview")
+	}
+	for _, resource := range []string{"app1", "app2_preview", "app1_preview_extra", "../app1_preview"} {
+		if _, err = f.observation.server.appServiceHostDrift(context.Background(), "app1", resource, f.observation.inspected, f.manifest); err == nil {
+			t.Fatal("Preview accepted foreign resource scope", resource)
+		}
+	}
+	f.observation.inspected.Name += "-old"
+	if _, err = f.observation.server.appServiceHostDrift(context.Background(), "app1", "app1_preview", f.observation.inspected, f.manifest); err == nil {
+		t.Fatal("Preview diagnosis accepted a name prefix instead of the exact canonical name")
+	}
+}

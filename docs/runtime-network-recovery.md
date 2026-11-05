@@ -10,9 +10,15 @@ Confirmed infrastructure drift produces an `unavailable` observation with an exp
 
 This diagnostic covers MySQL, Redis, RabbitMQ and, when enabled for a protected app, the directory authorization service. Connector mappings have separate scope checks; this diagnosis does not certify them. Healthy applications do not incur these extra inspections. Missing, changed or unverified evidence does not establish a network-drift cause.
 
+Before signing-key maintenance resumes a container that it previously stopped, the broker also verifies these service mappings. Published apps and previews use separate, explicitly checked resource names and private networks. The read-only preflight has a ten-second deadline. Confirmed drift or unverifiable evidence leaves the exact stopped container, keys and recovery records unchanged and reports `unavailable` with instructions to contact the platform operator. Valid mappings still allow the existing owned-issuer refresh and health-checked resume; a manually stopped app is not started.
+
+This preflight applies to stopped targets. A container already running during an interrupted refresh can still finish its existing health/recovery cycle before the stopped-target check applies on the next pass.
+
 ## Recovery still to implement
 
 Active-container replacement remains an operator recovery operation. The existing guard against deleting or recreating an active container remains in place. Automatic startup recovery is not implemented by this change.
+
+An old preview route or matching image does not prove that the preview is still current. This check does not infer that a preview is obsolete or retire it. Authoritative preview lifecycle reconciliation and interrupted signing-key records bound to a replaced container remain separate work. Signing-key maintenance and publication still share the app lock; the public catalog's wait for that lock is not yet cancellation-aware.
 
 A future recovery executor needs a durable, app-locked workflow with these requirements:
 
