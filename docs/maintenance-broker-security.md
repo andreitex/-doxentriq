@@ -1,0 +1,7 @@
+# Daily application security transport
+
+The maintenance caller makes one authenticated request to the private broker through the shared trusted transport. It requires the fixed HTTPS authority, rejects redirects, bounds streamed replies to 4 MiB and retains the existing exact application, release, image and report-status checks. Requests are limited to 64 KiB. HTTP and local CLI failures expose a fixed message; private bodies and credentials do not enter diagnostics.
+
+The HTTP deadline is five minutes and the local capture deadline is 330 seconds. The capture helper bounds output while it is read and attempts to kill and reap only its direct local child on failure. That does not establish that a daemon-owned container stopped. An uncertain result stays unavailable and does not trigger another request or qualify a release.
+
+The company image and Linux pipeline require both new test suites. The local verification receipt (private installation record; not distributed) binds current source to 168 integrated Python checks and eleven installed transport checks. The original failed legacy fixture and its narrow correction remain retained. Native UID10001 helper readability, matching image modules, real TLS and the complete daily workflow remain separate acceptance work. Roll out only a company image containing the matching shared transport; an older running image cannot supply the newly imported module.

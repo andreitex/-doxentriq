@@ -1,0 +1,455 @@
+name: autosoft
+
+x-service: &service
+  labels:
+    io.autosoft.managed: "true"
+  restart: unless-stopped
+  security_opt: ["no-new-privileges:true"]
+  logging:
+    driver: journald
+    options: {tag: "autosoft/{{.Name}}"}
+
+x-platform-env: &platform-env
+  NODE_ENV: production
+  PORT: "3000"
+  AUTH_MODE: oidc
+  PUBLIC_ORIGIN: ${ADMIN_ORIGIN:?}
+  ADMIN_ORIGIN: ${ADMIN_ORIGIN:?}
+  APPS_BASE_URL: ${APPS_BASE_URL:?}
+  OIDC_ISSUER: ${OIDC_ISSUER:?}
+  OIDC_CLIENT_ID: autosoft-admin
+  OIDC_CLIENT_SECRET_FILE: /run/secrets/oidc-client
+  OWNER_SUBJECT: ${OWNER_SUBJECT:?}
+  MYSQL_HOST: mysql
+  MYSQL_PORT: "3306"
+  MYSQL_USER: platform
+  MYSQL_DATABASE: platform
+  MYSQL_PASSWORD_FILE: /run/secrets/mysql-platform
+  MYSQL_CA_FILE: /etc/autosoft/ca.crt
+  MYSQL_TLS: "true"
+  RABBITMQ_URL_FILE: /run/secrets/rabbitmq-url
+  RABBITMQ_CA_FILE: /etc/autosoft/ca.crt
+  REDIS_URL_FILE: /run/secrets/redis-url
+  REDIS_CA_FILE: /etc/autosoft/ca.crt
+  NODE_EXTRA_CA_CERTS: /etc/autosoft/ca.crt
+  SECRET_KEY_FILE: /run/secrets/secret-key
+  SECRETS_KEY_FILE: /run/secrets/secret-key
+  DATA_DIR: /data/platform
+  JOB_BUDGET_USD: ${JOB_BUDGET_USD:?}
+  MONTHLY_BUDGET_USD: ${MONTHLY_BUDGET_USD:?}
+  MODEL_CATALOG_PATH: /etc/autosoft/models.json
+  MODEL_CATALOG_FILE: /etc/autosoft/models.json
+  OPENAI_API_KEY_FILE: /run/secrets/openai-key
+  ANTHROPIC_API_KEY_FILE: /run/secrets/anthropic-key
+  BROKER_URL: https://broker:8090
+  PACKAGER_URL: https://packager:8091
+  BROKER_TOKEN_FILE: /run/secrets/broker-token
+  BROKER_APPROVAL_KEY_FILE: /run/secrets/publication-proof-key
+  WORKSPACE_DIR: /data/workspaces
+  OTEL_EXPORTER_OTLP_ENDPOINT: https://otel:4318
+  OTEL_EXPORTER_OTLP_CERTIFICATE: /etc/autosoft/ca.crt
+
+x-platform-volumes: &platform-volumes
+  - ${DATA_DIR:?}/platform:/data/platform:z
+  - ${DATA_DIR:?}/workspaces:/data/workspaces:z
+  - ${DATA_DIR:?}/config/models.json:/etc/autosoft/models.json:ro,z
+  - ${DATA_DIR:?}/tls/ca.crt:/etc/autosoft/ca.crt:ro,z
+  - ${DATA_DIR:?}/secrets/platform:/run/secrets:ro,z
+
+services:
+  mysql:
+    <<: *service
+    image: ${MYSQL_IMAGE:?digest required}
+    user: "999:999"
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql-root
+      MYSQL_ROOT_HOST: localhost
+    networks: [database]
+    volumes:
+      - ${DATA_DIR:?}/mysql:/var/lib/mysql:Z
+      - ${DATA_DIR:?}/mysql-keyring:/var/lib/mysql-keyring:Z
+      - ${DATA_DIR:?}/config/mysql.cnf:/etc/mysql/conf.d/autosoft.cnf:ro,Z
+      - ${DATA_DIR:?}/config/mysqld.my:/usr/sbin/mysqld.my:ro,Z
+      - ${DATA_DIR:?}/config/component_keyring_file.cnf:/usr/lib64/mysql/plugin/component_keyring_file.cnf:ro,Z
+      - ${DATA_DIR:?}/config/mysql-init.sql:/docker-entrypoint-initdb.d/01-autosoft.sql:ro,Z
+      - ${DATA_DIR:?}/tls/mysql:/etc/autosoft/tls:ro,z
+      - ${DATA_DIR:?}/secrets/mysql:/run/secrets:ro,Z
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin --defaults-extra-file=/run/secrets/client.cnf ping --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    mem_limit: 2g
+
+  redis:
+    <<: *service
+    image: ${REDIS_IMAGE:?}
+    command: ["redis-server", "/etc/autosoft/redis/redis.conf"]
+    networks: [cache]
+    volumes:
+      - ${DATA_DIR:?}/redis:/data:Z
+      - ${DATA_DIR:?}/config/redis:/etc/autosoft/redis:ro,Z
+      - ${DATA_DIR:?}/tls/redis:/etc/autosoft/tls:ro,z
+    mem_limit: 768m
+
+  rabbitmq:
+    <<: *service
+    image: ${RABBITMQ_IMAGE:?}
+    hostname: rabbitmq
+    networks: [queue, observability]
+    volumes:
+      - ${DATA_DIR:?}/rabbitmq:/var/lib/rabbitmq:Z
+      - ${DATA_DIR:?}/config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro,Z
+      - ${DATA_DIR:?}/config/rabbitmq-definitions.json:/etc/rabbitmq/definitions.json:ro,Z
+      - ${DATA_DIR:?}/tls/rabbitmq:/etc/autosoft/tls:ro,z
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+    mem_limit: 1g
+
+  keycloak:
+    <<: *service
+    image: ${KEYCLOAK_IMAGE:?}
+    entrypoint: ["/bin/bash", "/etc/autosoft/keycloak-start.sh"]
+    environment:
+      KC_DB: mysql
+      KC_DB_URL: jdbc:mysql://mysql:3306/keycloak?sslMode=VERIFY_IDENTITY&fallbackToSystemTrustStore=true
+      KC_TRUSTSTORE_PATHS: /etc/autosoft/tls/ca.crt
+      KC_DB_USERNAME: keycloak
+      KC_HOSTNAME: ${AUTH_ORIGIN:?}
+      KC_HOSTNAME_STRICT: "true"
+      KC_HTTP_ENABLED: "false"
+      KC_HTTPS_CERTIFICATE_FILE: /etc/autosoft/tls/keycloak.crt
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /etc/autosoft/tls/keycloak.key
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+    networks: [database, identity, outbound]
+    depends_on:
+      mysql: {condition: service_healthy}
+    volumes:
+      - ${DATA_DIR:?}/config/keycloak-start.sh:/etc/autosoft/keycloak-start.sh:ro,Z
+      - ${DATA_DIR:?}/config/realm.json:/opt/keycloak/data/import/platform-realm.json:ro,Z
+      - ${DATA_DIR:?}/tls/keycloak:/etc/autosoft/tls:ro,z
+      - ${DATA_DIR:?}/secrets/keycloak:/run/secrets:ro,Z
+    mem_limit: 1536m
+
+  registry:
+    <<: *service
+    image: ${REGISTRY_IMAGE:?}
+    environment:
+      REGISTRY_HTTP_ADDR: 0.0.0.0:5000
+      REGISTRY_HTTP_TLS_CERTIFICATE: /etc/autosoft/tls/registry.crt
+      REGISTRY_HTTP_TLS_KEY: /etc/autosoft/tls/registry.key
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Autosoft
+      REGISTRY_AUTH_HTPASSWD_PATH: /run/secrets/htpasswd
+      REGISTRY_STORAGE_DELETE_ENABLED: "false"
+    networks: [artifact, ingress]
+    ports: ["127.0.0.1:5000:5000"]
+    volumes:
+      - ${DATA_DIR:?}/registry:/var/lib/registry:Z
+      - ${DATA_DIR:?}/tls/registry:/etc/autosoft/tls:ro,z
+      - ${DATA_DIR:?}/secrets/registry:/run/secrets:ro,Z
+    mem_limit: 512m
+
+  control:
+    <<: *service
+    stop_grace_period: 60s
+    image: ${PLATFORM_IMAGE:?company digest required}
+    environment:
+      <<: *platform-env
+      REPORT_TOKEN_FILE: /run/control-secrets/report-token
+      METRICS_TOKEN_FILE: /run/control-secrets/metrics-token
+      CONTROL_TLS_CERT_FILE: /etc/autosoft/tls/control.crt
+      CONTROL_TLS_KEY_FILE: /etc/autosoft/tls/control.key
+    networks: [edge, database, cache, queue, identity, runtime, observability, outbound]
+    volumes:
+      - ${DATA_DIR:?}/platform:/data/platform:z
+      - ${DATA_DIR:?}/workspaces:/data/workspaces:z
+      - ${DATA_DIR:?}/config/models.json:/etc/autosoft/models.json:ro,z
+      - ${DATA_DIR:?}/tls/ca.crt:/etc/autosoft/ca.crt:ro,z
+      - ${DATA_DIR:?}/secrets/platform:/run/secrets:ro,z
+      - ${DATA_DIR:?}/secrets/control:/run/control-secrets:ro,z
+      - ${DATA_DIR:?}/tls/control:/etc/autosoft/tls:ro,z
+    depends_on:
+      mysql: {condition: service_healthy}
+      rabbitmq: {condition: service_healthy}
+    read_only: true
+    tmpfs: ["/tmp:size=128m,mode=1777"]
+    cap_drop: [ALL]
+    mem_limit: 1g
+
+  worker:
+    <<: *service
+    stop_grace_period: 60s
+    image: ${PLATFORM_IMAGE:?}
+    command: ["node", "--import", "tsx", "apps/control/src/worker-main.ts"]
+    environment: *platform-env
+    networks: [database, cache, queue, identity, runtime, observability, outbound]
+    volumes: *platform-volumes
+    depends_on:
+      mysql: {condition: service_healthy}
+      rabbitmq: {condition: service_healthy}
+    read_only: true
+    tmpfs: ["/tmp:size=128m,mode=1777"]
+    cap_drop: [ALL]
+    mem_limit: 2g
+
+  broker:
+    <<: *service
+    stop_grace_period: 60s
+    image: ${RUNTIME_IMAGE:?company digest required}
+    user: "10001:10001"
+    group_add: ["${DOCKER_GID:?}"]
+    environment:
+      MODE: broker
+      DOCKER_CONFIG: /run/secrets
+      LISTEN_ADDR: :8090
+      PORT: "8090"
+      BROKER_TOKEN_FILE: /run/secrets/broker-token
+      DATA_DIR: /data/runtime
+      HOST_DATA_DIR: ${DATA_DIR:?}
+      WORKSPACE_ROOT: /data/workspaces
+      HOST_WORKSPACE_ROOT: ${DATA_DIR:?}/workspaces
+      HOST_RUNTIME_DIR: ${DATA_DIR:?}/runtime
+      PACKAGER_URL: https://packager:8091
+      INTERNAL_CA_FILE: /etc/autosoft/ca.crt
+      SERVER_TLS_CERT_FILE: /etc/autosoft/tls/broker.crt
+      SERVER_TLS_KEY_FILE: /etc/autosoft/tls/broker.key
+      PACKAGER_TOKEN_FILE: /run/secrets/broker-token
+      BROKER_APPROVAL_KEY_FILE: /run/secrets/publication-proof-key
+      BROKER_VAULT_KEY_FILE: /run/secrets/vault-key
+      APP_TLS_CA_CERT_FILE: /run/secrets/app-issuer.crt
+      APP_TLS_CA_KEY_FILE: /run/secrets/app-issuer.key
+      QUOTA_HELPER_SOCKET_FILE: /run/autosoft/quota.sock
+      QUOTA_HELPER_TOKEN_FILE: /run/secrets/quota-token
+      STORAGE_QUOTA_ENFORCED: "1"
+      MYSQL_HOST: mysql
+      MYSQL_USER: provisioner
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql-provisioner
+      MYSQL_PROVISIONER_PASSWORD_FILE: /run/secrets/mysql-provisioner
+      MYSQL_CA_FILE: /etc/autosoft/ca.crt
+      REDIS_URL: rediss://redis:6379
+      REDIS_USER: provisioner
+      REDIS_PASSWORD_FILE: /run/secrets/redis-admin
+      REDIS_ADMIN_PASSWORD_FILE: /run/secrets/redis-admin
+      REDIS_CA_FILE: /etc/autosoft/ca.crt
+      RABBITMQ_MANAGEMENT_URL: https://rabbitmq:15671
+      RABBITMQ_ADMIN_USER: provisioner
+      RABBITMQ_ADMIN_PASSWORD_FILE: /run/secrets/rabbitmq-admin
+      RABBITMQ_CA_FILE: /etc/autosoft/ca.crt
+      KEYCLOAK_URL: https://keycloak:8443
+      KEYCLOAK_INTERNAL_URL: https://keycloak:8443
+      KEYCLOAK_PROVISIONER_REALM: master
+      KEYCLOAK_REALM: platform
+      KEYCLOAK_CLIENT_ID: autosoft-provisioner
+      KEYCLOAK_CLIENT_SECRET_FILE: /run/secrets/keycloak-client
+      KEYCLOAK_PLATFORM_CLIENT_ID: platform-provisioner
+      KEYCLOAK_PLATFORM_CLIENT_SECRET_FILE: /run/secrets/keycloak-platform-client
+      KEYCLOAK_DIRECTORY_READER_SECRET_FILE: /run/secrets/keycloak-directory-reader
+      FILESYSTEM_SOURCE_CATALOG: /etc/autosoft/filesystem-sources.json
+      APP_DIRECTORY_AUTHORIZATION_ENABLED: ${APP_DIRECTORY_AUTHORIZATION_ENABLED:-0}
+      KEYCLOAK_CA_FILE: /etc/autosoft/ca.crt
+      AUTH_ORIGIN: ${AUTH_ORIGIN:?}
+      OWNER_SUBJECT: ${OWNER_SUBJECT:?}
+      DEPENDENCY_NETWORK: autosoft_dependency
+      DEPENDENCY_PROXY_URL: http://dependency-proxy:3128
+      RUNSC_RUNTIME: runsc
+      REGISTRY_URL: https://registry:5000
+      REGISTRY_CA_FILE: /etc/autosoft/ca.crt
+      RUNTIME_MANIFEST_PATH: /etc/autosoft/runtime-manifest.json
+      HOST_SECURITY_CACHE_DIR: ${DATA_DIR:?}/security-cache
+      CADDY_ADMIN_SOCKET_FILE: /run/caddy/admin.sock
+      CADDY_SERVER_NAME: apps
+      APPS_BASE_URL: ${APPS_BASE_URL:?}
+    networks: [runtime, artifact, edge, database, cache, queue, dependency]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /run/autosoft:/run/autosoft:ro,z
+      - ${DATA_DIR:?}/caddy-admin:/run/caddy:z
+      - ${DATA_DIR:?}/runtime:/data/runtime:z
+      - ${DATA_DIR:?}/workspaces:/data/workspaces:z
+      - ${DATA_DIR:?}/security-cache:/data/security-cache:ro,z
+      - ${DATA_DIR:?}/config/runtime-manifest.json:/etc/autosoft/runtime-manifest.json:ro,z
+      - ${DATA_DIR:?}/config/filesystem-sources.json:/etc/autosoft/filesystem-sources.json:ro,z
+      - ${DATA_DIR:?}/imports:/data/imports:ro,z
+      - ${DATA_DIR:?}/secrets/runtime:/run/secrets:ro,z
+      - ${DATA_DIR:?}/tls/broker:/etc/autosoft/tls:ro,z
+      - ${DATA_DIR:?}/tls/ca.crt:/etc/autosoft/ca.crt:ro,z
+    read_only: true
+    tmpfs: ["/tmp:size=128m,mode=1777"]
+    cap_drop: [ALL]
+    mem_limit: 512m
+
+  packager:
+    <<: *service
+    stop_grace_period: 60s
+    image: ${RUNTIME_IMAGE:?}
+    user: "10001:10001"
+    environment:
+      MODE: packager
+      LISTEN_ADDR: :8091
+      PORT: "8091"
+      INTERNAL_CA_FILE: /etc/autosoft/ca.crt
+      SERVER_TLS_CERT_FILE: /etc/autosoft/tls/packager.crt
+      SERVER_TLS_KEY_FILE: /etc/autosoft/tls/packager.key
+      BROKER_TOKEN_FILE: /run/secrets/broker-token
+      DATA_DIR: /data/runtime
+      REGISTRY_URL: https://registry:5000
+      REGISTRY_CA_FILE: /etc/autosoft/ca.crt
+      REGISTRY_CREDENTIALS_FILE: /run/secrets/registry.json
+      RUNTIME_MANIFEST_PATH: /etc/autosoft/runtime-manifest.json
+    networks: [runtime, artifact]
+    volumes:
+      - ${DATA_DIR:?}/runtime/artifacts:/data/runtime/artifacts:ro,z
+      - ${DATA_DIR:?}/config/runtime-manifest.json:/etc/autosoft/runtime-manifest.json:ro,z
+      - ${DATA_DIR:?}/secrets/packager:/run/secrets:ro,Z
+      - ${DATA_DIR:?}/tls/packager:/etc/autosoft/tls:ro,z
+      - ${DATA_DIR:?}/tls/ca.crt:/etc/autosoft/ca.crt:ro,z
+    read_only: true
+    tmpfs: ["/tmp:size=256m,mode=1777"]
+    cap_drop: [ALL]
+    mem_limit: 1g
+
+  dependency-proxy:
+    <<: *service
+    image: ${DEPENDENCY_PROXY_IMAGE:?company digest required}
+    networks: [dependency, outbound]
+    volumes:
+      - ${DATA_DIR:?}/config/squid.conf:/etc/squid/squid.conf:ro,Z
+    read_only: true
+    tmpfs: ["/tmp:size=16m,mode=1777", "/run:size=16m", "/var/log/squid:size=16m", "/var/spool/squid:size=16m"]
+    cap_drop: [ALL]
+    mem_limit: 256m
+
+  caddy:
+    <<: *service
+    image: ${CADDY_IMAGE:?}
+    user: "10001:10001"
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    ports: ["80:80", "443:443"]
+    networks: [edge, identity, runtime, observability, ingress]
+    volumes:
+      - ${DATA_DIR:?}/config/caddy.json:/etc/caddy/caddy.json:ro,Z
+      - ${DATA_DIR:?}/public-tls:/etc/autosoft/public-tls:ro,z
+      - ${DATA_DIR:?}/tls/ca.crt:/etc/autosoft/ca.crt:ro,z
+      - ${DATA_DIR:?}/caddy:/data:Z
+      - ${DATA_DIR:?}/caddy-config:/config:Z
+      - ${DATA_DIR:?}/caddy-admin:/run/caddy:z
+    mem_limit: 512m
+    command: ["caddy", "run", "--resume", "--config", "/etc/caddy/caddy.json"]
+
+  prometheus:
+    <<: *service
+    image: ${PROMETHEUS_IMAGE:?}
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--web.config.file=/etc/prometheus/web.yml", "--storage.tsdb.path=/prometheus", "--storage.tsdb.retention.time=7d", "--web.external-url=${ADMIN_ORIGIN:?}/telemetry/prometheus", "--web.route-prefix=/"]
+    networks: [observability]
+    volumes:
+      - ${DATA_DIR:?}/config/prometheus.yml:/etc/prometheus/prometheus.yml:ro,Z
+      - ${DATA_DIR:?}/prometheus:/prometheus:Z
+      - ${DATA_DIR:?}/secrets/metrics:/run/secrets:ro,z
+      - ${DATA_DIR:?}/config/prometheus-web.yml:/etc/prometheus/web.yml:ro,Z
+      - ${DATA_DIR:?}/tls/prometheus:/etc/autosoft/tls:ro,z
+    mem_limit: 768m
+
+  loki:
+    <<: *service
+    image: ${LOKI_IMAGE:?}
+    command: ["-config.file=/etc/loki/config.yml"]
+    networks: [observability]
+    volumes:
+      - ${DATA_DIR:?}/config/loki.yml:/etc/loki/config.yml:ro,Z
+      - ${DATA_DIR:?}/loki:/loki:Z
+      - ${DATA_DIR:?}/tls/loki:/etc/autosoft/tls:ro,z
+    mem_limit: 768m
+
+  grafana:
+    <<: *service
+    image: ${GRAFANA_IMAGE:?}
+    environment:
+      GF_SERVER_ROOT_URL: ${ADMIN_ORIGIN:?}/telemetry/grafana/
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SERVER_PROTOCOL: https
+      GF_SERVER_MIN_TLS_VERSION: TLS1.2
+      GF_SERVER_CERT_FILE: /etc/autosoft/tls/grafana.crt
+      GF_SERVER_CERT_KEY: /etc/autosoft/tls/grafana.key
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_AUTH_PROXY_ENABLED: "true"
+      GF_AUTH_PROXY_HEADER_NAME: X-Auth-User
+      GF_AUTH_PROXY_HEADER_PROPERTY: username
+      GF_AUTH_PROXY_AUTO_SIGN_UP: "true"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_AUTH_BASIC_ENABLED: "false"
+      GF_USERS_AUTO_ASSIGN_ORG_ROLE: Viewer
+      GF_SECURITY_ADMIN_USER: owner
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana-password
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    networks: [observability]
+    volumes:
+      - ${DATA_DIR:?}/grafana:/var/lib/grafana:Z
+      - ${DATA_DIR:?}/config/grafana-datasources.yml:/etc/grafana/provisioning/datasources/default.yml:ro,Z
+      - ${DATA_DIR:?}/secrets/grafana:/run/secrets:ro,Z
+      - ${DATA_DIR:?}/tls/grafana:/etc/autosoft/tls:ro,z
+    mem_limit: 512m
+
+  otel:
+    <<: *service
+    image: ${OTEL_IMAGE:?}
+    user: "10001:10001"
+    command: ["--config=/etc/otel/config.yml"]
+    networks: [observability]
+    volumes:
+      - ${DATA_DIR:?}/config/otel.yml:/etc/otel/config.yml:ro,Z
+      - ${DATA_DIR:?}/logs:/var/log/autosoft:ro,z
+      - ${DATA_DIR:?}/otel-offsets:/var/lib/otel:Z
+      - ${DATA_DIR:?}/tls/otel:/etc/autosoft/tls:ro,z
+    mem_limit: 512m
+
+  lego:
+    <<: *service
+    restart: "no"
+    image: ${LEGO_IMAGE:?}
+    profiles: [maintenance]
+    env_file: ${DATA_DIR:?}/secrets/dns.env
+    volumes:
+      - ${DATA_DIR:?}/acme:/acme:Z
+      - ${DATA_DIR:?}/secrets/dns:/run/secrets:ro,Z
+    networks: [outbound]
+    cap_drop: [ALL]
+    read_only: true
+    tmpfs: ["/tmp:size=128m,mode=1777"]
+    mem_limit: 256m
+
+  scanner:
+    <<: *service
+    restart: "no"
+    image: ${TRIVY_IMAGE:?}
+    profiles: [maintenance]
+    volumes:
+      - ${DATA_DIR:?}/security-cache:/root/.cache:Z
+      - ${DATA_DIR:?}/security:/reports:Z
+    networks: [outbound]
+    runtime: runsc
+    cap_drop: [ALL]
+    read_only: true
+    tmpfs: ["/tmp:size=128m,mode=1777"]
+    mem_limit: 1g
+
+networks:
+  edge: {name: autosoft_edge, internal: true}
+  database: {name: autosoft_database, internal: true}
+  cache: {name: autosoft_cache, internal: true}
+  queue: {name: autosoft_queue, internal: true}
+  identity: {name: autosoft_identity, internal: true}
+  runtime: {name: autosoft_runtime, internal: true}
+  artifact: {name: autosoft_artifact, internal: true}
+  observability: {name: autosoft_observability, internal: true}
+  outbound: {name: autosoft_outbound}
+  # Only trusted ingress services join this bridge. Docker does not publish
+  # host ports for containers attached exclusively to internal bridges.
+  ingress: {name: autosoft_ingress}
+  dependency: {name: autosoft_dependency, internal: true}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "adapter": "filesystem",
+  "runtime": "company-maintained Python stdlib adapter",
+  "dependencies": [],
+  "provenance": [
+    "https://docs.python.org/3/library/os.html",
+    "https://raw.githubusercontent.com/torvalds/linux/master/include/uapi/linux/openat2.h",
+    "https://gvisor.dev/docs/user_guide/compatibility/linux/amd64/"
+  ],
+  "licenseSources": ["https://docs.python.org/3/license.html"],
+  "sdkQualification": "No external SDK is installed. The independently scanned pinned Python runtime remains mandatory.",
+  "protocolQualification": "pending actual Linux amd64 runsc fixture",
+  "capabilities": ["files.list", "files.read"],
+  "scope": "One read-only company-approved encrypted import mount. No arbitrary host paths, links, special files, cross-mount traversal or outbound network client.",
+  "limits": {"maximumFileBytes": 4194304, "maximumDirectoryEntries": 1000, "maximumRequestBytes": 16384, "operationSeconds": 8},
+  "availability": "Registry metadata and these unit checks do not authorize execution. Company source/image hashes, actual runsc containment qualification, independent image scan and fresh vulnerability feed must pass before configuration and application use."
+}

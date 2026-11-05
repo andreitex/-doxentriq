@@ -1,0 +1,33 @@
+# Company-owned recovery clients. Build, scan, sign and digest-pin before use.
+# The approved server image supplies the independently trusted Oracle RPM key.
+ARG MYSQL_IMAGE
+FROM ${MYSQL_IMAGE}
+USER 0:0
+ARG MYSQL_VERSION=8.4.11-1.el9
+RUN set -eux; \
+    test "$MYSQL_VERSION" = '8.4.11-1.el9'; \
+    test -s /etc/pki/rpm-gpg/RPM-GPG-KEY-mysql; \
+    microdnf remove -y mysql-community-server-minimal mysql-shell; \
+    printf '%s\n' \
+      '[autosoft-mysql-client]' \
+      'name=Oracle MySQL 8.4 full recovery clients' \
+      'baseurl=https://repo.mysql.com/yum/mysql-8.4-community/el/9/$basearch/' \
+      'enabled=1' \
+      'gpgcheck=1' \
+      'gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-mysql' \
+      'module_hotfixes=true' > /etc/yum.repos.d/autosoft-mysql-client.repo; \
+    microdnf --disablerepo=mysql8.4-server-minimal --disablerepo=mysql-tools-community install -y \
+      "mysql-community-client-$MYSQL_VERSION" \
+      "mysql-community-client-plugins-$MYSQL_VERSION" \
+      "mysql-community-common-$MYSQL_VERSION" \
+      "mysql-community-libs-$MYSQL_VERSION"; \
+    microdnf clean all; \
+    for component in mysql-community-client mysql-community-client-plugins mysql-community-common mysql-community-libs; do \
+      test "$(rpm -q --qf '%{VERSION}-%{RELEASE}' "$component")" = "$MYSQL_VERSION"; \
+    done; \
+    mysql --version | grep -F '8.4.11'; \
+    mysqlbinlog --version | grep -F '8.4.11'; \
+    rpm -qa | sort > /usr/local/share/autosoft-recovery-packages.txt
+USER 999:999
+ENTRYPOINT ["/bin/bash"]
+CMD ["-c", "mysql --version && mysqlbinlog --version"]

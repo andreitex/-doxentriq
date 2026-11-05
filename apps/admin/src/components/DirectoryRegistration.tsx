@@ -1,0 +1,58 @@
+import { useRef, type ChangeEvent } from 'react';
+import type { AppRecord, ConnectionRecord } from '../types';
+
+export type DirectoryRegistrationInput = { tenantCustomerId: string; clientId: string; clientSecret: string; clientEmail: string; privateKey: string; delegatedSubject: string; expiresAt: string; consentAcknowledged: boolean };
+export const microsoftDirectoryConsent = ['Organization.Read.All', 'User.Read.All'] as const;
+export const googleDirectoryConsent = ['https://www.googleapis.com/auth/admin.directory.customer.readonly', 'https://www.googleapis.com/auth/admin.directory.user.readonly', 'https://www.googleapis.com/auth/admin.directory.group.readonly', 'https://www.googleapis.com/auth/admin.directory.group.member.readonly'] as const;
+const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/, clientEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.iam\.gserviceaccount\.com$/, email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const validKey = (key: string) => key.length >= 100 && key.length <= 16000 && /^-----BEGIN (?:RSA )?PRIVATE KEY-----\r?\n[\s\S]+\r?\n-----END (?:RSA )?PRIVATE KEY-----\s*$/.test(key);
+export const emptyDirectoryRegistration = (): DirectoryRegistrationInput => ({ tenantCustomerId: '', clientId: '', clientSecret: '', clientEmail: '', privateKey: '', delegatedSubject: '', expiresAt: '', consentAcknowledged: false });
+export const isDirectoryConnection = (connection: ConnectionRecord): boolean => (connection.type === 'microsoft' || connection.type === 'google') && connection.capabilities.length === 1 && connection.capabilities[0] === 'directory.groups.read' && connection.endpoints.length === 1 && connection.endpoints[0] === (connection.type === 'microsoft' ? 'https://graph.microsoft.com/v1.0' : 'https://admin.googleapis.com/admin/directory/v1') && connection.roots.length === 1 && (connection.type === 'microsoft' ? uuid.test(connection.roots[0]!) : /^C[A-Za-z0-9_-]{1,127}$/.test(connection.roots[0]!));
+
+/** Extract only credential fields. Uploaded auth/token URLs never select an endpoint. */
+export function readDirectoryKeyFile(text: string, expectedEmail = ''): { clientEmail: string; privateKey: string } {
+  if (new TextEncoder().encode(text).length > 32768 || !text.length) throw new Error('Choose a service-account JSON or RSA PEM file no larger than 32 KiB.');
+  let selectedEmail = expectedEmail.trim(), privateKey = text;
+  if (text.trimStart().startsWith('{')) {
+    let value: unknown; try { value = JSON.parse(text); } catch { throw new Error('The service-account file is not valid JSON.'); }
+    if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Choose a native service-account JSON file.');
+    const credential = value as Record<string, unknown>;
+    if (credential.type !== 'service_account' || typeof credential.client_email !== 'string' || !clientEmail.test(credential.client_email) || credential.client_email.length > 254 || typeof credential.private_key !== 'string' || selectedEmail && selectedEmail !== credential.client_email) throw new Error('The file must be a service-account key with the exact dedicated service-account email.');
+    selectedEmail = credential.client_email; privateKey = credential.private_key;
+  }
+  if (!validKey(privateKey) || selectedEmail && (!clientEmail.test(selectedEmail) || selectedEmail.length > 254)) throw new Error('Choose a bounded unencrypted RSA private key and dedicated service-account email. The protected activation verifies its key type.');
+  return { clientEmail: selectedEmail, privateKey };
+}
+
+export function directoryRegistration(input: { name: string; provider: 'microsoft' | 'google'; appIds: string[]; fields: DirectoryRegistrationInput }, at = Date.now()) {
+  const { fields, provider } = input, name = input.name.trim(), tenantCustomerId = fields.tenantCustomerId.trim(), ids = [...input.appIds];
+  const expiry = Date.parse(fields.expiresAt);
+  if (!name || name.length > 120 || !ids.length || ids.length > 100 || new Set(ids).size !== ids.length || ids.some(id => !uuid.test(id)) || !fields.consentAcknowledged || !Number.isFinite(expiry) || expiry <= at || expiry > at + 365 * 86400000) throw new Error('Provide a name, exact application scope, confirmed dedicated directory consent, and credential expiry within one year.');
+  let credentials: Record<string, unknown>;
+  if (provider === 'microsoft') {
+    if (!uuid.test(tenantCustomerId) || !uuid.test(fields.clientId.trim()) || !fields.clientSecret.length || fields.clientSecret.length > 4096) throw new Error('Microsoft requires the immutable tenant ID, dedicated client ID and protected client secret.');
+    credentials = { tenantId: tenantCustomerId, clientId: fields.clientId.trim(), clientSecret: fields.clientSecret, consentedScopes: [...microsoftDirectoryConsent] };
+  } else {
+    const account = fields.clientEmail.trim(), subject = fields.delegatedSubject.trim();
+    if (!/^C[A-Za-z0-9_-]{1,127}$/.test(tenantCustomerId) || !clientEmail.test(account) || account.length > 254 || !validKey(fields.privateKey) || !email.test(subject) || subject.length > 254) throw new Error('Google requires the immutable Workspace customer ID, dedicated service-account email and RSA key, and explicitly delegated Workspace administrator.');
+    credentials = { clientEmail: account, privateKey: fields.privateKey, delegatedSubject: subject, consentedScopes: [...googleDirectoryConsent] };
+  }
+  return { name, type: provider, endpoints: [provider === 'microsoft' ? 'https://graph.microsoft.com/v1.0' : 'https://admin.googleapis.com/admin/directory/v1'], roots: [tenantCustomerId], capabilities: ['directory.groups.read'], appIds: ids, expiresAt: new Date(expiry).toISOString(), credentials };
+}
+
+export default function DirectoryRegistration({ provider, fields, apps, appIds, busy, canManage, onChange, onApps, onError }: { provider: 'microsoft' | 'google'; fields: DirectoryRegistrationInput; apps: AppRecord[]; appIds: string[]; busy: boolean; canManage: boolean; onChange: (fields: DirectoryRegistrationInput) => void; onApps: (ids: string[]) => void; onError: (error: string) => void }) {
+  const disabled = busy || !canManage, update = (change: Partial<DirectoryRegistrationInput>) => onChange({ ...fields, ...change });
+  const current = useRef({ fields, provider, disabled }); current.current = { fields, provider, disabled };
+  async function keyFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]; event.target.value = ''; if (!file || disabled) return;
+    try { if (file.size > 32768) throw new Error('Choose a key file no larger than 32 KiB.'); const key = readDirectoryKeyFile(await file.text(), fields.clientEmail); if (current.current.fields !== fields || current.current.provider !== provider || current.current.disabled) return; update(key); } catch (fault) { if (current.current.fields !== fields || current.current.provider !== provider || current.current.disabled) return; update({ privateKey: '' }); onError(fault instanceof Error ? fault.message : 'The protected key file is unavailable.'); }
+  }
+  return <div className="form-stack"><p className="field-hint">Dedicated read-only directory group lookup uses the fixed official endpoint {provider === 'microsoft' ? 'https://graph.microsoft.com/v1.0' : 'https://admin.googleapis.com/admin/directory/v1'} and only directory.groups.read. Stored credentials do not validate consent, activate groups or prove live tenant health.</p>{!canManage && <p className="field-hint">Sign in as the permanent local owner with MFA to use this protected directory setup.</p>}
+    <label>{provider === 'microsoft' ? 'Immutable Microsoft tenant ID' : 'Immutable Google Workspace customer ID'}<input required value={fields.tenantCustomerId} disabled={disabled} onChange={event => update({ tenantCustomerId: event.target.value })} autoComplete="off" maxLength={128} placeholder={provider === 'microsoft' ? 'Tenant GUID' : 'C012345678'} /></label>
+    <fieldset className="app-access"><legend>Exact applications permitted for directory reads</legend>{apps.filter(app => app.status !== 'archived').map(app => <label className="checkbox-label" key={app.id}><input type="checkbox" checked={appIds.includes(app.id)} disabled={disabled} onChange={event => onApps(event.target.checked ? [...appIds, app.id] : appIds.filter(id => id !== app.id))} />{app.name}</label>)}<span className="field-hint">Select at least one application. Each app still needs its own approved group policy and exact directory activation.</span></fieldset>
+    <div className="credential-form"><strong>Protected dedicated credentials</strong><p className="field-hint">Credentials go only to the existing encrypted credential API. They are never copied into chat, approval text or browser storage.</p>{provider === 'microsoft' ? <><label>Dedicated Microsoft application (client) ID<input required value={fields.clientId} disabled={disabled} onChange={event => update({ clientId: event.target.value })} autoComplete="off" maxLength={36} /></label><label>Dedicated Microsoft client secret<input required type="password" value={fields.clientSecret} disabled={disabled} onChange={event => update({ clientSecret: event.target.value })} autoComplete="new-password" maxLength={4096} /></label><p className="field-hint">Confirm tenant administrator consent for application permissions Organization.Read.All and User.Read.All. This form does not verify upstream consent or other rights held by the credential.</p></> : <><label>Dedicated service-account email<input required type="email" value={fields.clientEmail} disabled={disabled} onChange={event => update({ clientEmail: event.target.value, privateKey: '' })} autoComplete="off" maxLength={254} /></label><label>Service-account JSON or RSA PEM file<input type="file" accept=".json,.pem,.key,application/json,text/plain" disabled={disabled} onChange={event => { void keyFile(event); }} /><span className="field-hint">Use Google's native downloaded service-account JSON, or a PEM key. Maximum 32 KiB. File contents and names are not displayed; supplied URLs are ignored.</span></label><p className="field-hint">{fields.privateKey ? 'A bounded key is loaded in memory; its value is hidden.' : 'No private key loaded.'}</p><label>Explicitly delegated Workspace administrator email<input required type="email" value={fields.delegatedSubject} disabled={disabled} onChange={event => update({ delegatedSubject: event.target.value })} autoComplete="off" maxLength={254} /><span className="field-hint">Must belong to the exact hosted domain later reviewed for activation. An email address never substitutes for an immutable user or group ID.</span></label><p className="field-hint">Confirm domain-wide delegation for the four exact read-only customer, user, group and group-member scopes shown below.</p><ul className="impact-list">{googleDirectoryConsent.map(scope => <li key={scope}><code>{scope}</code></li>)}</ul></>}
+      <label>Credential expires at<input required type="datetime-local" value={fields.expiresAt} disabled={disabled} onChange={event => update({ expiresAt: event.target.value })} /><span className="field-hint">Enter the actual credential expiry, within one year. Activation ends no later than this date and its separate 90-day limit. Browser local timezone.</span></label>
+      <label className="checkbox-label"><input type="checkbox" required checked={fields.consentAcknowledged} disabled={disabled} onChange={event => update({ consentAcknowledged: event.target.checked })} />I confirm this dedicated credential has the listed read-only directory consent. Protected activation must independently verify it before permissions are usable.</label>
+    </div>
+  </div>;
+}

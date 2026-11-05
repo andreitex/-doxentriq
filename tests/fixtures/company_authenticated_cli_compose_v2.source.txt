@@ -1,0 +1,184 @@
+"""Compose original authenticated CLI factories from a borrowed SourceInputs.
+
+Initial executing origins and original source context are independently trusted.
+This unit compiles only original CLI authentication/composition modules through
+the original factory. It performs no stage, native operation, evidence or ACK.
+"""
+import contextlib
+import hashlib
+from pathlib import Path
+from types import (BuiltinFunctionType,CellType,FunctionType,GeneratorType,
+                   GenericAlias,GetSetDescriptorType,MappingProxyType,ModuleType)
+
+UNRELEASED=[]
+class CliComposeUnavailable(ValueError):pass
+
+
+def _factory(public,error_kind,namespace,primitives):
+ (type,dict,tuple,list,set,str,int,bool,bytes,len,all,any,vars,object,id,BaseException,property,classmethod,staticmethod)=primitives
+ fn,builtin,modulekind,proxy=FunctionType,BuiltinFunctionType,ModuleType,MappingProxyType
+ gettype=type.__getattribute__;new_error,init_error=BaseException.__new__,BaseException.__init__
+ digest=hashlib.sha256;cm_kind=contextlib._GeneratorContextManager;cm_meta=type(cm_kind)
+ used=failed=False;registry={};retained=[]
+ def deny():
+  value=new_error(error_kind);init_error(value,'company-authenticated-cli-compose-unavailable');raise value
+ def need(value):
+  if value is not True:deny()
+ def same(current,items):
+  need(type(current) in (dict,proxy) and len(current)==len(items) and all(type(key) is str for key in current) and all(key in current and current[key] is value for key,value in items))
+ def function(value):
+  if type(value) is builtin:return None
+  need(type(value) is fn);return value,value.__code__,value.__closure__,value.__defaults__,value.__kwdefaults__,tuple(vars(value).items())
+ def function_same(row):
+  if row is None:return
+  value,code,closure,defaults,kwdefaults,items=row
+  need(value.__code__ is code and value.__closure__ is closure and value.__defaults__ is defaults and value.__kwdefaults__ is kwdefaults);same(vars(value),items)
+ def tables(kind):
+  need(type(kind) in (type,cm_meta));mro=gettype(kind,'__mro__');need(len(mro)<=8 and all(type(owner) in (type,cm_meta) for owner in mro));rows=tuple((owner,gettype(owner,'__bases__'),gettype(owner,'__mro__'),tuple(gettype(owner,'__dict__').items())) for owner in mro)
+  need(all(len(items)<=128 and all(type(key) is str for key,value in items) for owner,bases,lineage,items in rows));functions=[]
+  for owner,bases,lineage,items in rows:
+   for name,value in items:
+    if type(value) is fn:functions.append(function(value))
+    elif type(value) is property:
+     for getter in (value.fget,value.fset,value.fdel):
+      if getter is not None:functions.append(function(getter))
+    elif type(value) in (classmethod,staticmethod):
+     target=value.__func__
+     if type(target) is type:need(name=='__class_getitem__' and target is GenericAlias)
+     else:functions.append(function(target))
+  return rows,tuple(functions)
+ def table_same(value):
+  for owner,bases,mro,items in value[0]:need(gettype(owner,'__bases__') is bases and gettype(owner,'__mro__') is mro);same(gettype(owner,'__dict__'),items)
+  for row in value[1]:function_same(row)
+ def capture(module):
+  need(type(module) is modulekind);items=tuple(vars(module).items());need(len(items)<=512 and all(type(key) is str for key,value in items));name=dict(items).get('__name__');need(type(name) is str);classes=[];functions=[]
+  for key,value in items:
+   if type(value) is fn:functions.append(function(value))
+   elif type(value) is type:
+    owner=gettype(value,'__module__');need(type(owner) is str)
+    if owner==name:classes.append(tables(value))
+  return module,items,tuple(classes),tuple(functions)
+ def capture_same(value):
+  module,items,classes,functions=value;same(vars(module),items)
+  for item in classes:table_same(item)
+  for row in functions:function_same(row)
+ def method(kind,name,module):
+  need(type(kind) is type);value=gettype(kind,'__dict__').get(name);need(type(value) is fn and value.__globals__ is vars(module));return value
+ def retain(record,phase,error):
+  nonlocal failed
+  failed=True;record['failed']=True;row=(record,phase,error,record['inputs'],record.get('data'),record.get('cm'),record.get('cli'));retained.append(row);public.append(row)
+ def guard(record):
+  need(type(record['inputs']) is record['inputs_kind']);same(namespace,record['own_items']);table_same(kind_tables);table_same(record['error_tables'])
+  for row in record['own_functions']:function_same(row)
+  for module in record['modules']:capture_same(module)
+  for table in record['tables']:table_same(table)
+  for row in record['functions']:function_same(row)
+  need(record['auth_cell'].cell_contents is record['wrapped'])
+  if record.get('cli') is not None:need(type(record['cli']) is record['cli_kind'])
+ def boundary(record,phase,callback,*args,_save=None,**kwargs):
+  guard(record);record['attempts'].append((phase,callback,args,kwargs));value=callback(*args,**kwargs);record['returns'].append((phase,value))
+  if _save is not None:record[_save]=value
+  if _save=='cm':record['cm_owned']=True
+  guard(record);return value
+ def live(record):
+  need(not failed and not retained and not record['failed']);need(boundary(record,'original-source-inputs-recheck',record['input_recheck'],record['inputs']) is record['inputs'])
+ def issued(value):
+  record=registry.get(id(value));need(type(record) is dict and record['value'] is value)
+  try:need(type(value) is kind and not record['failed']);guard(record)
+  except BaseException as error:retain(record,'issued-boundary',error);deny()
+  return record
+ def plain_rows(value,*,logical=False):
+  need(type(value) is proxy and len(value)<=33 and all(type(path) is str for path in value));answer={}
+  for path,row in value.items():
+   keys=('bytes','sha256','gitMode') if logical else ('bytes','sha256');need(type(row) is proxy and len(row)==len(keys) and all(type(key) is str for key in row) and set(row)==set(keys))
+   need(type(row['bytes']) is int and 0<row['bytes']<=8388608 and type(row['sha256']) is str and len(row['sha256'])==64 and all(char in '0123456789abcdef' for char in row['sha256']))
+   if logical:need(type(row['gitMode']) is str and row['gitMode']=='100644')
+   answer[path]=dict(row)
+  return answer
+ def cm_check(record,*,after_enter=False):
+  cm=record['cm'];need(type(cm) is cm_kind);state=record['cm_dict_getter'].__get__(cm,cm_kind);need(state is record['cm_state']);expected=record['cm_enter_items'] if after_enter else record['cm_initial_items'];same(state,expected)
+  generator=record['generator'];need(type(generator) is GeneratorType and state.get('gen') is generator and generator.gi_code is record['wrapped'].__code__)
+  if generator.gi_frame is not None:
+   frame=generator.gi_frame;need(frame.f_globals is vars(record['C']) and frame.f_locals.get('delivery_raw') is record['delivery']);need(all(frame.f_locals.get(key) is value for key,value in record['auth'].items()))
+ def reader(record,path,maximum):
+  live(record);need(type(path) is record['path_kind'] and type(maximum) is int and 0<maximum<=8388608)
+  text=record['path_str'](path);need(type(text) is str and text in record['reader_bytes']);raw=record['reader_bytes'][text];need(len(raw)==maximum)
+  record['reads']+=1;need(record['reads']<=59);record['returns'].append(('signed-source-reader',raw));live(record);return raw
+ def close(record):
+  live(record);need(record['entered'] and not record['exit_attempted']);cm_check(record,after_enter=True);record['exit_attempted']=True
+  value=record['exit'](record['cm'],None,None,None);record['returns'].append(('original-cli-context-exit',value));guard(record);cm_check(record,after_enter=True);need(record['generator'].gi_frame is None)
+  cli=record['cli'];state=boundary(record,'original-cli-closed-state',record['owned_state'],cli);owner=dict.get(record['owners'],id(cli));closed=dict.get(record['closed'],id(cli))
+  need(type(owner) is tuple and len(owner)==6 and owner[0] is cli and owner[1] is state and type(closed) is tuple and len(closed)==2 and closed[0] is owner and dict.get(state,'_closed') is True and dict.get(state,'_failed') is False and dict.get(state,'_retained') is False)
+  record['known_closed']=True;live(record)
+ class PreparedCliComposition:
+  __slots__=()
+  def capture_delivery(self):
+   record=issued(self)
+   try:live(record);return record['summary']
+   except BaseException as error:retain(record,'delivery-capture',error);deny()
+  def open(self):
+   record=issued(self)
+   try:
+    live(record);need(record['phase']=='prepared');record['phase']='open-attempted'
+    cm=boundary(record,'original-cli-factory',record['auth_factory'],record['delivery'],_save='cm',**record['auth']);record['cm_owned']=True;need(type(cm) is cm_kind)
+    state=record['cm_dict_getter'].__get__(cm,cm_kind);need(type(state) is dict and len(state)<=8 and all(type(key) is str for key in state));generator=state.get('gen');need(type(generator) is GeneratorType)
+    record.update(cm_state=state,cm_initial_items=tuple(state.items()),cm_enter_items=tuple((key,value) for key,value in state.items() if key not in ('args','kwds','func')),generator=generator);cm_check(record)
+    record['enter_attempted']=True;cli=record['enter'](cm);record['returns'].append(('original-cli-context-enter',cli));record['cli']=cli;record['entered']=True;guard(record);cm_check(record,after_enter=True)
+    need(type(cli) is record['cli_kind'] and boundary(record,'original-cli-recheck',record['cli_recheck'],cli) is cli);live(record);record['phase']='open';return cli
+   except BaseException as error:retain(record,'cli-open',error);deny()
+  def recheck(self):
+   record=issued(self)
+   try:
+    live(record);need(record['phase']=='open');cm_check(record,after_enter=True);need(boundary(record,'original-cli-recheck',record['cli_recheck'],record['cli']) is record['cli']);return self
+   except BaseException as error:retain(record,'cli-recheck',error);deny()
+  def close(self):
+   record=issued(self)
+   try:need(record['phase']=='open');close(record);record['phase']='closed';return self
+   except BaseException as error:retain(record,'cli-close',error);deny()
+  def require_released(self):
+   record=issued(self)
+   try:need(record['phase']=='closed' and record['known_closed']);guard(record);return self
+   except BaseException as error:retain(record,'cli-release-observation',error);deny()
+ kind=PreparedCliComposition;kind_tables=tables(kind)
+ def prepare_cli_composition(inputs_module,source_inputs,*,root,package_module,delivery_module,cli_module):
+  nonlocal used
+  need(not used and not failed and not retained and type(public) is list and not public and type(root) is str and 0<len(root)<=4096 and root.isascii())
+  prefix=Path(root);need(prefix.is_absolute());path_kind=type(prefix);path_str=None
+  for owner in gettype(path_kind,'__mro__'):
+   candidate=gettype(owner,'__dict__').get('__str__')
+   if candidate is not None:path_str=candidate;break
+  need(type(path_str) is fn)
+  modules=tuple(capture(value) for value in (inputs_module,package_module,delivery_module,cli_module,contextlib))
+  inputs_kind=vars(inputs_module).get('SourceInputs');need(type(inputs_kind) is type and type(source_inputs) is inputs_kind)
+  input_recheck=method(inputs_kind,'recheck',inputs_module);input_capture=method(inputs_kind,'capture_inputs',inputs_module)
+  assemble_package=vars(package_module).get('assemble');assemble_delivery=vars(delivery_module).get('assemble');auth_factory=vars(cli_module).get('authenticated_cli');need(all(type(value) is fn for value in (assemble_package,assemble_delivery,auth_factory)))
+  need(assemble_package.__globals__ is vars(package_module) and assemble_delivery.__globals__ is vars(delivery_module));wrapped=vars(auth_factory).get('__wrapped__');need(type(wrapped) is fn and wrapped.__globals__ is vars(cli_module) and auth_factory.__globals__ is vars(contextlib))
+  cells=auth_factory.__closure__;need(type(cells) is tuple and len(cells)==1 and type(cells[0]) is CellType and cells[0].cell_contents is wrapped)
+  cm_tables=tables(cm_kind);dict_getter=None
+  for owner,bases,lineage,items in cm_tables[0]:
+   candidate=dict(items).get('__dict__')
+   if candidate is not None:dict_getter=candidate;break
+  need(type(dict_getter) is GetSetDescriptorType)
+  enter=gettype(cm_kind,'__dict__').get('__enter__');exit=gettype(cm_kind,'__dict__').get('__exit__');need(type(enter) is type(exit) is fn)
+  cli_kind=vars(cli_module).get('FullCli');cli_recheck=method(cli_kind,'recheck',cli_module);owned_state=vars(cli_module).get('_owned_state');owners=vars(cli_module).get('_CLI_OWNERS');closed=vars(cli_module).get('_CLOSED_OWNERS');need(type(owned_state) is fn and owned_state.__globals__ is vars(cli_module) and type(owners) is type(closed) is dict)
+  record=dict(value=None,inputs=source_inputs,inputs_kind=inputs_kind,C=cli_module,modules=modules,tables=(tables(inputs_kind),tables(path_kind),cm_tables,tables(cm_meta)),error_tables=tables(error_kind),own_items=tuple(namespace.items()),own_functions=tuple(function(value) for value in namespace.values() if type(value) is fn),functions=tuple(function(value) for value in (input_recheck,input_capture,assemble_package,assemble_delivery,auth_factory,wrapped,enter,exit,cli_recheck,owned_state,path_str)),input_recheck=input_recheck,input_capture=input_capture,assemble_package=assemble_package,assemble_delivery=assemble_delivery,auth_factory=auth_factory,wrapped=wrapped,auth_cell=cells[0],enter=enter,exit=exit,cm_dict_getter=dict_getter,cli_kind=cli_kind,cli_recheck=cli_recheck,owned_state=owned_state,owners=owners,closed=closed,path_kind=path_kind,path_str=path_str,attempts=[],returns=[],reader_bytes={},reads=0,failed=False,phase='preparing',cm=None,cli=None,cm_owned=False,enter_attempted=False,entered=False,exit_attempted=False,known_closed=False)
+  used=True
+  try:
+   live(record);data=boundary(record,'original-source-inputs-capture',input_capture,source_inputs,_save='data');need(type(data) is proxy and all(type(key) is str for key in data) and data.get('scope')=='AUTHENTICATED_CLI_SOURCE_INPUT_DATA_ONLY')
+   files=data['sourceFiles'];need(type(files) is proxy and len(files)==33 and all(type(path) is str and type(raw) is bytes for path,raw in files.items()))
+   record['reader_bytes']={path_str(prefix/path):raw for path,raw in files.items()};need(len(record['reader_bytes'])==33)
+   launch=plain_rows(data['launchPins']);package=plain_rows(data['packagePins']);catalog=plain_rows(data['operationalCatalog'],logical=True);fingerprint=data['fingerprint'];need(type(fingerprint) is str and len(fingerprint)==64)
+   fixed_reader=lambda path,maximum:reader(record,path,maximum)
+   full=boundary(record,'original-package-assemble',assemble_package,prefix,fingerprint,package_pins=package,operational_catalog=catalog,reader=fixed_reader,_save='full');need(type(full) is bytes and 0<len(full)<=524288);full_pin=dict(bytes=len(full),sha256=digest(full).hexdigest())
+   delivery=boundary(record,'original-delivery-assemble',assemble_delivery,prefix,launch_pins=launch,package_pins=package,operational_catalog=catalog,fingerprint=fingerprint,full_package_raw=full,full_package_pin=full_pin,reader=fixed_reader,_save='delivery');need(type(delivery) is bytes and 0<len(delivery)<=1048576 and record['reads']==59);delivery_pin=dict(bytes=len(delivery),sha256=digest(delivery).hexdigest())
+   bootstrap=data['bootstrapRecords'];need(type(bootstrap) is proxy and len(bootstrap)==2 and all(type(key) is str and type(raw) is bytes for key,raw in bootstrap.items()))
+   auth=dict(delivery_module=delivery_module,delivery_pin=delivery_pin,launch_pins=launch,package_pins=package,operational_catalog=catalog,fingerprint=fingerprint,full_package_pin=full_pin,bootstrap_records=dict(bootstrap),bootstrap_pins=plain_rows(data['bootstrapPins']),running_cli_raw=files['deploy/installer/company_full_cli.py']);record['auth']=auth
+   record['summary']=proxy(dict(scope='AUTHENTICATED_CLI_COMPOSITION_DATA_ONLY',fullPackageRaw=full,fullPackagePin=proxy(full_pin),deliveryRaw=delivery,deliveryPin=proxy(delivery_pin),sourceReleaseSha256=data['releaseSha256'],fingerprint=fingerprint,signedSourceReads=record['reads'],initialOriginSelfAuthenticated=False,originalSourceObjectTransferred=False,downstreamOriginalSourceReauthenticationRequired=True,operationalCodeCompiled=False,stageDispatched=False,executionEvidenceIssued=False,stageAcknowledged=False))
+   live(record);value=object.__new__(kind);record['value']=value;registry[id(value)]=record;record['phase']='prepared';guard(record);return value
+  except BaseException as error:retain(record,'cli-composition-prepare',error);deny()
+ def main(argv=None):deny()
+ return PreparedCliComposition,prepare_cli_composition,main
+
+
+PreparedCliComposition,prepare_cli_composition,main=_factory(UNRELEASED,CliComposeUnavailable,globals(),(type,dict,tuple,list,set,str,int,bool,bytes,len,all,any,vars,object,id,BaseException,property,classmethod,staticmethod))
+del _factory

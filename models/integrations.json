@@ -1,0 +1,339 @@
+{
+  "schemaVersion": 1,
+  "integrations": [
+    {
+      "id": "filesystem",
+      "aliases": ["filesystem", "file system", "local files", "import folder"],
+      "sources": [
+        {
+          "url": "https://docs.python.org/3/library/os.html",
+          "purpose": "documentation",
+          "sdkCandidate": null,
+          "metadata": {
+            "publisher": "Python Software Foundation",
+            "provenance": "Primary Python standard-library documentation. No external filesystem SDK or generated installation script is selected. Runtime version and OCI digest are controlled by the independently reviewed company image catalog.",
+            "license": "Python documentation terms and PSF license; separately retrieved upstream license is required.",
+            "maintenance": "Maintained Python stdlib; documentation retrieval does not qualify the pinned runtime, openat2 behavior, gVisor isolation or dependencies. Actual runsc and fresh image security evidence remain mandatory.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        },
+        {
+          "url": "https://raw.githubusercontent.com/torvalds/linux/master/include/uapi/linux/openat2.h",
+          "purpose": "documentation",
+          "sdkCandidate": null,
+          "metadata": {
+            "publisher": "Linux kernel maintainers",
+            "provenance": "Primary Linux UAPI definition of openat2 and RESOLVE_BENEATH, NO_SYMLINKS, NO_MAGICLINKS and NO_XDEV. Source is untrusted text; it is never compiled or executed by research.",
+            "license": "Header SPDX GPL-2.0 WITH Linux-syscall-note, verified in the retrieved primary source; no kernel source is installed.",
+            "maintenance": "Kernel interfaces and gVisor support must be tested on the actual pinned deployment. Failure or unsupported openat2 keeps the adapter unavailable, without ordinary-open fallback.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        },
+        {
+          "url": "https://raw.githubusercontent.com/python/cpython/3.13/LICENSE",
+          "purpose": "license",
+          "sdkCandidate": null,
+          "metadata": {
+            "publisher": "Python Software Foundation",
+            "provenance": "License published by the maintained official CPython 3.13 source repository; this is provenance evidence, not selection of an arbitrary external SDK or approval of a runtime image.",
+            "license": "PSF License Version 2 and upstream historical license notices; exact installed company runtime provenance and image scan remain independently required.",
+            "maintenance": "The source catalog is reviewed as of its date. Exact image digest, patch version, source qualification and security feed freshness remain separate enforced runtime gates.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        }
+      ]
+    },
+    {
+      "id": "samba",
+      "aliases": [
+        "samba",
+        "smb",
+        "smb3",
+        "smbprotocol"
+      ],
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/samba-team/samba/master/docs-xml/manpages/smbclient.1.xml",
+          "purpose": "documentation",
+          "sdkCandidate": null,
+          "metadata": {
+            "publisher": "Samba Team",
+            "provenance": "Samba project's published source mirror, smbclient DocBook manual. Retrieved bytes are treated only as text: XML entities, external DTDs and embedded examples are never resolved or executed. The selected SDK candidate has separate publisher and license sources.",
+            "license": "Publisher documentation terms; no executable code selected.",
+            "maintenance": "Documentation and repository availability must be rechecked at execution time. Package version, dependency vulnerabilities, protocol behavior and compatibility remain unqualified.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        },
+        {
+          "url": "https://raw.githubusercontent.com/jborean93/smbprotocol/master/README.md",
+          "purpose": "sdk",
+          "sdkCandidate": {
+            "packageName": "smbprotocol",
+            "repository": "https://github.com/jborean93/smbprotocol",
+            "version": "not_selected"
+          },
+          "metadata": {
+            "publisher": "Samba Team documentation; Jordan Borean/Red Hat SDK publisher",
+            "provenance": "SDK publisher repository github.com/jborean93/smbprotocol; license is a separate required retrieved source. This is a candidate, not an approved dependency.",
+            "license": "MIT; package version not selected",
+            "maintenance": "Documentation and repository availability must be rechecked at execution time. Package version, dependency vulnerabilities, protocol behavior and compatibility remain unqualified.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        },
+        {
+          "url": "https://raw.githubusercontent.com/jborean93/smbprotocol/master/LICENSE",
+          "purpose": "license",
+          "sdkCandidate": {
+            "packageName": "smbprotocol",
+            "repository": "https://github.com/jborean93/smbprotocol",
+            "version": "not_selected"
+          },
+          "metadata": {
+            "publisher": "Samba Team documentation; Jordan Borean/Red Hat SDK publisher",
+            "provenance": "License file published by github.com/jborean93/smbprotocol; does not qualify transitive dependencies or runtime access.",
+            "license": "MIT; verify exact selected version before installation",
+            "maintenance": "Documentation and repository availability must be rechecked at execution time. Package version, dependency vulnerabilities, protocol behavior and compatibility remain unqualified.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        }
+      ]
+    },
+    {
+      "id": "stripe",
+      "aliases": [
+        "stripe"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.stripe.com/api",
+          "purpose": "documentation",
+          "sdkCandidate": null,
+          "metadata": {
+            "publisher": "Stripe",
+            "provenance": "Company review of primary publisher documentation and the SDK publisher repository; retrieved source hashes provide the exact as-of reference.",
+            "license": "Publisher documentation terms; no executable code selected.",
+            "maintenance": "Documentation and repository availability must be rechecked at execution time. Package version, dependency vulnerabilities, protocol behavior and compatibility remain unqualified.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        },
+        {
+          "url": "https://raw.githubusercontent.com/stripe/stripe-node/master/README.md",
+          "purpose": "sdk",
+          "sdkCandidate": {
+            "packageName": "stripe",
+            "repository": "https://github.com/stripe/stripe-node",
+            "version": "not_selected"
+          },
+          "metadata": {
+            "publisher": "Stripe",
+            "provenance": "SDK publisher repository github.com/stripe/stripe-node; license is a separate required retrieved source. This is a candidate, not an approved dependency.",
+            "license": "MIT; package version not selected",
+            "maintenance": "Documentation and repository availability must be rechecked at execution time. Package version, dependency vulnerabilities, protocol behavior and compatibility remain unqualified.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        },
+        {
+          "url": "https://raw.githubusercontent.com/stripe/stripe-node/master/LICENSE",
+          "purpose": "license",
+          "sdkCandidate": {
+            "packageName": "stripe",
+            "repository": "https://github.com/stripe/stripe-node",
+            "version": "not_selected"
+          },
+          "metadata": {
+            "publisher": "Stripe",
+            "provenance": "License file published by github.com/stripe/stripe-node; does not qualify transitive dependencies or runtime access.",
+            "license": "MIT; verify exact selected version before installation",
+            "maintenance": "Documentation and repository availability must be rechecked at execution time. Package version, dependency vulnerabilities, protocol behavior and compatibility remain unqualified.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        }
+      ]
+    },
+    {
+      "id": "microsoft",
+      "aliases": [
+        "microsoft",
+        "exchange",
+        "outlook",
+        "microsoft graph",
+        "office 365",
+        "microsoft 365",
+        "entra",
+        "sharepoint"
+      ],
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/graph/overview",
+          "purpose": "documentation",
+          "sdkCandidate": null,
+          "metadata": {
+            "publisher": "Microsoft",
+            "provenance": "Company review of primary publisher documentation and the SDK publisher repository; retrieved source hashes provide the exact as-of reference.",
+            "license": "Publisher documentation terms; no executable code selected.",
+            "maintenance": "Documentation and repository availability must be rechecked at execution time. Package version, dependency vulnerabilities, protocol behavior and compatibility remain unqualified.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        },
+        {
+          "url": "https://raw.githubusercontent.com/microsoftgraph/msgraph-sdk-javascript/dev/README.md",
+          "purpose": "sdk",
+          "sdkCandidate": {
+            "packageName": "@microsoft/microsoft-graph-client",
+            "repository": "https://github.com/microsoftgraph/msgraph-sdk-javascript",
+            "version": "not_selected"
+          },
+          "metadata": {
+            "publisher": "Microsoft",
+            "provenance": "SDK publisher repository github.com/microsoftgraph/msgraph-sdk-javascript; license is a separate required retrieved source. This is a candidate, not an approved dependency.",
+            "license": "MIT; package version not selected",
+            "maintenance": "Documentation and repository availability must be rechecked at execution time. Package version, dependency vulnerabilities, protocol behavior and compatibility remain unqualified.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        },
+        {
+          "url": "https://raw.githubusercontent.com/microsoftgraph/msgraph-sdk-javascript/dev/LICENSE",
+          "purpose": "license",
+          "sdkCandidate": {
+            "packageName": "@microsoft/microsoft-graph-client",
+            "repository": "https://github.com/microsoftgraph/msgraph-sdk-javascript",
+            "version": "not_selected"
+          },
+          "metadata": {
+            "publisher": "Microsoft",
+            "provenance": "License file published by github.com/microsoftgraph/msgraph-sdk-javascript; does not qualify transitive dependencies or runtime access.",
+            "license": "MIT; verify exact selected version before installation",
+            "maintenance": "Documentation and repository availability must be rechecked at execution time. Package version, dependency vulnerabilities, protocol behavior and compatibility remain unqualified.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        }
+      ]
+    },
+    {
+      "id": "google",
+      "aliases": [
+        "google",
+        "gmail",
+        "google workspace",
+        "google drive"
+      ],
+      "sources": [
+        {
+          "url": "https://developers.google.com/workspace/guides/auth-overview",
+          "purpose": "documentation",
+          "sdkCandidate": null,
+          "metadata": {
+            "publisher": "Google",
+            "provenance": "Company review of primary publisher documentation and the SDK publisher repository; retrieved source hashes provide the exact as-of reference.",
+            "license": "Publisher documentation terms; no executable code selected.",
+            "maintenance": "Documentation and repository availability must be rechecked at execution time. Package version, dependency vulnerabilities, protocol behavior and compatibility remain unqualified.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        },
+        {
+          "url": "https://raw.githubusercontent.com/googleapis/google-api-nodejs-client/main/README.md",
+          "purpose": "sdk",
+          "sdkCandidate": {
+            "packageName": "googleapis",
+            "repository": "https://github.com/googleapis/google-api-nodejs-client",
+            "version": "not_selected"
+          },
+          "metadata": {
+            "publisher": "Google",
+            "provenance": "SDK publisher repository github.com/googleapis/google-api-nodejs-client; license is a separate required retrieved source. This is a candidate, not an approved dependency.",
+            "license": "Apache-2.0; package version not selected",
+            "maintenance": "Documentation and repository availability must be rechecked at execution time. Package version, dependency vulnerabilities, protocol behavior and compatibility remain unqualified.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        },
+        {
+          "url": "https://raw.githubusercontent.com/googleapis/google-api-nodejs-client/main/LICENSE",
+          "purpose": "license",
+          "sdkCandidate": {
+            "packageName": "googleapis",
+            "repository": "https://github.com/googleapis/google-api-nodejs-client",
+            "version": "not_selected"
+          },
+          "metadata": {
+            "publisher": "Google",
+            "provenance": "License file published by github.com/googleapis/google-api-nodejs-client; does not qualify transitive dependencies or runtime access.",
+            "license": "Apache-2.0; verify exact selected version before installation",
+            "maintenance": "Documentation and repository availability must be rechecked at execution time. Package version, dependency vulnerabilities, protocol behavior and compatibility remain unqualified.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        }
+      ]
+    },
+    {
+      "id": "efactura",
+      "aliases": [
+        "efactura",
+        "e-factura",
+        "e factura",
+        "anaf"
+      ],
+      "sources": [
+        {
+          "url": "https://mfinante.gov.ro/ro/web/efactura/informatii-tehnice",
+          "purpose": "documentation",
+          "sdkCandidate": null,
+          "metadata": {
+            "publisher": "Romanian Ministry of Finance / ANAF",
+            "provenance": "Company review of primary publisher documentation and the SDK publisher repository; retrieved source hashes provide the exact as-of reference.",
+            "license": "Publisher documentation terms; no executable code selected.",
+            "maintenance": "Documentation and repository availability must be rechecked at execution time. Package version, dependency vulnerabilities, protocol behavior and compatibility remain unqualified.",
+            "reviewedBy": "AutoSoft source catalog review",
+            "reviewedAt": "2026-10-10T00:00:00.000Z",
+            "reviewStatus": "reviewed",
+            "qualification": "pending_dependency_and_protocol_checks"
+          }
+        }
+      ]
+    }
+  ]
+}

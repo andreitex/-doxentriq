@@ -1,0 +1,7 @@
+# Synthetic protocol qualification only; never included as a customer runtime.
+ARG PYTHON_IMAGE
+FROM ${PYTHON_IMAGE}
+RUN apt-get update && apt-get install -y --no-install-recommends samba && rm -rf /var/lib/apt/lists/* && useradd --uid 10001 --no-create-home --shell /usr/sbin/nologin smbreader
+COPY deploy/connectors/fixture-smb.conf /etc/samba/smb.conf
+COPY deploy/connectors/fixture-start.sh /opt/fixture-start.sh
+CMD ["/bin/sh", "/opt/fixture-start.sh"]

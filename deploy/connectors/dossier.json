@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "name": "Company read-only Samba connector",
+  "implementation": "deploy/connectors/samba.py",
+  "reviewStatus": "reviewed-source-and-synthetic-protocol-tested-awaiting-security-scanned-signed-company-release",
+  "checkedAt": "2026-10-10",
+  "documentation": [
+    "https://github.com/jborean93/smbprotocol/releases/tag/v1.17.0",
+    "https://github.com/jborean93/smbprotocol/blob/v1.17.0/src/smbprotocol/connection.py",
+    "https://github.com/jborean93/smbprotocol/blob/v1.17.0/src/smbprotocol/session.py",
+    "https://github.com/jborean93/smbprotocol/blob/v1.17.0/src/smbprotocol/open.py",
+    "https://github.com/jborean93/smbprotocol/blob/v1.17.0/src/smbprotocol/tree.py",
+    "https://github.com/jborean93/pyspnego",
+    "https://pypi.org/project/smbprotocol/1.17.0/",
+    "https://www.samba.org/samba/docs/current/man-html/smb.conf.5.html",
+    "https://docs.docker.com/reference/cli/docker/container/run/",
+    "https://gvisor.dev/docs/user_guide/faq/"
+  ],
+  "provenance": "Official maintainer repositories and official PyPI release metadata/wheel SHA256 values. Company-owned source, fixed Dockerfiles and immutable digest. No generated connector executable or installation scripts.",
+  "dependencies": [
+    {
+      "name": "smbprotocol",
+      "version": "1.17.0",
+      "license": "MIT"
+    },
+    {
+      "name": "pyspnego",
+      "version": "0.12.4",
+      "license": "MIT"
+    },
+    {
+      "name": "cryptography",
+      "version": "50.0.2",
+      "license": "Apache-2.0 OR BSD-3-Clause"
+    },
+    {
+      "name": "cffi",
+      "version": "2.1.1",
+      "license": "MIT-0"
+    },
+    {
+      "name": "pycparser",
+      "version": "3.11",
+      "license": "BSD-3-Clause"
+    }
+  ],
+  "allowedCapabilities": [
+    "files.list",
+    "files.read"
+  ],
+  "runtimeGuards": [
+    "One exact application, connection, logical root and ordinary share; one literal unicast IPv4 destination on TCP 445",
+    "Separate app-scoped adapter bearer, relay bearer and dedicated remote readonly account; no share credentials in generated code or application mounts",
+    "HTTPS adapter and verified TLS relay; SMB3.1.1 only, signing requested and session encryption mandatory; NTLMv2-only client setting; no guest fallback",
+    "Low-level protocol operations only; no DFS referral shares, no automatic symlink resolution, reparse points refused, held readonly ancestor handles",
+    "Only FILE_OPEN with read/list access; no writes, creates, deletes, rename, ACL update, RPC administration or host CIFS/UNC mounts",
+    "gVisor, UID10001, readonly root, dropped capabilities, no new privileges, 256MiB/64 processes/0.5CPU, 16MiB tmpfs, no published ports or host/socket mounts",
+    "Adapter has only private app/connector networks; trusted sealed relay has private connector plus dedicated egress network",
+    "16MiB read, 1000-entry list, 24 path segments, bounded bodies, request rates, two tunnels, eight-second absolute tunnel/operation lifetime, 32MiB tunnel traffic",
+    "Owner MFA and exact signed five-minute approval; immutable scope and credentials; maximum ninety-day grant; encrypted broker state and encrypted volume scoped readonly secret mounts",
+    "Fresh independent MEDIUM/HIGH/CRITICAL and unknown-severity package/image checks required before provisioning and daily in app security reports",
+    "Seven-day encrypted journal receives only redacted operation/outcome/timing; no filenames, file contents, share/account names, passwords or tokens",
+    "Per-candidate capability directory and bearer; failed candidate leaves routed release scope unchanged; prior provenance-verified sidecars retired by immutable container ID after confirmed route activation",
+    "Docker embedded DNS is not used by gVisor; trusted exact-network IP host mappings preserve private TLS SAN verification"
+  ],
+  "requiredCustomerEvidence": [
+    "A dedicated remote account whose server-side ACL permits read/list only and confines it to this one share",
+    "A company-reviewed evidence record of those ACLs, bound by SHA256 to the approved scope",
+    "Approved literal IP destination and encrypted SMB3.1.1 server; independent live root listing before app deployment"
+  ],
+  "qualification": {
+    "localPolicyTests": "10/10 passed inside pinned Linux connector image with actual SDK; Windows policy run 9 passed, SDK-only test unavailable",
+    "companyImageScan": "unavailable until company build runs with fresh advisory feeds",
+    "realSyntheticSMBProtocol": "passed on Rocky10.2 foundation 2026-10-10T12:36:58Z; exact source/image binding in deploy/verification/rocky10.2-samba-protocol.json",
+    "customerServerACLAndConnectivity": "unavailable until separately reviewed and checked",
+    "windowsSMBServer": "unavailable",
+    "kerberos": "unsupported in initial company template"
+  },
+  "limits": [
+    "Trusted relay code enforces the single destination. A compromised relay process has its dedicated external network; this is not a claim of kernel-enforced destination firewalling.",
+    "The account's server-side share ACL is the dataset boundary. A client cannot prove remote write restrictions merely by making read-only requests.",
+    "Arbitrary subtree isolation inside a broad share, DFS, Kerberos, write operations and SMB1/2/3.0 downgrade are not supported.",
+    "Package review and scan results are evidence at a point in time; future vulnerabilities block provisioning/publication until fixed or explicitly reported."
+  ]
+}

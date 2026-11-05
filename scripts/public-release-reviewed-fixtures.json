@@ -1,0 +1,74 @@
+[
+  {
+    "path": "apps/admin/test/portal.test.tsx",
+    "sha256": "2f106d22619f0e69fde30c113bda5454acee6b7d12ac46176611eaefd683d84e",
+    "code": "credential_url",
+    "reason": "Synthetic credential-bearing URL used only in a rejection/redaction test; reviewed source contains no production credential."
+  },
+  {
+    "path": "apps/admin/test/stripe-webhooks.test.tsx",
+    "sha256": "ce2ae092cc8774ba0fcbe471e24c16aae85e25969a3df800d1bd584afe69a90a",
+    "code": "credential_url",
+    "reason": "Synthetic credential-bearing URL used only in a rejection/redaction test; reviewed source contains no production credential."
+  },
+  {
+    "path": "apps/control/src/config.ts",
+    "sha256": "d62cbf5df6e9a526dfae7605cea37d7bac3666a9526a6cbbd65b2330aebcd5f8",
+    "code": "credential_url",
+    "reason": "URL is assembled from protected runtime credential variables; this reviewed source contains no literal credential in the URL."
+  },
+  {
+    "path": "apps/control/test/config.test.ts",
+    "sha256": "8333b30c4f62a1115911f9c77908003feb46927ce08e88cd2915fe4ae07878f2",
+    "code": "credential_url",
+    "reason": "Synthetic credential-bearing URL used only in a rejection/redaction test; reviewed source contains no production credential."
+  },
+  {
+    "path": "apps/control/test/control.test.ts",
+    "sha256": "41b309dc634bbdc9c5dc42a8fb5444e30965b2bfaa19cbf5d91c4fc88a105000",
+    "code": "credential_url",
+    "reason": "Synthetic credential-bearing URL used only in a rejection/redaction test; reviewed source contains no production credential."
+  },
+  {
+    "path": "apps/control/test/integration-research.test.ts",
+    "sha256": "4bf1c692cfad477f9444b669121900f36a07072b700f5eb3634a273ad3d99d94",
+    "code": "credential_url",
+    "reason": "Synthetic credential-bearing URL used only in a rejection/redaction test; reviewed source contains no production credential."
+  },
+  {
+    "path": "apps/control/test/protected-metadata.test.ts",
+    "sha256": "d2049d3a4bd0e9ed81ecfcc84048b4f1a8d2bbcc40ab3ef7cbe3504b4200711c",
+    "code": "credential_url",
+    "reason": "Synthetic credential-bearing URL used only in a rejection/redaction test; reviewed source contains no production credential."
+  },
+  {
+    "path": "packages/core/test/app-accounts.test.ts",
+    "sha256": "f37354384ece6e807489b9594247c079c3197d3e591889bb1ad4bf8fd5003a90",
+    "code": "credential_url",
+    "reason": "Synthetic credential-bearing URL used only in a rejection/redaction test; reviewed source contains no production credential."
+  },
+  {
+    "path": "packages/core/test/trusted-broker-clients.test.ts",
+    "sha256": "4545e436cdb39279dd8c2b9b07fc7dc4e995fd8686ef98c2fbbe1c61c76410f5",
+    "code": "credential_url",
+    "reason": "Synthetic credential-bearing URL used only in a rejection/redaction test; reviewed source contains no production credential."
+  },
+  {
+    "path": "scripts/bootstrap.py",
+    "sha256": "cce4bef2d3e887f525b7eeefa61b5888b09e261bfd1987b8bb2112531d703e87",
+    "code": "credential_url",
+    "reason": "URL is assembled from protected runtime credential variables; this reviewed source contains no literal credential in the URL."
+  },
+  {
+    "path": "scripts/test-logging.py",
+    "sha256": "873b73f952785d76af068a889da0fd9345ece408e57090a0b34eb56d1ace5a3c",
+    "code": "credential_url",
+    "reason": "Synthetic credential-bearing URL used only in a rejection/redaction test; reviewed source contains no production credential."
+  },
+  {
+    "path": "scripts/qualify-filesystem.py",
+    "sha256": "d5adb3dd23782958a2be0fd7494158a1f6b8015323f0be1f1e2db511453ec4c0",
+    "code": "trial_endpoint",
+    "reason": "Synthetic isolated filesystem-qualification DNS alias and generated test CA, not a customer address."
+  }
+]

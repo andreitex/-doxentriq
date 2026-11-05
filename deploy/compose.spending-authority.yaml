@@ -1,0 +1,13 @@
+# Company-managed test allowance. Apply to BOTH API and worker together, after
+# the journal handover has committed and the new platform image is qualified.
+services:
+  control:
+    environment:
+      SPENDING_AUTHORITY_FILE: /etc/autosoft/spending-authority.json
+    volumes:
+      - ${SPENDING_AUTHORITY_PATH:?committed company handover required}:/etc/autosoft/spending-authority.json:ro,z
+  worker:
+    environment:
+      SPENDING_AUTHORITY_FILE: /etc/autosoft/spending-authority.json
+    volumes:
+      - ${SPENDING_AUTHORITY_PATH:?committed company handover required}:/etc/autosoft/spending-authority.json:ro,z

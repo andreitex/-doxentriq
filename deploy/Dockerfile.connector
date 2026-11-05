@@ -1,0 +1,12 @@
+ARG PYTHON_IMAGE
+FROM ${PYTHON_IMAGE}
+WORKDIR /opt/connector
+COPY deploy/connectors/requirements.lock ./requirements.lock
+RUN python -m pip install --no-cache-dir --only-binary=:all: --require-hashes --no-deps -r requirements.lock && python -m pip check
+COPY deploy/connectors/samba.py ./samba.py
+COPY scripts/test-samba.py ./test-samba.py
+RUN python test-samba.py
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+USER 10001:10001
+EXPOSE 8443 8444
+CMD ["python", "-I", "/opt/connector/samba.py"]

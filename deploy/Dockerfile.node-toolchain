@@ -1,0 +1,28 @@
+# Company-maintained Node template: the production runtime stays separate.
+# npm-reviewed.tgz is the exact official release archive selected in the source
+# manifest. The trusted builder must verify its published SHA512 before build.
+ARG NODE_IMAGE
+ARG NODE_RUNTIME_IMAGE
+FROM ${NODE_IMAGE} AS package-manager
+ARG NPM_ARCHIVE_SHA512
+COPY npm-reviewed.tgz /tmp/npm-reviewed.tgz
+RUN --network=none test -n "$NPM_ARCHIVE_SHA512" \
+    && node -e "const fs=require('node:fs'),crypto=require('node:crypto'),assert=require('node:assert/strict');assert.match(process.argv[1],/^[a-f0-9]{128}$/);assert.equal(crypto.createHash('sha512').update(fs.readFileSync('/tmp/npm-reviewed.tgz')).digest('hex'),process.argv[1]);" "$NPM_ARCHIVE_SHA512" \
+    && npm install --global --ignore-scripts --no-audit --fund=false --offline /tmp/npm-reviewed.tgz \
+    && node -e "require('node:assert/strict').equal(require('/usr/local/lib/node_modules/npm/package.json').version,'12.2.0')"
+COPY models/npm-toolchain-security-updates.json /tmp/npm-toolchain-security-updates.json
+COPY scripts/update-npm-toolchain-dependencies.mjs /tmp/update-npm-toolchain-dependencies.mjs
+RUN node /tmp/update-npm-toolchain-dependencies.mjs prepare
+RUN --network=default npm install --prefix /tmp/autosoft-reviewed-npm-updates --install-strategy=nested --ignore-scripts --no-audit --fund=false --omit=dev --fetch-retries=1 --fetch-timeout=20000 \
+    && node /tmp/update-npm-toolchain-dependencies.mjs apply
+
+FROM ${NODE_RUNTIME_IMAGE}
+COPY --from=package-manager /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/npm
+COPY --from=package-manager /usr/local/share/autosoft/node-toolchain /usr/local/share/autosoft/node-toolchain
+RUN test ! -e /usr/local/bin/npm && test ! -L /usr/local/bin/npm \
+    && test ! -e /usr/local/bin/npx && test ! -L /usr/local/bin/npx \
+    && ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
+    && ln -s ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx \
+    && test "$(npm --version)" = 12.2.0
+ENV NPM_CONFIG_AUDIT=false NPM_CONFIG_FUND=false
+LABEL io.autosoft.role="node-application-toolchain" io.autosoft.acceptance="candidate-requires-fresh-image-scan"

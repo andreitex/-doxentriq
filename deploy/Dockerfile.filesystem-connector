@@ -1,0 +1,10 @@
+ARG PYTHON_IMAGE
+FROM ${PYTHON_IMAGE}
+WORKDIR /opt/connector
+COPY deploy/connectors/filesystem.py ./filesystem.py
+COPY deploy/connectors/test-filesystem.py ./test-filesystem.py
+RUN python -I test-filesystem.py
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+USER 10001:10001
+EXPOSE 8443
+CMD ["python", "-I", "/opt/connector/filesystem.py"]

@@ -1,0 +1,75 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+        tls:
+          cert_file: /etc/autosoft/tls/otel.crt
+          key_file: /etc/autosoft/tls/otel.key
+          min_version: '1.2'
+      http:
+        endpoint: 0.0.0.0:4318
+        tls:
+          cert_file: /etc/autosoft/tls/otel.crt
+          key_file: /etc/autosoft/tls/otel.key
+          min_version: '1.2'
+  filelog:
+    include: [/var/log/autosoft/*/*.log]
+    start_at: beginning
+    storage: file_storage
+    retry_on_failure:
+      enabled: true
+    operators:
+      - type: json_parser
+        parse_from: body
+        on_error: drop
+        timestamp:
+          parse_from: attributes.timestamp
+          layout_type: gotime
+          layout: '2006-01-02T15:04:05.999999999Z07:00'
+      - type: move
+        id: service_resource
+        from: attributes.service
+        to: resource['service.name']
+      - type: move
+        id: redacted_body
+        from: attributes.body
+        to: body
+extensions:
+  file_storage:
+    directory: /var/lib/otel
+    create_directory: false
+    fsync: true
+    max_size: 268435456
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 256
+  batch: {}
+exporters:
+  otlphttp/loki:
+    endpoint: https://loki:3100/otlp
+    sending_queue:
+      storage: file_storage
+    retry_on_failure:
+      max_elapsed_time: 0s
+    tls:
+      ca_file: /etc/autosoft/tls/ca.crt
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    tls:
+      cert_file: /etc/autosoft/tls/otel.crt
+      key_file: /etc/autosoft/tls/otel.key
+  debug:
+    verbosity: basic
+service:
+  extensions: [file_storage]
+  pipelines:
+    logs:
+      receivers: [filelog]
+      processors: [memory_limiter, batch]
+      exporters: [otlphttp/loki]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus]

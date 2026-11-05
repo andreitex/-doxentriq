@@ -1,0 +1,141 @@
+ARG NODE_IMAGE
+ARG NODE_PRODUCTION_DEPENDENCY_IMAGE=${NODE_IMAGE}
+ARG NODE_RUNTIME_IMAGE=${NODE_IMAGE}
+FROM ${NODE_IMAGE} AS build
+WORKDIR /app
+ENV NPM_CONFIG_AUDIT=false NPM_CONFIG_FUND=false
+COPY package.json package-lock.json tsconfig.json ./
+COPY packages ./packages
+COPY apps ./apps
+COPY templates ./templates
+COPY models ./models
+COPY tools ./tools
+COPY scripts ./scripts
+COPY deploy ./deploy
+COPY services ./services
+COPY database ./database
+COPY docs ./docs
+COPY README.md .gitignore .gitattributes ./
+COPY test/test_checkpoint_admission.py ./test/test_checkpoint_admission.py
+COPY scripts/test-quota-admission.py ./scripts/test-quota-admission.py
+COPY scripts/test-quota-command.py ./scripts/test-quota-command.py
+COPY scripts/test-runtime-layout.py ./scripts/test-runtime-layout.py
+COPY scripts/test-installation-identity.py ./scripts/test-installation-identity.py
+COPY scripts/test-installation-wiring.py ./scripts/test-installation-wiring.py
+COPY scripts/test-installation-budgets.py ./scripts/test-installation-budgets.py
+COPY scripts/test-install-lock.py ./scripts/test-install-lock.py
+COPY scripts/test-startup-binding.py ./scripts/test-startup-binding.py
+COPY scripts/test-runtime-pair-init.py ./scripts/test-runtime-pair-init.py
+COPY scripts/test-install-lock-verification.py ./scripts/test-install-lock-verification.py
+COPY scripts/test-installer-parent.py ./scripts/test-installer-parent.py
+COPY scripts/test-recovery-catalog.py ./scripts/test-recovery-catalog.py
+COPY scripts/test-company-source.py ./scripts/test-company-source.py
+COPY scripts/test-company-release.py ./scripts/test-company-release.py
+COPY scripts/test-qualify-trivy-feed.py ./scripts/test-qualify-trivy-feed.py
+COPY tests/test_installer_materialize.py ./tests/test_installer_materialize.py
+COPY tests/test_company_foundation.py ./tests/test_company_foundation.py
+COPY tests/test_platform_source.py ./tests/test_platform_source.py
+COPY tests/test_company_release_schema4.py ./tests/test_company_release_schema4.py
+COPY tests/test_company_platform_issuance.py ./tests/test_company_platform_issuance.py
+COPY tests/test_authenticated_seed.py ./tests/test_authenticated_seed.py
+COPY tests/test_company_platform_store.py ./tests/test_company_platform_store.py
+COPY tests/test_platform_git_runner.py ./tests/test_platform_git_runner.py
+COPY tests/test_install_session_stage_binding.py ./tests/test_install_session_stage_binding.py
+COPY tests/test_company_stored_platform_source.py ./tests/test_company_stored_platform_source.py
+COPY tests/test_company_source_tree.py ./tests/test_company_source_tree.py
+COPY tests/test_company_source_guard.py ./tests/test_company_source_guard.py
+COPY tests/test_company_source_guard_backend.py ./tests/test_company_source_guard_backend.py
+COPY tests/test_company_captured_loader.py ./tests/test_company_captured_loader.py
+COPY tests/test_company_full_entry.py ./tests/test_company_full_entry.py
+COPY tests/test_company_stored_startup.py ./tests/test_company_stored_startup.py
+COPY tests/test_company_fresh_assembly.py ./tests/test_company_fresh_assembly.py
+COPY tests/test_platform_foundation_materialize.py ./tests/test_platform_foundation_materialize.py
+COPY tests/test_company_full_plan.py ./tests/test_company_full_plan.py
+COPY tests/test_company_full_package.py ./tests/test_company_full_package.py
+COPY tests/test_company_full_package_loader.py ./tests/test_company_full_package_loader.py
+COPY tests/test_company_runtime_pair_parent.py ./tests/test_company_runtime_pair_parent.py
+COPY tests/test_company_full_package_emit.py ./tests/test_company_full_package_emit.py
+COPY tests/test_company_stage_scope.py ./tests/test_company_stage_scope.py
+COPY tests/test_company_full_retention_worker.py ./tests/test_company_full_retention_worker.py
+COPY tests/test_company_parent_system.py ./tests/test_company_parent_system.py
+COPY tests/test_company_seed_backend.py ./tests/test_company_seed_backend.py
+COPY tests/test_company_seed_runner.py ./tests/test_company_seed_runner.py
+COPY tests/test_company_retention_effects.py ./tests/test_company_retention_effects.py
+COPY tests/test_company_full_cli_package.py ./tests/test_company_full_cli_package.py
+COPY tests/test_company_full_cli.py ./tests/test_company_full_cli.py
+COPY tests/test_company_release_crypto.py ./tests/test_company_release_crypto.py
+COPY tests/test_company_cli_record.py ./tests/test_company_cli_record.py
+COPY tests/test_company_live_completion_receiver.py ./tests/test_company_live_completion_receiver.py
+COPY tests/test_company_cli_live_verify_caller.py ./tests/test_company_cli_live_verify_caller.py
+COPY tests/test_company_cli_executed_record_store.py ./tests/test_company_cli_executed_record_store.py
+COPY tests/test_company_bash_execution_status.py ./tests/test_company_bash_execution_status.py
+COPY tests/test_company_cli_verify_invocation.py ./tests/test_company_cli_verify_invocation.py
+COPY tests/test_company_cli_execute_bootstrap.py ./tests/test_company_cli_execute_bootstrap.py
+COPY tests/test_company_authenticated_cli_inputs.py ./tests/test_company_authenticated_cli_inputs.py
+COPY tests/test_company_authenticated_cli_compose.py ./tests/test_company_authenticated_cli_compose.py
+COPY tests/test_company_signed_execute_preparation.py ./tests/test_company_signed_execute_preparation.py
+COPY tests/test_company_fixed_execute_child.py ./tests/test_company_fixed_execute_child.py
+COPY tests/test_company_startup_join.py ./tests/test_company_startup_join.py
+COPY tests/test_provider_preflight.py ./tests/test_provider_preflight.py
+COPY tests/test_model_test_budget.py ./tests/test_model_test_budget.py
+COPY tests/test_model_budget_handover.py ./tests/test_model_budget_handover.py
+COPY tests/test_public_npm_advisories.py ./tests/test_public_npm_advisories.py
+COPY tests/test_platform_recheck_efficiency.py ./tests/test_platform_recheck_efficiency.py
+COPY tests/test_company_source_owned_execute.py ./tests/test_company_source_owned_execute.py
+COPY tests/fixtures/company_signed_execute_helpers_v1.json ./tests/fixtures/company_signed_execute_helpers_v1.json
+COPY tests/fixtures/company_signed_execute_helpers_v2.json ./tests/fixtures/company_signed_execute_helpers_v2.json
+COPY tests/fixtures/company_signed_execute_helpers_v3.json ./tests/fixtures/company_signed_execute_helpers_v3.json
+COPY tests/fixtures/company_cli_execute_bootstrap_before_public_path.source.txt ./tests/fixtures/company_cli_execute_bootstrap_before_public_path.source.txt
+COPY tests/test_company_binary_capture.py ./tests/test_company_binary_capture.py
+COPY tests/test_company_cli_record_io.py ./tests/test_company_cli_record_io.py
+COPY tests/test_company_cli_record_publish.py ./tests/test_company_cli_record_publish.py
+COPY tests/test_company_cli_captured_publish.py ./tests/test_company_cli_captured_publish.py
+COPY tests/test_company_cli_stage_child.py ./tests/test_company_cli_stage_child.py
+COPY tests/fixtures/company_bash_status_v1.source.txt ./tests/fixtures/company_bash_status_v1.source.txt
+RUN apt-get update && apt-get install -y --no-install-recommends python3 openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN python3 -I -B tests/test_provider_preflight.py
+RUN python3 -I -B tests/test_model_test_budget.py
+RUN python3 -I -B tests/test_model_budget_handover.py
+RUN python3 -I -B tests/test_public_npm_advisories.py
+RUN python3 -I -B tests/test_platform_recheck_efficiency.py
+ENV AUTOSOFT_TEST_ARTIFACT_ROOT=/app/.local
+RUN install -d -m 0700 /app/.local
+# A fresh company build nonce invalidates cached network advisory results.
+ARG SECURITY_SCAN_NONCE
+RUN test -n "$SECURITY_SCAN_NONCE" && python3 -I -B scripts/public-npm-advisories.py --lock package-lock.json --reviewed-public-packages models/platform-reviewed-public-npm.json --report /app/platform-public-advisories.json && python3 -I -B scripts/public-npm-advisories.py --lock templates/dms/package-lock.json --reviewed-public-packages models/dms-reviewed-public-npm.json --report /app/dms-public-advisories.json
+RUN npm ci --ignore-scripts --no-audit --fund=false && npm run check && npm --prefix templates/dms ci --ignore-scripts --no-audit --fund=false && npm --prefix templates/dms test && npm --prefix templates/dms run build && python3 -I -B scripts/check-platform-image.py
+
+# Keep the expensive source-ownership suite after the faster checks. No gate is
+# skipped: production dependencies cannot be copied until this stage completes.
+RUN python3 -I -B tests/test_company_source_owned_execute.py
+
+FROM ${NODE_PRODUCTION_DEPENDENCY_IMAGE} AS production-dependencies
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY packages/core/package.json ./packages/core/package.json
+# This dependency on the fully checked stage is a required security gate.
+# Its full-lock advisory inventory includes every production dependency too.
+COPY --from=build /app/platform-public-advisories.json /app/platform-public-advisories.json
+COPY --from=build /app/dms-public-advisories.json /app/dms-public-advisories.json
+ENV NPM_CONFIG_AUDIT=false NPM_CONFIG_FUND=false
+# tsx and its optional native esbuild dependency are required by the API/worker.
+RUN npm ci --omit=dev --ignore-scripts --no-audit --fund=false
+
+FROM ${NODE_RUNTIME_IMAGE} AS runtime-validation
+ENV NODE_ENV=production PORT=3000
+WORKDIR /app
+COPY --from=production-dependencies --chown=10001:10001 /app/node_modules ./node_modules
+COPY --from=build --chown=10001:10001 /app/package.json /app/package-lock.json /app/tsconfig.json ./
+COPY --from=build --chown=10001:10001 /app/packages/core/package.json ./packages/core/package.json
+COPY --from=build --chown=10001:10001 /app/packages/core/src ./packages/core/src
+COPY --from=build --chown=10001:10001 /app/apps/control/src ./apps/control/src
+COPY --from=build --chown=10001:10001 /app/apps/admin/dist ./apps/admin/dist
+COPY --from=build --chown=10001:10001 /app/models ./models
+COPY --from=build --chown=10001:10001 /app/templates/generation-guide.md ./templates/generation-guide.md
+USER 10001:10001
+RUN --network=none --mount=type=bind,source=scripts/test-platform-runtime.mjs,target=/tmp/test-platform-runtime.mjs,ro \
+    LOG_LEVEL=silent node --import tsx /tmp/test-platform-runtime.mjs
+
+FROM runtime-validation AS final
+EXPOSE 3000
+CMD ["node", "--import", "tsx", "apps/control/src/main.ts"]

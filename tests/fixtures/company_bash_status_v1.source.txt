@@ -1,0 +1,65 @@
+"""Bounded ASBT1 parent-status DATA codec, no process, IO, issuer or ACK.
+
+Initial module authentication, original Bash ownership/wait, channel origin,
+exclusive writer closure and original FullCLI/source closure are external.
+Matching serialized fields or hashes do not establish any of those facts.
+"""
+import hashlib,re
+from types import MappingProxyType
+MAX_FRAME=2048
+STDOUT_CAP=32768;STDERR_CAP=8192;TOTAL_CAP=40960
+BINDING_FIELDS=('requestSha256','releaseSha256','deliverySha256','planSha256','actionSha256','inputSha256','stage','session','parentPid','childPid','parentStart','childStart','bootId')
+STAGES=('company-platform-store','company-source-materialize')
+class StatusFrameUnavailable(ValueError):pass
+def _make_codec(error_type):
+ fields=BINDING_FIELDS;stages=STAGES;frame_cap=MAX_FRAME;out_cap=STDOUT_CAP;err_cap=STDERR_CAP;total_cap=TOTAL_CAP
+ proxy=MappingProxyType;match=re.fullmatch;raw_hash=hashlib.sha256
+ def need(value):
+  if value is not True:raise error_type('company-parent-status-data-unavailable')
+ def digest(raw):return raw_hash(raw).hexdigest()
+ def unsigned(value,minimum,maximum):need(type(value) is int and minimum<=value<=maximum);return value
+ def hash_value(value):need(type(value) is str and len(value)==64 and match('[a-f0-9]{64}',value) is not None);return value
+ def binding_value(value):
+  need(type(value) is dict and all(type(key) is str for key in value) and set(value)==set(fields))
+  answer={key:value[key] for key in fields}
+  for key in fields[:6]:hash_value(answer[key])
+  need(type(answer['stage']) is str and answer['stage'] in stages)
+  need(type(answer['session']) is str and match('s-[A-Za-z0-9]{12}',answer['session']) is not None)
+  need(type(answer['bootId']) is str and match('[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}',answer['bootId']) is not None)
+  for key in ('parentPid','childPid'):unsigned(answer[key],2,2**31-1)
+  for key in ('parentStart','childStart'):unsigned(answer[key],2,2**64-1)
+  need(answer['parentPid']!=answer['childPid']);return answer
+ def streams(stdout,stderr):
+  need(type(stdout) is bytes and type(stderr) is bytes and len(stdout)<=out_cap and len(stderr)<=err_cap and len(stdout)+len(stderr)<=total_cap)
+  return digest(stdout),len(stdout),digest(stderr),len(stderr)
+ def format_frame(binding,out_hash,out_bytes,err_hash,err_bytes,exit_code):
+  parts=['ASBT1']+[str(binding[key]) for key in fields]+[out_hash,str(out_bytes),err_hash,str(err_bytes),str(exit_code)]
+  raw=('|'.join(parts)+'\n').encode('ascii');need(len(raw)<=frame_cap);return raw
+ def encode_status(binding,*,stdout,stderr,exit_code):
+  bound=binding_value(binding);unsigned(exit_code,0,255);out_hash,out_bytes,err_hash,err_bytes=streams(stdout,stderr)
+  return format_frame(bound,out_hash,out_bytes,err_hash,err_bytes,exit_code)
+ def parse_uint(text,minimum,maximum):
+  need(type(text) is str and 1<=len(text)<=len(str(maximum)) and match('0|[1-9][0-9]*',text) is not None)
+  return unsigned(int(text),minimum,maximum)
+ def decode_status(raw):
+  need(type(raw) is bytes and 0<len(raw)<=frame_cap and raw.endswith(b'\n') and raw.count(b'\n')==1 and b'\r' not in raw and b'\0' not in raw)
+  try:parts=raw[:-1].decode('ascii').split('|')
+  except UnicodeError:raise error_type('company-parent-status-data-unavailable') from None
+  need(len(parts)==19 and parts[0]=='ASBT1')
+  bound=dict(zip(fields,parts[1:14]))
+  for key in ('parentPid','childPid'):bound[key]=parse_uint(bound[key],2,2**31-1)
+  for key in ('parentStart','childStart'):bound[key]=parse_uint(bound[key],2,2**64-1)
+  bound=binding_value(bound);out_hash=hash_value(parts[14]);out_bytes=parse_uint(parts[15],0,out_cap)
+  err_hash=hash_value(parts[16]);err_bytes=parse_uint(parts[17],0,err_cap);exit_code=parse_uint(parts[18],0,255)
+  need(out_bytes+err_bytes<=total_cap and format_frame(bound,out_hash,out_bytes,err_hash,err_bytes,exit_code)==raw)
+  return proxy(dict(scope='ASBT1_PARENT_STATUS_DATA_ONLY',frame=raw,sha256=digest(raw),bytes=len(raw),binding=proxy(bound),
+   stdout=proxy(dict(sha256=out_hash,bytes=out_bytes)),stderr=proxy(dict(sha256=err_hash,bytes=err_bytes)),exitCode=exit_code,
+   parentOriginQualified=False,parentWaitQualified=False,sourceClosureQualified=False,crossProcessEvidenceIssued=False,stageAcknowledged=False))
+ def bind_status(raw,*,expected_binding,stdout,stderr):
+  expected=binding_value(expected_binding);out_hash,out_bytes,err_hash,err_bytes=streams(stdout,stderr);answer=decode_status(raw)
+  need(all(answer['binding'][key]==expected[key] for key in fields) and answer['stdout']['sha256']==out_hash and answer['stdout']['bytes']==out_bytes
+   and answer['stderr']['sha256']==err_hash and answer['stderr']['bytes']==err_bytes)
+  return answer
+ return encode_status,decode_status,bind_status
+encode_status,decode_status,bind_status=_make_codec(StatusFrameUnavailable)
+del _make_codec

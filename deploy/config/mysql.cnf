@@ -1,0 +1,17 @@
+[mysqld]
+require_secure_transport=ON
+tls_version=TLSv1.2,TLSv1.3
+ssl_ca=/etc/autosoft/tls/ca.crt
+ssl_cert=/etc/autosoft/tls/mysql.crt
+ssl_key=/etc/autosoft/tls/mysql.key
+default_table_encryption=ON
+table_encryption_privilege_check=ON
+innodb_redo_log_encrypt=ON
+innodb_undo_log_encrypt=ON
+binlog_encryption=ON
+log_bin=mysql-bin
+binlog_expire_logs_seconds=604800
+local_infile=OFF
+skip_name_resolve=ON
+max_connections=200
+log_error_verbosity=2

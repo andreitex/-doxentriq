@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 30s
+  evaluation_interval: 30s
+scrape_configs:
+  - job_name: platform
+    scheme: https
+    tls_config: {ca_file: /etc/autosoft/tls/ca.crt}
+    bearer_token_file: /run/secrets/metrics-token
+    static_configs:
+      - targets: ["control:3000"]
+    metrics_path: /metrics
+  - job_name: rabbitmq
+    scheme: https
+    tls_config: {ca_file: /etc/autosoft/tls/ca.crt}
+    static_configs:
+      - targets: ["rabbitmq:15691"]
+  - job_name: otel
+    scheme: https
+    tls_config: {ca_file: /etc/autosoft/tls/ca.crt}
+    static_configs:
+      - targets: ["otel:8889"]

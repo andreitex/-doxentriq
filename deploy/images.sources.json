@@ -1,0 +1,16 @@
+{
+  "mysql": "docker.io/library/mysql:8.4.11",
+  "redis": "docker.io/library/redis:8.10.2",
+  "rabbitmq": "docker.io/library/rabbitmq:4.3.6-management",
+  "registry": "docker.io/library/registry:3.1.2",
+  "caddy": "docker.io/library/caddy:2.11.7",
+  "node": "docker.io/library/node:24.21.0-bookworm-slim",
+  "python": "docker.io/library/python:3.13.16-slim-bookworm",
+  "keycloak": "quay.io/keycloak/keycloak:26.8.0",
+  "lego": "docker.io/goacme/lego:v5.5.2",
+  "prometheus": "docker.io/prom/prometheus:v3.15.0",
+  "loki": "docker.io/grafana/loki:3.7.8",
+  "grafana": "docker.io/grafana/grafana:13.2.3",
+  "otel": "docker.io/otel/opentelemetry-collector-contrib:0.162.0",
+  "trivy": "docker.io/aquasec/trivy:0.75.0"
+}

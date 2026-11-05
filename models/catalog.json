@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "pricesVerifiedAt": "2026-10-15T06:45:41Z",
+  "sources": [
+    "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+    "https://developers.openai.com/api/docs/models/gpt-6-luna",
+    "https://developers.openai.com/api/docs/models/gpt-6-astra",
+    "https://platform.claude.com/docs/en/about-claude/pricing"
+  ],
+  "models": [
+    {
+      "id": "gpt-6-luna",
+      "provider": "openai",
+      "tier": "economy",
+      "inputUsdPerMillion": 0.1,
+      "outputUsdPerMillion": 0.5,
+      "cacheWriteUsdPerMillion": 0.125,
+      "effort": "low",
+      "qualified": true,
+      "maxInputTokens": 90000,
+      "maxOutputTokens": 32768,
+      "cachedInputUsdPerMillion": 0.01
+    },
+    {
+      "id": "gpt-6.1-sol",
+      "provider": "openai",
+      "tier": "balanced",
+      "inputUsdPerMillion": 2,
+      "outputUsdPerMillion": 10,
+      "cacheWriteUsdPerMillion": 2.5,
+      "effort": "medium",
+      "qualified": true,
+      "maxInputTokens": 90000,
+      "maxOutputTokens": 32768,
+      "cachedInputUsdPerMillion": 0.1
+    },
+    {
+      "id": "gpt-6-astra",
+      "provider": "openai",
+      "tier": "strong",
+      "inputUsdPerMillion": 10,
+      "outputUsdPerMillion": 50,
+      "cacheWriteUsdPerMillion": 12.5,
+      "effort": "high",
+      "qualified": true,
+      "maxInputTokens": 90000,
+      "maxOutputTokens": 32768,
+      "cachedInputUsdPerMillion": 1.0
+    },
+    {
+      "id": "claude-haiku-5-5",
+      "provider": "anthropic",
+      "tier": "economy",
+      "inputUsdPerMillion": 0.1,
+      "outputUsdPerMillion": 0.5,
+      "cacheWriteUsdPerMillion": 0.125,
+      "effort": "low",
+      "qualified": false,
+      "maxInputTokens": 90000,
+      "maxOutputTokens": 32768,
+      "cachedInputUsdPerMillion": 0.01
+    },
+    {
+      "id": "claude-sonnet-5-5",
+      "provider": "anthropic",
+      "tier": "balanced",
+      "inputUsdPerMillion": 2,
+      "outputUsdPerMillion": 10,
+      "cacheWriteUsdPerMillion": 2.5,
+      "effort": "medium",
+      "qualified": false,
+      "maxInputTokens": 90000,
+      "maxOutputTokens": 32768,
+      "cachedInputUsdPerMillion": 0.1
+    },
+    {
+      "id": "claude-opus-5-5",
+      "provider": "anthropic",
+      "tier": "strong",
+      "inputUsdPerMillion": 4,
+      "outputUsdPerMillion": 20,
+      "cacheWriteUsdPerMillion": 5,
+      "effort": "high",
+      "qualified": true,
+      "maxInputTokens": 90000,
+      "maxOutputTokens": 32768,
+      "cachedInputUsdPerMillion": 0.2
+    }
+  ]
+}

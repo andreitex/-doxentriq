@@ -1,0 +1,1 @@
+{"schemaVersion":1,"id":"dms-reference","slug":"dms-reference","name":"Document management reference","kind":"web","template":"node-web","auth":"sso","permissions":["dms.read","dms.write","dms.admin","dms.search"],"connections":[],"resources":{"cpu":0.5,"memoryMb":512,"pids":128},"health":{"path":"/healthz","port":8080},"storage":[{"name":"documents","maxMb":1024}]}

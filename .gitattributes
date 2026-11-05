@@ -1,0 +1,4 @@
+# Source signatures, historical fixtures and disclosure reviews bind exact bytes.
+# Preserve those bytes on every checkout, including Windows. Use LF for new files;
+# do not normalize existing signed/pinned inputs without reviewing their bindings.
+* -text

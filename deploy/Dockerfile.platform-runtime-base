@@ -1,0 +1,18 @@
+# Company-maintained API/worker runtime. Dependency installation is a separate
+# build stage; production executes Node and its already-installed modules.
+ARG NODE_IMAGE
+FROM ${NODE_IMAGE}
+ARG ZLIB_VERSION
+COPY scripts/trim-platform-runtime-tools.mjs /tmp/trim-platform-runtime-tools.mjs
+RUN test -n "$ZLIB_VERSION" \
+    && sha256sum /usr/local/bin/node /etc/ssl/certs/ca-certificates.crt > /tmp/preserved-runtime.sha256 \
+    && apk info -v | sort > /tmp/packages.before \
+    && apk add --no-cache --no-scripts --upgrade "zlib=$ZLIB_VERSION" \
+    && apk info -v | sort > /tmp/packages.after \
+    && grep -v '^zlib-' /tmp/packages.before > /tmp/packages.other.before \
+    && grep -v '^zlib-' /tmp/packages.after > /tmp/packages.other.after \
+    && cmp /tmp/packages.other.before /tmp/packages.other.after \
+    && node /tmp/trim-platform-runtime-tools.mjs \
+    && sha256sum -c /tmp/preserved-runtime.sha256 \
+    && rm /tmp/trim-platform-runtime-tools.mjs /tmp/preserved-runtime.sha256 /tmp/packages.before /tmp/packages.after /tmp/packages.other.before /tmp/packages.other.after
+LABEL io.autosoft.role="platform-runtime-base" io.autosoft.acceptance="candidate-requires-fresh-image-scan"

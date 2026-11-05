@@ -1,0 +1,17 @@
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: https://prometheus:9090
+    jsonData: {tlsAuthWithCACert: true, tlsSkipVerify: false}
+    secureJsonData:
+      tlsCACert: ${AUTOSOFT_CA_PEM}
+    isDefault: true
+  - name: Loki
+    type: loki
+    access: proxy
+    url: https://loki:3100
+    jsonData: {tlsAuthWithCACert: true, tlsSkipVerify: false}
+    secureJsonData:
+      tlsCACert: ${AUTOSOFT_CA_PEM}

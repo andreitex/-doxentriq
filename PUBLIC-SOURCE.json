@@ -1,0 +1,3847 @@
+{
+  "schemaVersion": 1,
+  "status": "source_candidate_not_published",
+  "licenseSelected": true,
+  "fileCount": 628,
+  "excludedFileCount": 709,
+  "transformedFileCount": 29,
+  "publicSourceCheck": {
+    "schemaVersion": 1,
+    "ready": true,
+    "candidateFiles": 628,
+    "scannedFiles": 628,
+    "reviewedFixtureFindings": 12,
+    "findingCounts": {},
+    "findings": [],
+    "scope": "Current candidate files only; Git history, dependency licenses, vulnerabilities, installation and usability require separate review."
+  },
+  "brokenDocumentationLinks": [],
+  "files": [
+    {
+      "path": ".dockerignore",
+      "sourceSha256": "134907c6b5bc1bb4978047c88fbdc59b0cffe27d120e144694486c4133b4ea06",
+      "exportSha256": "134907c6b5bc1bb4978047c88fbdc59b0cffe27d120e144694486c4133b4ea06",
+      "transformations": []
+    },
+    {
+      "path": ".gitattributes",
+      "sourceSha256": "1040ba04cf9a0f5b67f1e22b04bcdf2a84d5eeb79585009e698723666826dc34",
+      "exportSha256": "1040ba04cf9a0f5b67f1e22b04bcdf2a84d5eeb79585009e698723666826dc34",
+      "transformations": []
+    },
+    {
+      "path": ".github/workflows/public-source-readiness.yml",
+      "sourceSha256": "2b8028796d5acb2f08154c1974c059b978f8d053a1be7d66056f0da5856ef01c",
+      "exportSha256": "2b8028796d5acb2f08154c1974c059b978f8d053a1be7d66056f0da5856ef01c",
+      "transformations": []
+    },
+    {
+      "path": ".gitignore",
+      "sourceSha256": "1fc92889f824bbc9a7bcf4b25d4204955878e2eeb61d24225119a2a4f36919c4",
+      "exportSha256": "1fc92889f824bbc9a7bcf4b25d4204955878e2eeb61d24225119a2a4f36919c4",
+      "transformations": []
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "sourceSha256": "5c6c223c267f6a38e606e92719575739f8442e5b6d7c0ddc75764ee0fe7ad814",
+      "exportSha256": "5c6c223c267f6a38e606e92719575739f8442e5b6d7c0ddc75764ee0fe7ad814",
+      "transformations": []
+    },
+    {
+      "path": "LICENSE",
+      "sourceSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "exportSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "transformations": []
+    },
+    {
+      "path": "README.md",
+      "sourceSha256": "f519626a7dde9e37b8c51dcee2561ebe44e0a0e57a0a19449ce49f27e2219b63",
+      "exportSha256": "f519626a7dde9e37b8c51dcee2561ebe44e0a0e57a0a19449ce49f27e2219b63",
+      "transformations": []
+    },
+    {
+      "path": "RELEASING.md",
+      "sourceSha256": "779089c0d0e54af7e5961d7a8aa03dc95cd38a51cab54b317feebf45dd605fab",
+      "exportSha256": "779089c0d0e54af7e5961d7a8aa03dc95cd38a51cab54b317feebf45dd605fab",
+      "transformations": []
+    },
+    {
+      "path": "SECURITY.md",
+      "sourceSha256": "a5bfdb7d704a81596c4fd881306bd2349630976ad0c76dff1685cecd337703a3",
+      "exportSha256": "a5bfdb7d704a81596c4fd881306bd2349630976ad0c76dff1685cecd337703a3",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/PORTAL.md",
+      "sourceSha256": "e2823c9c461a1b606d40cae6735d7ae21dd9cf0acff110a8e0bac1c372cdb871",
+      "exportSha256": "e2823c9c461a1b606d40cae6735d7ae21dd9cf0acff110a8e0bac1c372cdb871",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/index.html",
+      "sourceSha256": "01ffe185bf690537f309bd8ceecffcb2e6e8ebbb8b079418528e69634d05a8c9",
+      "exportSha256": "01ffe185bf690537f309bd8ceecffcb2e6e8ebbb8b079418528e69634d05a8c9",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/portal.html",
+      "sourceSha256": "058a90f0b611fc064365492016185132d51abcb0bc44b3b2c1cb1cb6596fd9a5",
+      "exportSha256": "058a90f0b611fc064365492016185132d51abcb0bc44b3b2c1cb1cb6596fd9a5",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/App.tsx",
+      "sourceSha256": "9c0af2e947a4c7000d4f886eedf9e3660d4e2e8bfc52e9784ce62fee3f5fbe4d",
+      "exportSha256": "9c0af2e947a4c7000d4f886eedf9e3660d4e2e8bfc52e9784ce62fee3f5fbe4d",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/api.ts",
+      "sourceSha256": "e55da905d725b0073e19cac6f5cea0f0d17a2bcbcae562435217e561f025c8c3",
+      "exportSha256": "e55da905d725b0073e19cac6f5cea0f0d17a2bcbcae562435217e561f025c8c3",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/components/AppAccounts.tsx",
+      "sourceSha256": "82358bf5cf5b1cf38f74f20f607f6b4a6a539397667a1b8c7aa8b5327d1bce92",
+      "exportSha256": "82358bf5cf5b1cf38f74f20f607f6b4a6a539397667a1b8c7aa8b5327d1bce92",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/components/BudgetApproval.tsx",
+      "sourceSha256": "e878660b4d71b245a2e797670851be2259456c63ceda8578aab9605579f5e696",
+      "exportSha256": "e878660b4d71b245a2e797670851be2259456c63ceda8578aab9605579f5e696",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/components/ConnectionRevocation.tsx",
+      "sourceSha256": "429c90204fa35c094e42d65ed5b870aac467358c91a08157a09d466fd4a140a0",
+      "exportSha256": "429c90204fa35c094e42d65ed5b870aac467358c91a08157a09d466fd4a140a0",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/components/DirectoryAuthorization.tsx",
+      "sourceSha256": "f34c2fdd381532f8e4fbaaf5f93142d3a2d4b1912e7f166ba569b162496557a0",
+      "exportSha256": "f34c2fdd381532f8e4fbaaf5f93142d3a2d4b1912e7f166ba569b162496557a0",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/components/DirectoryRegistration.tsx",
+      "sourceSha256": "668ad6616add33502d6ee4ee52c28be1d1ad5ef51f96431abfa2d529d56caaa6",
+      "exportSha256": "668ad6616add33502d6ee4ee52c28be1d1ad5ef51f96431abfa2d529d56caaa6",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/components/Elapsed.tsx",
+      "sourceSha256": "fd629e2ebac84c3b771baa4cd2a43092473a096ee2266b3d26bcd302221cf1bc",
+      "exportSha256": "fd629e2ebac84c3b771baa4cd2a43092473a096ee2266b3d26bcd302221cf1bc",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/components/EmergencyRollback.tsx",
+      "sourceSha256": "b4603d1d3466080ab93a4e11c5e0613ff5d1c687bd7bb953b3c8619f352ff5df",
+      "exportSha256": "b4603d1d3466080ab93a4e11c5e0613ff5d1c687bd7bb953b3c8619f352ff5df",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/components/FilesystemProvision.tsx",
+      "sourceSha256": "8bcfb9efdbd6bd1c1a9d4a6a0822582d4f931204b59a0072211d70abedf9959f",
+      "exportSha256": "8bcfb9efdbd6bd1c1a9d4a6a0822582d4f931204b59a0072211d70abedf9959f",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/components/FilesystemRegistration.tsx",
+      "sourceSha256": "698a9579aa7c4eed5588fb7e6dbaf4434e49a40e1205e8a20ff571cc7ace79d5",
+      "exportSha256": "698a9579aa7c4eed5588fb7e6dbaf4434e49a40e1205e8a20ff571cc7ace79d5",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/components/PortalListing.tsx",
+      "sourceSha256": "aa486e7533d2ad3c1711d23f15654cd5cb80a262a9a6ee2a87d5cad9ebdd69b1",
+      "exportSha256": "aa486e7533d2ad3c1711d23f15654cd5cb80a262a9a6ee2a87d5cad9ebdd69b1",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/components/RecoveryConsent.tsx",
+      "sourceSha256": "64348e8cae1e19e5dd25855ab0a97c1c316f165cbf88d487c03172e0b4a6a193",
+      "exportSha256": "64348e8cae1e19e5dd25855ab0a97c1c316f165cbf88d487c03172e0b4a6a193",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/components/SambaProvision.tsx",
+      "sourceSha256": "41f48315d6a29789193f215d910b53937254e41ef6da114d5decc64adafc61d4",
+      "exportSha256": "41f48315d6a29789193f215d910b53937254e41ef6da114d5decc64adafc61d4",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/components/StripeWebhooks.tsx",
+      "sourceSha256": "fd3f1e218c2c7dcdb4570d53af9208ab522b241eb7d73ba00bafa7c6fe9f618d",
+      "exportSha256": "fd3f1e218c2c7dcdb4570d53af9208ab522b241eb7d73ba00bafa7c6fe9f618d",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/components/ui.tsx",
+      "sourceSha256": "93edf601a292de1a3b616f30090b930f917a6cb8ec100a245b40a56ff33197d3",
+      "exportSha256": "93edf601a292de1a3b616f30090b930f917a6cb8ec100a245b40a56ff33197d3",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/hooks.ts",
+      "sourceSha256": "6162d272bfb3ce50d87ee4b34d4f6f2dd62282096f351a0909191844ad08e77e",
+      "exportSha256": "6162d272bfb3ce50d87ee4b34d4f6f2dd62282096f351a0909191844ad08e77e",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/job-updates.ts",
+      "sourceSha256": "41a2f6fecb1e897f279cbec896314a9d48dbcbe9a278a319e5a17627a1bca7de",
+      "exportSha256": "41a2f6fecb1e897f279cbec896314a9d48dbcbe9a278a319e5a17627a1bca7de",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/main.tsx",
+      "sourceSha256": "fc400cf6024a7aaa373ad3ad5f17352466a4912ebe94150119bd3476e52d1806",
+      "exportSha256": "fc400cf6024a7aaa373ad3ad5f17352466a4912ebe94150119bd3476e52d1806",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/portal/Invitation.tsx",
+      "sourceSha256": "6c04d88281194b60476c4d333c01d9ba9c0eb716f9e36063aaf8402375c90170",
+      "exportSha256": "6c04d88281194b60476c4d333c01d9ba9c0eb716f9e36063aaf8402375c90170",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/portal/Portal.tsx",
+      "sourceSha256": "d990cf45ba73d498a2bbe829dde53d842462a44f97863bdf65e5c94982690ed9",
+      "exportSha256": "d990cf45ba73d498a2bbe829dde53d842462a44f97863bdf65e5c94982690ed9",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/portal/catalog.ts",
+      "sourceSha256": "e8835524fcec17d3e64186dcd789702489169bee48d2a8883678c4175dc914b4",
+      "exportSha256": "e8835524fcec17d3e64186dcd789702489169bee48d2a8883678c4175dc914b4",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/portal/main.tsx",
+      "sourceSha256": "4bba8731fe9e9a84ee0530c46fcf742c4690df61c27d5e3293e7f897b6f38a75",
+      "exportSha256": "4bba8731fe9e9a84ee0530c46fcf742c4690df61c27d5e3293e7f897b6f38a75",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/portal/portal.css",
+      "sourceSha256": "c8f599968d91690e6b13a3bbdb7651a133f2b767231af8f93207e718c3392980",
+      "exportSha256": "c8f599968d91690e6b13a3bbdb7651a133f2b767231af8f93207e718c3392980",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/progress-time.ts",
+      "sourceSha256": "756f83f8ba0d42b5380e5512136bc8ac08dc7e00d99c53b7b99ffd31b8fc5e9a",
+      "exportSha256": "756f83f8ba0d42b5380e5512136bc8ac08dc7e00d99c53b7b99ffd31b8fc5e9a",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/styles.css",
+      "sourceSha256": "014087ad93e6826ffcd546efe38c9382516b7859d0d28d823b88d19163eff6a8",
+      "exportSha256": "014087ad93e6826ffcd546efe38c9382516b7859d0d28d823b88d19163eff6a8",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/types.ts",
+      "sourceSha256": "87321d66cbe3c2cfa9e1647fb2e5aebc2994467f6f9f13afdd98f0688d41db18",
+      "exportSha256": "87321d66cbe3c2cfa9e1647fb2e5aebc2994467f6f9f13afdd98f0688d41db18",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/views/Access.tsx",
+      "sourceSha256": "4f59ddd973f12ffb43f38e7fc640f8b829b0668a4122499df555de31adbe297a",
+      "exportSha256": "4f59ddd973f12ffb43f38e7fc640f8b829b0668a4122499df555de31adbe297a",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/views/Chat.tsx",
+      "sourceSha256": "531218968e67d6c308942b82ab1a9baa5c83911e94d4f86b3122b18ed1846987",
+      "exportSha256": "531218968e67d6c308942b82ab1a9baa5c83911e94d4f86b3122b18ed1846987",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/views/Connections.tsx",
+      "sourceSha256": "fab4a0321781c6bb3bc91494194c15c8bc228b7e942218ec532816abf09d2f15",
+      "exportSha256": "fab4a0321781c6bb3bc91494194c15c8bc228b7e942218ec532816abf09d2f15",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/views/Releases.tsx",
+      "sourceSha256": "feed3fced505404a1df8fca7de416d43c86adf050be9de40abd7a76fde435359",
+      "exportSha256": "feed3fced505404a1df8fca7de416d43c86adf050be9de40abd7a76fde435359",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/views/Security.tsx",
+      "sourceSha256": "d6448586b16489dd9721821159ebeb120220de2f24efd7083e9a895b4cead610",
+      "exportSha256": "d6448586b16489dd9721821159ebeb120220de2f24efd7083e9a895b4cead610",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/views/Telemetry.tsx",
+      "sourceSha256": "cb5eaa0809fd48d2857a257b094b154413a0e93efa98feef2e719476116c9c88",
+      "exportSha256": "cb5eaa0809fd48d2857a257b094b154413a0e93efa98feef2e719476116c9c88",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/views/local-account-setup.tsx",
+      "sourceSha256": "8b717d9721bacef76bc0bae73973052516dbd4fcfd1dba0c7cc11b1e8cb41e4f",
+      "exportSha256": "8b717d9721bacef76bc0bae73973052516dbd4fcfd1dba0c7cc11b1e8cb41e4f",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/src/views/request-guidance.ts",
+      "sourceSha256": "e8b713ddc50e025a3ed330feca5318e00c8daf610241b1b4663d895fad5cc849",
+      "exportSha256": "e8b713ddc50e025a3ed330feca5318e00c8daf610241b1b4663d895fad5cc849",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/app-accounts.test.tsx",
+      "sourceSha256": "552433610bca19075b6e3c4ec655d43aeef7cf696a89076ff01df15b118fb563",
+      "exportSha256": "552433610bca19075b6e3c4ec655d43aeef7cf696a89076ff01df15b118fb563",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/connection-revocation.test.tsx",
+      "sourceSha256": "91d7a0c35047d40e370347b34f4a40e39025dc1d565bbe7a43955bee896dea72",
+      "exportSha256": "91d7a0c35047d40e370347b34f4a40e39025dc1d565bbe7a43955bee896dea72",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/directory-registration.test.tsx",
+      "sourceSha256": "d022abe2e58c2650b90525492f7c2722c3d0051ce26aa61b89593c3d8d932059",
+      "exportSha256": "d022abe2e58c2650b90525492f7c2722c3d0051ce26aa61b89593c3d8d932059",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/directory.test.tsx",
+      "sourceSha256": "352fdf594e98e835cb00438b7ba8fd0b876585390e486b209a02cc2f3a3fbb74",
+      "exportSha256": "352fdf594e98e835cb00438b7ba8fd0b876585390e486b209a02cc2f3a3fbb74",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/emergency-rollback.test.tsx",
+      "sourceSha256": "79718cc6dc85098e359b6ecb471edfbc18356b9a3cc41a786d4337024baf4e4a",
+      "exportSha256": "79718cc6dc85098e359b6ecb471edfbc18356b9a3cc41a786d4337024baf4e4a",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/filesystem.test.tsx",
+      "sourceSha256": "29bbc8c3e06f66589b1884549c0875a3838c09c99c07b2a99b8b4e8312e429fc",
+      "exportSha256": "29bbc8c3e06f66589b1884549c0875a3838c09c99c07b2a99b8b4e8312e429fc",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/invitation.test.tsx",
+      "sourceSha256": "b93fdd07d521ab6805ea503fdcd03e41896d2f618a3bf0b10e78bbce4cba1031",
+      "exportSha256": "b93fdd07d521ab6805ea503fdcd03e41896d2f618a3bf0b10e78bbce4cba1031",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/job-updates.test.tsx",
+      "sourceSha256": "72b028d6e22876aed086b4f60d23c0af51645daacfbdea8af212e9ec3bc52752",
+      "exportSha256": "72b028d6e22876aed086b4f60d23c0af51645daacfbdea8af212e9ec3bc52752",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/local-account-setup.test.tsx",
+      "sourceSha256": "2a0a45ecb44acdd26329cd87f3fd1fb71d21847f1af48b78b00abc941dbfdf07",
+      "exportSha256": "2a0a45ecb44acdd26329cd87f3fd1fb71d21847f1af48b78b00abc941dbfdf07",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/portal.test.tsx",
+      "sourceSha256": "2f106d22619f0e69fde30c113bda5454acee6b7d12ac46176611eaefd683d84e",
+      "exportSha256": "2f106d22619f0e69fde30c113bda5454acee6b7d12ac46176611eaefd683d84e",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/progress-time.test.tsx",
+      "sourceSha256": "2c1d9ec782699c32c6fe5edeeadc814ebfa104aff0e4538352ebeae782bcbeae",
+      "exportSha256": "2c1d9ec782699c32c6fe5edeeadc814ebfa104aff0e4538352ebeae782bcbeae",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/recovery-consent.test.tsx",
+      "sourceSha256": "9552703df490633b5e140a3909eafd5b250e18ce017710b0f09aae2f7f47d8f6",
+      "exportSha256": "9552703df490633b5e140a3909eafd5b250e18ce017710b0f09aae2f7f47d8f6",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/samba.test.tsx",
+      "sourceSha256": "66e3d7559c39b3dfcce82a7bb96a705ec0a16e55bb5defc6a3bacfb903ef1908",
+      "exportSha256": "66e3d7559c39b3dfcce82a7bb96a705ec0a16e55bb5defc6a3bacfb903ef1908",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/stripe-webhooks.test.tsx",
+      "sourceSha256": "ce2ae092cc8774ba0fcbe471e24c16aae85e25969a3df800d1bd584afe69a90a",
+      "exportSha256": "ce2ae092cc8774ba0fcbe471e24c16aae85e25969a3df800d1bd584afe69a90a",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/tsconfig.json",
+      "sourceSha256": "0dc30c138c13267c8ccaf0aa671a24dbe52d2c0ffebc479ffb86f7888dfa0613",
+      "exportSha256": "0dc30c138c13267c8ccaf0aa671a24dbe52d2c0ffebc479ffb86f7888dfa0613",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/test/views.test.tsx",
+      "sourceSha256": "a7505115c9be852f05190100a50a0af665844a79749b6f61f733634e2796bace",
+      "exportSha256": "a7505115c9be852f05190100a50a0af665844a79749b6f61f733634e2796bace",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/tsconfig.json",
+      "sourceSha256": "5ef09dbf634c1ab73f0c024ff8afae4afd39b95b1cc704986b467a59a7d856fd",
+      "exportSha256": "5ef09dbf634c1ab73f0c024ff8afae4afd39b95b1cc704986b467a59a7d856fd",
+      "transformations": []
+    },
+    {
+      "path": "apps/admin/vite.config.ts",
+      "sourceSha256": "893dc27e4b90aa3a4254dcc948ef2870d64d555dc4c6f2f19bfc9dec5b43156a",
+      "exportSha256": "893dc27e4b90aa3a4254dcc948ef2870d64d555dc4c6f2f19bfc9dec5b43156a",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/access.ts",
+      "sourceSha256": "e0bfa6599800bfcddc7a8a6def5e13104f0f9a80d3a8edc6a0ea5b9ebbf3d0e2",
+      "exportSha256": "e0bfa6599800bfcddc7a8a6def5e13104f0f9a80d3a8edc6a0ea5b9ebbf3d0e2",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/app-accounts.ts",
+      "sourceSha256": "3770b29b68f612a4247291aa10c4c354baa2c1972229c97144c533cacc7ef868",
+      "exportSha256": "3770b29b68f612a4247291aa10c4c354baa2c1972229c97144c533cacc7ef868",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/auth.ts",
+      "sourceSha256": "ee3b9c2da30dff0d49f452b0a867934d2f0767ee3bef27dce8d99f4d826b78a0",
+      "exportSha256": "ee3b9c2da30dff0d49f452b0a867934d2f0767ee3bef27dce8d99f4d826b78a0",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/budget.ts",
+      "sourceSha256": "1e104963e749fb583723e97acec3c12a74a0bcf54d7e9351ada17ba052518e14",
+      "exportSha256": "1e104963e749fb583723e97acec3c12a74a0bcf54d7e9351ada17ba052518e14",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/config.ts",
+      "sourceSha256": "d62cbf5df6e9a526dfae7605cea37d7bac3666a9526a6cbbd65b2330aebcd5f8",
+      "exportSha256": "d62cbf5df6e9a526dfae7605cea37d7bac3666a9526a6cbbd65b2330aebcd5f8",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/connection-context.ts",
+      "sourceSha256": "05e039c141a7d11f04c82be6251fe25d678514afb047b318f2a6cc860921df5d",
+      "exportSha256": "05e039c141a7d11f04c82be6251fe25d678514afb047b318f2a6cc860921df5d",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/connection-revocation.ts",
+      "sourceSha256": "02e4b740192cea9386562832071a8b61cb25a890d7235bc41c3a7e685a8c0ba9",
+      "exportSha256": "02e4b740192cea9386562832071a8b61cb25a890d7235bc41c3a7e685a8c0ba9",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/connectors.ts",
+      "sourceSha256": "08e351d20c52f8925194732cb00692d692bf3cc7af9c81d2f9943bb74298e09c",
+      "exportSha256": "08e351d20c52f8925194732cb00692d692bf3cc7af9c81d2f9943bb74298e09c",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/dependencies.ts",
+      "sourceSha256": "8b85dc968a42fd1f0149b07aa2049e9e8e9df9099c3f24b9d82dafe32bf8f71d",
+      "exportSha256": "8b85dc968a42fd1f0149b07aa2049e9e8e9df9099c3f24b9d82dafe32bf8f71d",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/deployments.ts",
+      "sourceSha256": "954995cfc61213cac541b4fe306f07a0c4d8e229c50d562672896d8b80975253",
+      "exportSha256": "954995cfc61213cac541b4fe306f07a0c4d8e229c50d562672896d8b80975253",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/directory-http.ts",
+      "sourceSha256": "6a24d0e5ce81e5ce1f52be6092c7d048ee91112275e7f0dc2c627d954a21cd15",
+      "exportSha256": "6a24d0e5ce81e5ce1f52be6092c7d048ee91112275e7f0dc2c627d954a21cd15",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/directory-provider.ts",
+      "sourceSha256": "10cdfe043548ea85a4e47c43426129206443a0f128124245b97b27619557858f",
+      "exportSha256": "10cdfe043548ea85a4e47c43426129206443a0f128124245b97b27619557858f",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/directory-route.ts",
+      "sourceSha256": "13a119ca552c49666f8c1ad17f8e99eb0f987d1f92c3e5e7ca1c10ffaa26694b",
+      "exportSha256": "13a119ca552c49666f8c1ad17f8e99eb0f987d1f92c3e5e7ca1c10ffaa26694b",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/directory.ts",
+      "sourceSha256": "9abbf8e030da9e091cdf094e06e8c133633994e7999597bf4bf8cade42999272",
+      "exportSha256": "9abbf8e030da9e091cdf094e06e8c133633994e7999597bf4bf8cade42999272",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/engine.ts",
+      "sourceSha256": "f4660c6b7880024990358a9041bc1c51f16b84e6bde877f4e864755b38b9119f",
+      "exportSha256": "f4660c6b7880024990358a9041bc1c51f16b84e6bde877f4e864755b38b9119f",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/external-effects.ts",
+      "sourceSha256": "5d88e223137169eda520377a83284bd21d4c8032e8dc86db875e304c1b4bce1c",
+      "exportSha256": "5d88e223137169eda520377a83284bd21d4c8032e8dc86db875e304c1b4bce1c",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/filesystem-connectors.ts",
+      "sourceSha256": "3a73467b5db005cc1727252d9828ed9b7bed8b65f6b17cd58d488880eaa90553",
+      "exportSha256": "3a73467b5db005cc1727252d9828ed9b7bed8b65f6b17cd58d488880eaa90553",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/http-drain.ts",
+      "sourceSha256": "0080fec78ef38c3a5b4b9ddf4751ab4514dc7acd25dbdd7610f0698a61e8419e",
+      "exportSha256": "0080fec78ef38c3a5b4b9ddf4751ab4514dc7acd25dbdd7610f0698a61e8419e",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/integration-research.ts",
+      "sourceSha256": "6941c4f738cddfc7f69a5824285cb0d29b5845846a320c6395c30a43861de94f",
+      "exportSha256": "6941c4f738cddfc7f69a5824285cb0d29b5845846a320c6395c30a43861de94f",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/main.ts",
+      "sourceSha256": "8983a083908d4d645364eb5f04fe473eba7c91d299125dbacd1b89aa14f28a3b",
+      "exportSha256": "8983a083908d4d645364eb5f04fe473eba7c91d299125dbacd1b89aa14f28a3b",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/messaging.ts",
+      "sourceSha256": "3aeb8937172dc5e481596773e9bfa4704f637b649eff39bdfca46d567c9b9a04",
+      "exportSha256": "3aeb8937172dc5e481596773e9bfa4704f637b649eff39bdfca46d567c9b9a04",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/metrics.ts",
+      "sourceSha256": "204d2c67ac4dd85d71770f328fd8af0ef955f60a77911a1b5d8a2f1b5da8b46c",
+      "exportSha256": "204d2c67ac4dd85d71770f328fd8af0ef955f60a77911a1b5d8a2f1b5da8b46c",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/model-checkpoints.ts",
+      "sourceSha256": "95460b16f18997947d0ec7168e4af238ab56ed3a8fbbce064cbbb6631aea5e0d",
+      "exportSha256": "95460b16f18997947d0ec7168e4af238ab56ed3a8fbbce064cbbb6631aea5e0d",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/model-records.ts",
+      "sourceSha256": "67c3d01f3c6a3f795e16efa937e1ecd923aeaed4f91e8d27e464326c8d181cfd",
+      "exportSha256": "67c3d01f3c6a3f795e16efa937e1ecd923aeaed4f91e8d27e464326c8d181cfd",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/observation.ts",
+      "sourceSha256": "b1ae8e858c7fb1cd08871b79fcc1c7b3ee3535e8558df055865da745f34b24f7",
+      "exportSha256": "b1ae8e858c7fb1cd08871b79fcc1c7b3ee3535e8558df055865da745f34b24f7",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/portal-listing.ts",
+      "sourceSha256": "688154e6786192dd8482221a78afa2c0b0c66a9daa3cc6772fe7a8e7adf44fc8",
+      "exportSha256": "688154e6786192dd8482221a78afa2c0b0c66a9daa3cc6772fe7a8e7adf44fc8",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/portal.ts",
+      "sourceSha256": "8c6b714feea4e23059a7b812635e8f3b8b4c12bf1ddf8b0c938a7800c2f59ad3",
+      "exportSha256": "8c6b714feea4e23059a7b812635e8f3b8b4c12bf1ddf8b0c938a7800c2f59ad3",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/preview.ts",
+      "sourceSha256": "7fc770bf2ee256d6ba2afc2531bd71b7f5db3a08395266c0c36385a5393a67a1",
+      "exportSha256": "7fc770bf2ee256d6ba2afc2531bd71b7f5db3a08395266c0c36385a5393a67a1",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/progress-bus.ts",
+      "sourceSha256": "1a6edfe747098291076e81e702a21026f2dfffa47bdd6d759a6601ba756b0223",
+      "exportSha256": "1a6edfe747098291076e81e702a21026f2dfffa47bdd6d759a6601ba756b0223",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/protected-values.ts",
+      "sourceSha256": "3468794eeaaf9573f72b6b762a968fa2a29302060e074763acd5c9b88375ce27",
+      "exportSha256": "3468794eeaaf9573f72b6b762a968fa2a29302060e074763acd5c9b88375ce27",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/reports.ts",
+      "sourceSha256": "3c5291b790ebd76166bf005113c5ab338deddd04f3256954817f8808e5c7034a",
+      "exportSha256": "3c5291b790ebd76166bf005113c5ab338deddd04f3256954817f8808e5c7034a",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/runtime.ts",
+      "sourceSha256": "90dcfc686e0691365ccc2fe48be95dd7304d31326851e6c6d7425d7ce9020eb1",
+      "exportSha256": "90dcfc686e0691365ccc2fe48be95dd7304d31326851e6c6d7425d7ce9020eb1",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/schema-state.ts",
+      "sourceSha256": "44c9bbc2cbecb7ae26a8ccb11bee8359573a0969161273078def9e1ea4fcfd11",
+      "exportSha256": "44c9bbc2cbecb7ae26a8ccb11bee8359573a0969161273078def9e1ea4fcfd11",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/server.ts",
+      "sourceSha256": "c4e99bf3ebb6fb32999e2c0adb08997936d1f2978f35941d313fba5846732bd3",
+      "exportSha256": "c4e99bf3ebb6fb32999e2c0adb08997936d1f2978f35941d313fba5846732bd3",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/shutdown.ts",
+      "sourceSha256": "d9380364ef8a3fc5ef811c21e081fb92f84347dbf94bd5819aa0da901f5f49b5",
+      "exportSha256": "d9380364ef8a3fc5ef811c21e081fb92f84347dbf94bd5819aa0da901f5f49b5",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/spending-authority.ts",
+      "sourceSha256": "0117eba447465d05e1991e9e96e72d8be705d61d967f7dbe75cae22b4180b47b",
+      "exportSha256": "0117eba447465d05e1991e9e96e72d8be705d61d967f7dbe75cae22b4180b47b",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/store.ts",
+      "sourceSha256": "fbb991c8f010e8de9026aea1bc05d6f2e58c264805e6a89a0062608ddafadceb",
+      "exportSha256": "fbb991c8f010e8de9026aea1bc05d6f2e58c264805e6a89a0062608ddafadceb",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/stripe-webhooks.ts",
+      "sourceSha256": "9d9f924b0c884289b17f1af8c35c3a284009221006d52ec47960c8ce3fdc8747",
+      "exportSha256": "9d9f924b0c884289b17f1af8c35c3a284009221006d52ec47960c8ce3fdc8747",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/telemetry.ts",
+      "sourceSha256": "e481a97c22767d68c26918923b8926eb7e0231dffefa6a26cbbaba8a60ada91a",
+      "exportSha256": "e481a97c22767d68c26918923b8926eb7e0231dffefa6a26cbbaba8a60ada91a",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/verification.ts",
+      "sourceSha256": "846fc5cf1d80dd2918923efc70d68e4b92a710862d7b08c73e8a5d21cfb5186d",
+      "exportSha256": "846fc5cf1d80dd2918923efc70d68e4b92a710862d7b08c73e8a5d21cfb5186d",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/src/worker-main.ts",
+      "sourceSha256": "2ffbdb77b13e2057fe1cc5f8cf8feb8490d82fb50dad5290fe9228b67b1e58c6",
+      "exportSha256": "2ffbdb77b13e2057fe1cc5f8cf8feb8490d82fb50dad5290fe9228b67b1e58c6",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/access.test.ts",
+      "sourceSha256": "55e536d2466cfde6392bb3943a129e3c8216f0d8ef5944e3794767fcc34c6b7d",
+      "exportSha256": "55e536d2466cfde6392bb3943a129e3c8216f0d8ef5944e3794767fcc34c6b7d",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/app-account-fixture.ts",
+      "sourceSha256": "8cbbb9adcdb062bcc0794e3e48430dc32ec6613ae4f92d86924446b37392ae9e",
+      "exportSha256": "8cbbb9adcdb062bcc0794e3e48430dc32ec6613ae4f92d86924446b37392ae9e",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/app-accounts.test.ts",
+      "sourceSha256": "39b92dfc9a76eefc43f8eb69b1b9df540f011c244d4bf4d7ad751cdeb5126cc6",
+      "exportSha256": "39b92dfc9a76eefc43f8eb69b1b9df540f011c244d4bf4d7ad751cdeb5126cc6",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/auth.test.ts",
+      "sourceSha256": "8d0b71724fee0765a342a87163157f72a672099f1f47a5d861abcb05467f8465",
+      "exportSha256": "8d0b71724fee0765a342a87163157f72a672099f1f47a5d861abcb05467f8465",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/backup-evidence.test.ts",
+      "sourceSha256": "e550a08a4eb8b2ffee6fa2c385db02943cd5daab020c0d89589153255909738f",
+      "exportSha256": "e550a08a4eb8b2ffee6fa2c385db02943cd5daab020c0d89589153255909738f",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/config.test.ts",
+      "sourceSha256": "8333b30c4f62a1115911f9c77908003feb46927ce08e88cd2915fe4ae07878f2",
+      "exportSha256": "8333b30c4f62a1115911f9c77908003feb46927ce08e88cd2915fe4ae07878f2",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/connection-context.test.ts",
+      "sourceSha256": "2cdc651b0d97c3e18797845e83896cd30dc7e937f61c7aa21a881138cbadb62b",
+      "exportSha256": "2cdc651b0d97c3e18797845e83896cd30dc7e937f61c7aa21a881138cbadb62b",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/connection-revocation.test.ts",
+      "sourceSha256": "b571311359e70a8dbcfaef829ebadeccbed0cd760f6585b9ca227e73f9bc615f",
+      "exportSha256": "b571311359e70a8dbcfaef829ebadeccbed0cd760f6585b9ca227e73f9bc615f",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/connectors.test.ts",
+      "sourceSha256": "46247be643eaaecc102480c60f760c7d804a98c1ab269cb232813e1f209fdd23",
+      "exportSha256": "46247be643eaaecc102480c60f760c7d804a98c1ab269cb232813e1f209fdd23",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/control.test.ts",
+      "sourceSha256": "41b309dc634bbdc9c5dc42a8fb5444e30965b2bfaa19cbf5d91c4fc88a105000",
+      "exportSha256": "41b309dc634bbdc9c5dc42a8fb5444e30965b2bfaa19cbf5d91c4fc88a105000",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/directory-provider.test.ts",
+      "sourceSha256": "23def936fcc0c2b462e1680fb70cb12c04abf4841c2c55c3429d23f0454f1736",
+      "exportSha256": "23def936fcc0c2b462e1680fb70cb12c04abf4841c2c55c3429d23f0454f1736",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/directory.test.ts",
+      "sourceSha256": "8f92f58e5beb898e1566702771e0e1431c715d168b7f70f619462a99d4f132e5",
+      "exportSha256": "8f92f58e5beb898e1566702771e0e1431c715d168b7f70f619462a99d4f132e5",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/external-effects.test.ts",
+      "sourceSha256": "cdd09ad3107acabf43a2b0583f9d43e5e2c29698364af5f63c0d8813aa62134b",
+      "exportSha256": "cdd09ad3107acabf43a2b0583f9d43e5e2c29698364af5f63c0d8813aa62134b",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/filesystem-connectors.test.ts",
+      "sourceSha256": "c2eb479843591d4dbf0b5d26c7db3f1046c8e3785f85b1d3d0df7e413fa64717",
+      "exportSha256": "c2eb479843591d4dbf0b5d26c7db3f1046c8e3785f85b1d3d0df7e413fa64717",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/http-drain.test.ts",
+      "sourceSha256": "3cb983483fc7329c1210fbd6c6439aeb3379e0a57589828eca8e388bfb08b985",
+      "exportSha256": "3cb983483fc7329c1210fbd6c6439aeb3379e0a57589828eca8e388bfb08b985",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/integration-research.test.ts",
+      "sourceSha256": "4bf1c692cfad477f9444b669121900f36a07072b700f5eb3634a273ad3d99d94",
+      "exportSha256": "4bf1c692cfad477f9444b669121900f36a07072b700f5eb3634a273ad3d99d94",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/migration-snapshot.test.ts",
+      "sourceSha256": "eea50b5830b13d6262931b60d94e3757afc1bb6da26eaf42eefb326f24073ecb",
+      "exportSha256": "eea50b5830b13d6262931b60d94e3757afc1bb6da26eaf42eefb326f24073ecb",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/model-checkpoints.test.ts",
+      "sourceSha256": "bae12097bd65f2a0df87c6471a3ed2e2141e5299867a2a922f0d668fd477082f",
+      "exportSha256": "bae12097bd65f2a0df87c6471a3ed2e2141e5299867a2a922f0d668fd477082f",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/model-interruption.test.ts",
+      "sourceSha256": "c5c0f271b0ec51db9d3d82bec12d3b705a84372877b674806f299567a020acfe",
+      "exportSha256": "c5c0f271b0ec51db9d3d82bec12d3b705a84372877b674806f299567a020acfe",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/model-records.test.ts",
+      "sourceSha256": "6e9b235ff4f24e75ccd0865e17941784275db2daf90ab62c97c715d5cdc8724a",
+      "exportSha256": "6e9b235ff4f24e75ccd0865e17941784275db2daf90ab62c97c715d5cdc8724a",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/observation.test.ts",
+      "sourceSha256": "01db285c2620dc6a1304999f7785c2e2e85eb7a35e47776989eac096a34272cd",
+      "exportSha256": "01db285c2620dc6a1304999f7785c2e2e85eb7a35e47776989eac096a34272cd",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/portal.test.ts",
+      "sourceSha256": "de335364b9a1ca9108c73fe4f1ca313600e910a750d0f15e026c598e5c2ac062",
+      "exportSha256": "de335364b9a1ca9108c73fe4f1ca313600e910a750d0f15e026c598e5c2ac062",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/protected-metadata.test.ts",
+      "sourceSha256": "d2049d3a4bd0e9ed81ecfcc84048b4f1a8d2bbcc40ab3ef7cbe3504b4200711c",
+      "exportSha256": "d2049d3a4bd0e9ed81ecfcc84048b4f1a8d2bbcc40ab3ef7cbe3504b4200711c",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/schema-state.test.ts",
+      "sourceSha256": "edb09fb9800e0a826477e3a9561beec8a6aae8150d982a9e0273427c69f4b591",
+      "exportSha256": "edb09fb9800e0a826477e3a9561beec8a6aae8150d982a9e0273427c69f4b591",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/security-finding-history.test.ts",
+      "sourceSha256": "46c6433e08a50522bf1cb2261eb99d96e90252375202b074958ec7310622d747",
+      "exportSha256": "46c6433e08a50522bf1cb2261eb99d96e90252375202b074958ec7310622d747",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/shutdown.test.ts",
+      "sourceSha256": "8e0807747b18edbf395a005fc50e5201c1932e4f3881497869ace1e868746bf1",
+      "exportSha256": "8e0807747b18edbf395a005fc50e5201c1932e4f3881497869ace1e868746bf1",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/source-binding.test.ts",
+      "sourceSha256": "e386363a8660e4ce0df0223a0004dadbc410520a3c72f32d3662ba460fd3f5d8",
+      "exportSha256": "e386363a8660e4ce0df0223a0004dadbc410520a3c72f32d3662ba460fd3f5d8",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/source-selection-checkpoints.test.ts",
+      "sourceSha256": "2492cb98652b3ae4d6315165639d70bbf9b6cb559a28a99f7baab2e8c2f390f1",
+      "exportSha256": "2492cb98652b3ae4d6315165639d70bbf9b6cb559a28a99f7baab2e8c2f390f1",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/spending-authority-mysql.test.ts",
+      "sourceSha256": "3c0067200f6cc46ec1070f3d750c979bcb49f1553c2b39f436296533815d4e15",
+      "exportSha256": "3c0067200f6cc46ec1070f3d750c979bcb49f1553c2b39f436296533815d4e15",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/spending-authority.test.ts",
+      "sourceSha256": "8123c420241110a294709a44b913f15c1da3f189fac4d62f23ab0676089a758d",
+      "exportSha256": "8123c420241110a294709a44b913f15c1da3f189fac4d62f23ab0676089a758d",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/sse-shutdown.test.ts",
+      "sourceSha256": "b973988b913045d37b8b3c79a8e5314925deaa02fdb89cb0166248ba0e6d309f",
+      "exportSha256": "b973988b913045d37b8b3c79a8e5314925deaa02fdb89cb0166248ba0e6d309f",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/stripe-webhooks.test.ts",
+      "sourceSha256": "2c95573852a14d2422d506ff6268d62f62aa1b306a6e1d68c25c6de78c06b266",
+      "exportSha256": "2c95573852a14d2422d506ff6268d62f62aa1b306a6e1d68c25c6de78c06b266",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/tls.test.ts",
+      "sourceSha256": "7e3b0284ff10771d2831b38fcf9f8518f39adaee39cef5b01364fb9f0abcd370",
+      "exportSha256": "7e3b0284ff10771d2831b38fcf9f8518f39adaee39cef5b01364fb9f0abcd370",
+      "transformations": []
+    },
+    {
+      "path": "apps/control/test/workflow-lease.test.ts",
+      "sourceSha256": "8fc3d85140cdc17e9b6a569087148a39606992430604866509fe66f78e007219",
+      "exportSha256": "8fc3d85140cdc17e9b6a569087148a39606992430604866509fe66f78e007219",
+      "transformations": []
+    },
+    {
+      "path": "database/001-platform.sql",
+      "sourceSha256": "9d7efbcd9457ab56ca60860161c2ee78b3cdae3f596b85311eddc6832df34a09",
+      "exportSha256": "9d7efbcd9457ab56ca60860161c2ee78b3cdae3f596b85311eddc6832df34a09",
+      "transformations": []
+    },
+    {
+      "path": "deploy/Dockerfile.connector",
+      "sourceSha256": "94c20c5692c508aa658cfc3e3212e7bdc1cc9776b0d1b210c7798cd03c7b5e91",
+      "exportSha256": "94c20c5692c508aa658cfc3e3212e7bdc1cc9776b0d1b210c7798cd03c7b5e91",
+      "transformations": []
+    },
+    {
+      "path": "deploy/Dockerfile.filesystem-connector",
+      "sourceSha256": "59a1e560f9c1916875d536ccb874018ddf0aa77ac1cecd0c147c2dabaf492e7b",
+      "exportSha256": "59a1e560f9c1916875d536ccb874018ddf0aa77ac1cecd0c147c2dabaf492e7b",
+      "transformations": []
+    },
+    {
+      "path": "deploy/Dockerfile.node-toolchain",
+      "sourceSha256": "dfa02ae01ef5fb2483e00c6ae2fc6f218bb60677ef03f2f7596fa7e2ed5bdc1b",
+      "exportSha256": "dfa02ae01ef5fb2483e00c6ae2fc6f218bb60677ef03f2f7596fa7e2ed5bdc1b",
+      "transformations": []
+    },
+    {
+      "path": "deploy/Dockerfile.platform",
+      "sourceSha256": "9d95a819906cb018a36f4273c488c47e8f48c8640c07bd59a0900629249295c5",
+      "exportSha256": "9d95a819906cb018a36f4273c488c47e8f48c8640c07bd59a0900629249295c5",
+      "transformations": []
+    },
+    {
+      "path": "deploy/Dockerfile.platform-runtime-base",
+      "sourceSha256": "9c39a225301e57884993a52a0e4bb9405805fc981b1cc1ed02b4f8011ecf5989",
+      "exportSha256": "9c39a225301e57884993a52a0e4bb9405805fc981b1cc1ed02b4f8011ecf5989",
+      "transformations": []
+    },
+    {
+      "path": "deploy/Dockerfile.proxy",
+      "sourceSha256": "18d71b14389a03b8e4b1315aa6705809654b1af8912c768017f6c144ab884d34",
+      "exportSha256": "18d71b14389a03b8e4b1315aa6705809654b1af8912c768017f6c144ab884d34",
+      "transformations": []
+    },
+    {
+      "path": "deploy/Dockerfile.recovery",
+      "sourceSha256": "f8685a243aaeab567180816893fb81a72779975fd70f4c3486f7685de21ef267",
+      "exportSha256": "f8685a243aaeab567180816893fb81a72779975fd70f4c3486f7685de21ef267",
+      "transformations": []
+    },
+    {
+      "path": "deploy/Dockerfile.runtime",
+      "sourceSha256": "381f6e45164f5d77e7ce539bb40e8d1c26483f68bda9ef65d82a2ded993a3ee5",
+      "exportSha256": "381f6e45164f5d77e7ce539bb40e8d1c26483f68bda9ef65d82a2ded993a3ee5",
+      "transformations": []
+    },
+    {
+      "path": "deploy/Dockerfile.samba-fixture",
+      "sourceSha256": "3a3dd7a796f47ff98ca9981510ba0e876f1398408fbd1b8b7bec5062396e7734",
+      "exportSha256": "3a3dd7a796f47ff98ca9981510ba0e876f1398408fbd1b8b7bec5062396e7734",
+      "transformations": []
+    },
+    {
+      "path": "deploy/README.md",
+      "sourceSha256": "f54e2e48a66e37b17ce2ef823a841e05ea5d27684b1d5f2a89cea1591772f402",
+      "exportSha256": "f54e2e48a66e37b17ce2ef823a841e05ea5d27684b1d5f2a89cea1591772f402",
+      "transformations": []
+    },
+    {
+      "path": "deploy/compose.spending-authority.yaml",
+      "sourceSha256": "aefd48b5060475896087417dcdb4cffb036b7be8ca75f7f90a47ea1cc1b2614f",
+      "exportSha256": "aefd48b5060475896087417dcdb4cffb036b7be8ca75f7f90a47ea1cc1b2614f",
+      "transformations": []
+    },
+    {
+      "path": "deploy/compose.yaml",
+      "sourceSha256": "fc584dc1ea5b443da7654d083603d2e67585b3dcff429cb6060d037155b7a553",
+      "exportSha256": "fc584dc1ea5b443da7654d083603d2e67585b3dcff429cb6060d037155b7a553",
+      "transformations": []
+    },
+    {
+      "path": "deploy/config/grafana-datasources.yml",
+      "sourceSha256": "61ae0decbbe03acb21e779106e207bb4e1d128d2db54bb10d81231e6c88e0b8f",
+      "exportSha256": "61ae0decbbe03acb21e779106e207bb4e1d128d2db54bb10d81231e6c88e0b8f",
+      "transformations": []
+    },
+    {
+      "path": "deploy/config/loki.yml",
+      "sourceSha256": "715172124c3f195252ebfa568b330ee5289b421909f37e626aea646ccdfd2131",
+      "exportSha256": "715172124c3f195252ebfa568b330ee5289b421909f37e626aea646ccdfd2131",
+      "transformations": []
+    },
+    {
+      "path": "deploy/config/mysql.cnf",
+      "sourceSha256": "e5fe1428dd5a6a7e7589c25e216bb03cb781df12532334cd454d3739447d1368",
+      "exportSha256": "e5fe1428dd5a6a7e7589c25e216bb03cb781df12532334cd454d3739447d1368",
+      "transformations": []
+    },
+    {
+      "path": "deploy/config/otel.yml",
+      "sourceSha256": "c67aa46e5d78c12b711949c48dbe70c06a0c01b4f9cc84cdc273bfba5797f6c3",
+      "exportSha256": "c67aa46e5d78c12b711949c48dbe70c06a0c01b4f9cc84cdc273bfba5797f6c3",
+      "transformations": []
+    },
+    {
+      "path": "deploy/config/prometheus-web.yml",
+      "sourceSha256": "8376f414a3ef0f6bf2975d319774e2f192cbcb4ed4030a08d578b530332fd382",
+      "exportSha256": "8376f414a3ef0f6bf2975d319774e2f192cbcb4ed4030a08d578b530332fd382",
+      "transformations": []
+    },
+    {
+      "path": "deploy/config/prometheus.yml",
+      "sourceSha256": "f1df25e544a1936ac22c75bcf317b49e2b4ec01fdbb29215e0d53184dd957a33",
+      "exportSha256": "f1df25e544a1936ac22c75bcf317b49e2b4ec01fdbb29215e0d53184dd957a33",
+      "transformations": []
+    },
+    {
+      "path": "deploy/config/rabbitmq.conf",
+      "sourceSha256": "6097a7278964634ddb8bd7355a6a8e5f64f078552ec5bf73264c36941fbbda37",
+      "exportSha256": "6097a7278964634ddb8bd7355a6a8e5f64f078552ec5bf73264c36941fbbda37",
+      "transformations": []
+    },
+    {
+      "path": "deploy/config/redis.conf",
+      "sourceSha256": "3eb392eeac03602a83143626f4f897933e88256dc40b7debc17f9584f2b85665",
+      "exportSha256": "3eb392eeac03602a83143626f4f897933e88256dc40b7debc17f9584f2b85665",
+      "transformations": []
+    },
+    {
+      "path": "deploy/config/squid.conf",
+      "sourceSha256": "64bf08ae5b6ba83b23ac27aaecf99eac5e0ba8d6a3499d2ef8ec63ea8f87024c",
+      "exportSha256": "64bf08ae5b6ba83b23ac27aaecf99eac5e0ba8d6a3499d2ef8ec63ea8f87024c",
+      "transformations": []
+    },
+    {
+      "path": "deploy/connectors/README.md",
+      "sourceSha256": "0fc32f3d2017205e6302bff2e84c901750f981f28295bb5c7ee5a4f814105011",
+      "exportSha256": "0fc32f3d2017205e6302bff2e84c901750f981f28295bb5c7ee5a4f814105011",
+      "transformations": []
+    },
+    {
+      "path": "deploy/connectors/dossier.json",
+      "sourceSha256": "6631ee579e350eecbb9b35b57b2a26e1f94835b3e42627a635ca519f68d5dad3",
+      "exportSha256": "6631ee579e350eecbb9b35b57b2a26e1f94835b3e42627a635ca519f68d5dad3",
+      "transformations": []
+    },
+    {
+      "path": "deploy/connectors/filesystem-dossier.json",
+      "sourceSha256": "69291752d0bcd681444b62c8572bce817440cdee1c4814f1cb17ee7c350f73bb",
+      "exportSha256": "69291752d0bcd681444b62c8572bce817440cdee1c4814f1cb17ee7c350f73bb",
+      "transformations": []
+    },
+    {
+      "path": "deploy/connectors/filesystem.py",
+      "sourceSha256": "bb4b14c33ab5d602c6bde48f8ba99bf94c025e08d13c2c91f0fd7a154c20be8e",
+      "exportSha256": "bb4b14c33ab5d602c6bde48f8ba99bf94c025e08d13c2c91f0fd7a154c20be8e",
+      "transformations": []
+    },
+    {
+      "path": "deploy/connectors/fixture-smb.conf",
+      "sourceSha256": "df0540c6f4069556ab07bf974adb38e0396f331a0b8694b93f5ec23892396260",
+      "exportSha256": "df0540c6f4069556ab07bf974adb38e0396f331a0b8694b93f5ec23892396260",
+      "transformations": []
+    },
+    {
+      "path": "deploy/connectors/fixture-start.sh",
+      "sourceSha256": "ce2589f95ecb145c0036bdc4c48224297d714c932d98883196bc589434a97bfc",
+      "exportSha256": "ce2589f95ecb145c0036bdc4c48224297d714c932d98883196bc589434a97bfc",
+      "transformations": []
+    },
+    {
+      "path": "deploy/connectors/requirements.lock",
+      "sourceSha256": "8d325d9e18829e5ff6766b2997a8babe8ceacc6fb961080b16a7b0d518d34033",
+      "exportSha256": "8d325d9e18829e5ff6766b2997a8babe8ceacc6fb961080b16a7b0d518d34033",
+      "transformations": []
+    },
+    {
+      "path": "deploy/connectors/samba.py",
+      "sourceSha256": "4872470f2eb0844f9c90f600d07705351d6c099b2cfa92ea5bdcb0155ab57db1",
+      "exportSha256": "4872470f2eb0844f9c90f600d07705351d6c099b2cfa92ea5bdcb0155ab57db1",
+      "transformations": []
+    },
+    {
+      "path": "deploy/connectors/test-filesystem.py",
+      "sourceSha256": "84dbfdb282beae4e116d539a0019e60757cf095c886a9ffd02480defd92722c3",
+      "exportSha256": "84dbfdb282beae4e116d539a0019e60757cf095c886a9ffd02480defd92722c3",
+      "transformations": []
+    },
+    {
+      "path": "deploy/images.sources.json",
+      "sourceSha256": "018520f13ff79d86fa8a03b70baba5ebef2d848860eb3e8e8e16d147308b8f74",
+      "exportSha256": "018520f13ff79d86fa8a03b70baba5ebef2d848860eb3e8e8e16d147308b8f74",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/build-full-cli-package.py",
+      "sourceSha256": "05e04b4e86c35d1bcc70ae0c251088e8b9789968ef070c2ae983393e2cc70a12",
+      "exportSha256": "05e04b4e86c35d1bcc70ae0c251088e8b9789968ef070c2ae983393e2cc70a12",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/build-full-package.py",
+      "sourceSha256": "0fbabad6923d3269e5e94eff373c2c0be5328fba927a588d1140627212964d1c",
+      "exportSha256": "0fbabad6923d3269e5e94eff373c2c0be5328fba927a588d1140627212964d1c",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/build-package.py",
+      "sourceSha256": "74a0ba90a98d216e669fb54b9443606d0b4632329d78b77819dc813146b37f35",
+      "exportSha256": "74a0ba90a98d216e669fb54b9443606d0b4632329d78b77819dc813146b37f35",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company-install.sh",
+      "sourceSha256": "539c5f96ec132455a11c55d512426bdee0899e56a9eb1fd55e36ca091a5b4769",
+      "exportSha256": "539c5f96ec132455a11c55d512426bdee0899e56a9eb1fd55e36ca091a5b4769",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_authenticated_cli_compose.py",
+      "sourceSha256": "365e8c48ad86d90063e8e7a5305bc383d80bbfc62171040c67e52efd21819aea",
+      "exportSha256": "365e8c48ad86d90063e8e7a5305bc383d80bbfc62171040c67e52efd21819aea",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_authenticated_cli_inputs.py",
+      "sourceSha256": "99156be4b544dbe16fecd47b977ff790de49863588703fe1317a253dc6840928",
+      "exportSha256": "99156be4b544dbe16fecd47b977ff790de49863588703fe1317a253dc6840928",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_bash_execution_status.py",
+      "sourceSha256": "1ca5846d66a066f503af0a45786f1362847c6ccfaf919481527e760d14fdcd80",
+      "exportSha256": "1ca5846d66a066f503af0a45786f1362847c6ccfaf919481527e760d14fdcd80",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_binary_capture.py",
+      "sourceSha256": "190be26f794a8ac6b1fd2195b6422d1850a231c621c3b634c1123276cb35f135",
+      "exportSha256": "190be26f794a8ac6b1fd2195b6422d1850a231c621c3b634c1123276cb35f135",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_cli_captured_publish.py",
+      "sourceSha256": "a56ddb3264ac748ea6ea935de72549caba8b09eebe6119fbbdffef8c96a406b5",
+      "exportSha256": "a56ddb3264ac748ea6ea935de72549caba8b09eebe6119fbbdffef8c96a406b5",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_cli_execute_bootstrap.py",
+      "sourceSha256": "19c396d40bd74bc3672effaa9ddb6be5dd35534be1e3dd3edd652137f4880277",
+      "exportSha256": "19c396d40bd74bc3672effaa9ddb6be5dd35534be1e3dd3edd652137f4880277",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_cli_executed_record_store.py",
+      "sourceSha256": "c4ac7faef7e0bbb25034552774ea1ef524f9a81aae4b02bca15337fd7b0bb107",
+      "exportSha256": "c4ac7faef7e0bbb25034552774ea1ef524f9a81aae4b02bca15337fd7b0bb107",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_cli_live_verify_caller.py",
+      "sourceSha256": "ca2de8ec2fab602ba3fa4be18d887850545b3bdd00e1612d471ebb51be61a924",
+      "exportSha256": "ca2de8ec2fab602ba3fa4be18d887850545b3bdd00e1612d471ebb51be61a924",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_cli_record.py",
+      "sourceSha256": "c48f61c44a0694ff0ae308970ca656c5f418f641f8e2f28329ac110e93d9f10d",
+      "exportSha256": "c48f61c44a0694ff0ae308970ca656c5f418f641f8e2f28329ac110e93d9f10d",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_cli_record_io.py",
+      "sourceSha256": "306b81f7cea78fa5eb25622e84115da7154ce82fad936644b1dccc6e8609ca47",
+      "exportSha256": "306b81f7cea78fa5eb25622e84115da7154ce82fad936644b1dccc6e8609ca47",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_cli_record_publish.py",
+      "sourceSha256": "dff4e2c0a57ebf35bfcddcb922f19f8df6e84f7ab1e90e0eef9e9adb8c0ce698",
+      "exportSha256": "dff4e2c0a57ebf35bfcddcb922f19f8df6e84f7ab1e90e0eef9e9adb8c0ce698",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_cli_stage_child.py",
+      "sourceSha256": "8e1097816963e48ce2157da4d69ab45cc158da787861209a0c38118f3cd09b69",
+      "exportSha256": "8e1097816963e48ce2157da4d69ab45cc158da787861209a0c38118f3cd09b69",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_cli_verify_invocation.py",
+      "sourceSha256": "5a4d9a475a4a77f4b0e2fce46bf48ad31825b279581840cde2fe5a9ec4e9d47d",
+      "exportSha256": "5a4d9a475a4a77f4b0e2fce46bf48ad31825b279581840cde2fe5a9ec4e9d47d",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_fixed_execute_child.py",
+      "sourceSha256": "6fc5656603e0f483455d9c9c2fdadf6231c912f99e50411c59fb0878411cdc25",
+      "exportSha256": "6fc5656603e0f483455d9c9c2fdadf6231c912f99e50411c59fb0878411cdc25",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_full_cli.py",
+      "sourceSha256": "ffa88e0450adbd8d469a8018fbb0c71bf7425281e7e6a2736ef4862100b60d77",
+      "exportSha256": "ffa88e0450adbd8d469a8018fbb0c71bf7425281e7e6a2736ef4862100b60d77",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_full_cli_request.py",
+      "sourceSha256": "9fee41ad2b55d734472dfaa9e954d648574acd8de66084c453000144e8729df8",
+      "exportSha256": "9fee41ad2b55d734472dfaa9e954d648574acd8de66084c453000144e8729df8",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_full_entry.py",
+      "sourceSha256": "bb377cb96a2fc4139aac8f013e5a251194c92485fc3681c245fb484cf3e11ab2",
+      "exportSha256": "bb377cb96a2fc4139aac8f013e5a251194c92485fc3681c245fb484cf3e11ab2",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_full_package_emit.py",
+      "sourceSha256": "30183e590a4da3b1ac272edea88fb13d1e91ba2d9249a6f7987f1bfd1af381e9",
+      "exportSha256": "30183e590a4da3b1ac272edea88fb13d1e91ba2d9249a6f7987f1bfd1af381e9",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_full_package_loader.py",
+      "sourceSha256": "5b22a1776bf58b9dee1c08c81f60a54a9b81dff2603e7bfa45d4170909fb51ea",
+      "exportSha256": "5b22a1776bf58b9dee1c08c81f60a54a9b81dff2603e7bfa45d4170909fb51ea",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_full_plan.py",
+      "sourceSha256": "917541e03fc0b89a703614817fb107b84c171187035626e5a7a404ee5afdea9f",
+      "exportSha256": "917541e03fc0b89a703614817fb107b84c171187035626e5a7a404ee5afdea9f",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_full_retention_worker.py",
+      "sourceSha256": "4f5d75fada6474f26e5de3e599c819aede36dfac9b7bd94e7a119e747a66a35d",
+      "exportSha256": "4f5d75fada6474f26e5de3e599c819aede36dfac9b7bd94e7a119e747a66a35d",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_install.py",
+      "sourceSha256": "367ae9291063740be71829ce26689430f38cbb372f854100971e2d57d4bcff53",
+      "exportSha256": "367ae9291063740be71829ce26689430f38cbb372f854100971e2d57d4bcff53",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_live_completion_receiver.py",
+      "sourceSha256": "772ab815a523ed08eb5d1b73f6cd05db95a5a5bddc1e9bf709ecc4a2369d67e9",
+      "exportSha256": "772ab815a523ed08eb5d1b73f6cd05db95a5a5bddc1e9bf709ecc4a2369d67e9",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_parent_system.py",
+      "sourceSha256": "5a3f8e7aed4bc6b8f172cbb3ff22f1ef67c9a124d1c95784a108e65a5d904354",
+      "exportSha256": "5a3f8e7aed4bc6b8f172cbb3ff22f1ef67c9a124d1c95784a108e65a5d904354",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_release_crypto.py",
+      "sourceSha256": "ac1ee990cce7ceedef03b76e1d23d7ca5d4203dcf88c1783adc8e5954f5fdc1b",
+      "exportSha256": "ac1ee990cce7ceedef03b76e1d23d7ca5d4203dcf88c1783adc8e5954f5fdc1b",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_retention_effects.py",
+      "sourceSha256": "226a8e02a63e54114bc486b144b51d1d795ee394458e4de1d9253727ca75fbd4",
+      "exportSha256": "226a8e02a63e54114bc486b144b51d1d795ee394458e4de1d9253727ca75fbd4",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_runtime_pair_parent.py",
+      "sourceSha256": "47d5109aebd23c4017d4215895ab01d6f4f00f8ce14dfd9a84f0b5ca5f714fda",
+      "exportSha256": "47d5109aebd23c4017d4215895ab01d6f4f00f8ce14dfd9a84f0b5ca5f714fda",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_seed_backend.py",
+      "sourceSha256": "ae7be5f73b5e279cde64f12bf031d0cb84576ac045f90e423775a093891fe768",
+      "exportSha256": "ae7be5f73b5e279cde64f12bf031d0cb84576ac045f90e423775a093891fe768",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_seed_runner.py",
+      "sourceSha256": "42af406862e9e2f6a81f436851453f525f1f35bf044fc0dc24708ee61fa21e17",
+      "exportSha256": "42af406862e9e2f6a81f436851453f525f1f35bf044fc0dc24708ee61fa21e17",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_signed_execute_preparation.py",
+      "sourceSha256": "4155f2c92f58fe3e1e0cba96155730c13b30dc6007eedb0b3775667159e2bf7a",
+      "exportSha256": "4155f2c92f58fe3e1e0cba96155730c13b30dc6007eedb0b3775667159e2bf7a",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_source_owned_execute.py",
+      "sourceSha256": "91b14445e6891998c88bef3f98d3baf12fe559f673165104bb4440c70b8b17fa",
+      "exportSha256": "91b14445e6891998c88bef3f98d3baf12fe559f673165104bb4440c70b8b17fa",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_stage_scope.py",
+      "sourceSha256": "e0516abc624d66e189ec385b11b22fa54be1328da1fbe389824b0f5fbfd1f486",
+      "exportSha256": "e0516abc624d66e189ec385b11b22fa54be1328da1fbe389824b0f5fbfd1f486",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_startup_join.py",
+      "sourceSha256": "8aa949381e170c2f58a498406644df91504c13ced6a2afcb3df229949e1bdb75",
+      "exportSha256": "8aa949381e170c2f58a498406644df91504c13ced6a2afcb3df229949e1bdb75",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_stored_startup.py",
+      "sourceSha256": "330e305b016a36103e705259e5d5e957cd20f88fb8ea11dacd11d82db7becff9",
+      "exportSha256": "330e305b016a36103e705259e5d5e957cd20f88fb8ea11dacd11d82db7becff9",
+      "transformations": []
+    },
+    {
+      "path": "deploy/validation/company-seed-backend-native-v1.py",
+      "sourceSha256": "2060673ea33605f5d5bf39c8e9044fdf6fbc0e253dfcd354eb3a4165afdf3a09",
+      "exportSha256": "2060673ea33605f5d5bf39c8e9044fdf6fbc0e253dfcd354eb3a4165afdf3a09",
+      "transformations": []
+    },
+    {
+      "path": "deploy/validation/company-seed-backend-native-v2.py",
+      "sourceSha256": "cca0e1348e9c3d71d2c311d1df16dc35c9292f359f0a8ba746a3f4ff479911be",
+      "exportSha256": "cca0e1348e9c3d71d2c311d1df16dc35c9292f359f0a8ba746a3f4ff479911be",
+      "transformations": []
+    },
+    {
+      "path": "deploy/validation/company-seed-backend-native-v3.py",
+      "sourceSha256": "1e285815d2cd7f06052b1151169c1dc9ed3fb1a9625b76e22fd63a3dd67c9853",
+      "exportSha256": "1e285815d2cd7f06052b1151169c1dc9ed3fb1a9625b76e22fd63a3dd67c9853",
+      "transformations": []
+    },
+    {
+      "path": "deploy/validation/company-seed-runner-native-v1.py",
+      "sourceSha256": "273cdd916f6bcc1e1bdf608bde763c824711a190540aec7ea1e71e404c08d078",
+      "exportSha256": "273cdd916f6bcc1e1bdf608bde763c824711a190540aec7ea1e71e404c08d078",
+      "transformations": []
+    },
+    {
+      "path": "docs/admin-guide.md",
+      "sourceSha256": "e6f1d22dee232b44d703d71eb268d3ec4fafb7b172e0368592f3d421c86da372",
+      "exportSha256": "e6f1d22dee232b44d703d71eb268d3ec4fafb7b172e0368592f3d421c86da372",
+      "transformations": []
+    },
+    {
+      "path": "docs/app-account-offboarding.md",
+      "sourceSha256": "05deeecd9b55aeeb4cb0420ccdbb08bcd0afb213dbcc21717cc39fad86c68a1e",
+      "exportSha256": "05deeecd9b55aeeb4cb0420ccdbb08bcd0afb213dbcc21717cc39fad86c68a1e",
+      "transformations": []
+    },
+    {
+      "path": "docs/backend-history-tests.md",
+      "sourceSha256": "1eda9d21600a1218560ed586437fad91b5ff89e7e0e8210526fc06caa249add5",
+      "exportSha256": "1eda9d21600a1218560ed586437fad91b5ff89e7e0e8210526fc06caa249add5",
+      "transformations": []
+    },
+    {
+      "path": "docs/checkpoint-admission.md",
+      "sourceSha256": "eb1c58ef7a307c3b08346e95666bd70bfb9e0056bc87849856f333a5c9ef030a",
+      "exportSha256": "eb1c58ef7a307c3b08346e95666bd70bfb9e0056bc87849856f333a5c9ef030a",
+      "transformations": []
+    },
+    {
+      "path": "docs/company-artifact-store.md",
+      "sourceSha256": "65204f53c3a8fe4afd6bb4ab0513272343c4e1e1dfcd5a003991ca5fe11e062f",
+      "exportSha256": "4a6209725ae4c3511e10ce268e56d4f9d5d9eff202114f524d928829b6638b39",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/company-captured-startup.md",
+      "sourceSha256": "f2a0a3b345d995b2f9e3b28dcc8d2a9771a83e3022bbc1a9447b88aa4465583c",
+      "exportSha256": "3f4be7341d23f7404dc2a0412329d40a32c168585693920420063e65516f06bd",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/company-foundation-entry.md",
+      "sourceSha256": "61590b7369d6c9d4b14fcb371687991fac96039715e7d3af021cb9b58b44bc8a",
+      "exportSha256": "aaa954a7ea5cff74e3b17d0c0768e71f73ae040fcfca56ab43e076fc4f7e8857",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/company-full-installation.md",
+      "sourceSha256": "13561292f7ff2e79bfbefdb279fdcab90f379e8a08d3929a3c43dce0858951e6",
+      "exportSha256": "0b02bbd989b99fab8cc40980675610942856a936475c1fd98fd6564ae9683c10",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/company-git-runner.md",
+      "sourceSha256": "698924fa942df15e5fcc0bf9814adec23ebc88f2a6e8ef9c9f196ef5e85f845f",
+      "exportSha256": "cf1b516e32f1fbdf8c0f770d1cd04689d476578e6767e7a77417e8ebb659b2b4",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/company-platform-source.md",
+      "sourceSha256": "e87f65c66f5a7d8494bb21a85112eec84daf16131abbaac6dd1639c1aa80bf31",
+      "exportSha256": "af5c9f585102f2390d649cc376b082de09accc1b94f8645497c2a204c0c37adc",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/company-release-trust.md",
+      "sourceSha256": "40cfd0e3741d38c8131370b5814afd84572423ac36a0ccf243498578e738cc7a",
+      "exportSha256": "40cfd0e3741d38c8131370b5814afd84572423ac36a0ccf243498578e738cc7a",
+      "transformations": []
+    },
+    {
+      "path": "docs/company-repository-seed.md",
+      "sourceSha256": "9156fd3a553ee0a43200056b899427414cc0bfc71b45f03cb899009c80452e2c",
+      "exportSha256": "15513702ab2a39045108120c1723cfd79b4247f4405e1620d8e4271e6630d674",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/company-source-guard.md",
+      "sourceSha256": "d3aec9868264660f6921d5ae1f7f63bc480250ab9b528951d30d6cfeacdb27f8",
+      "exportSha256": "0939233b9e8f7c7a321f8f9f5d885b0b78f35e8775afc9c678118a458469d8a8",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/company-source-tree.md",
+      "sourceSha256": "e7afd072eb8caca28a6afc9980a133b2ce78cd116b995f28e2709b9f87223fab",
+      "exportSha256": "0e21772e739ddb2d44074a91d0e9170e7c07d4d44ad484dcf362bb250d9c821f",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/company-source.md",
+      "sourceSha256": "50b5e341de6fbe1d57f4b137ef62d4d6b6025b0e121fb46581c0290f65a71f18",
+      "exportSha256": "50b5e341de6fbe1d57f4b137ef62d4d6b6025b0e121fb46581c0290f65a71f18",
+      "transformations": []
+    },
+    {
+      "path": "docs/connection-revocation.md",
+      "sourceSha256": "008845203016ce5364189961500a0bf2a63d34359b4df8770ff895d5ec68ee83",
+      "exportSha256": "008845203016ce5364189961500a0bf2a63d34359b4df8770ff895d5ec68ee83",
+      "transformations": []
+    },
+    {
+      "path": "docs/dependency-license-inventory.json",
+      "sourceSha256": "65dae75dd65045716bc9c2d8c6352bb869e0198934c31d065ad6640888f9abdb",
+      "exportSha256": "65dae75dd65045716bc9c2d8c6352bb869e0198934c31d065ad6640888f9abdb",
+      "transformations": []
+    },
+    {
+      "path": "docs/directory-authorization.md",
+      "sourceSha256": "987e77c9a53c70554b348f20e70990bc7a841b60757c911a03d731bfed323522",
+      "exportSha256": "987e77c9a53c70554b348f20e70990bc7a841b60757c911a03d731bfed323522",
+      "transformations": []
+    },
+    {
+      "path": "docs/dms-local-accounts.md",
+      "sourceSha256": "b85d621501128b03c0573df83d11187a6fa8d5af26c0189c5ffb52fccdd74a4b",
+      "exportSha256": "b85d621501128b03c0573df83d11187a6fa8d5af26c0189c5ffb52fccdd74a4b",
+      "transformations": []
+    },
+    {
+      "path": "docs/external-integrations.md",
+      "sourceSha256": "68f48f1d7c2e5dd8e12d05d8021587bfec0aa61ea0ce7cbe265a24095e07ee8a",
+      "exportSha256": "68f48f1d7c2e5dd8e12d05d8021587bfec0aa61ea0ce7cbe265a24095e07ee8a",
+      "transformations": []
+    },
+    {
+      "path": "docs/filesystem-revocation.md",
+      "sourceSha256": "d26c1c29216a5a108d8aaf465982cfa1d66f8b52333dc0a0de002775a1c272da",
+      "exportSha256": "d26c1c29216a5a108d8aaf465982cfa1d66f8b52333dc0a0de002775a1c272da",
+      "transformations": []
+    },
+    {
+      "path": "docs/host-remediation.md",
+      "sourceSha256": "734da13ca8cdf9431a26564319ffdcea5d94b8d0c0e7eb56d362e628084e2189",
+      "exportSha256": "a5f72c08183c5070a86b04f44f577061cc2ba66eceeaf4e8eb5df9417a4bc896",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/http-shutdown.md",
+      "sourceSha256": "36fd8a28bc4579f626279c03044ec27393ada9ab526c9065dd11e1aa2def9685",
+      "exportSha256": "36fd8a28bc4579f626279c03044ec27393ada9ab526c9065dd11e1aa2def9685",
+      "transformations": []
+    },
+    {
+      "path": "docs/identity.md",
+      "sourceSha256": "23b535a23c7733f057885666a2685a209786b88ca75b3567778fa51f4525106f",
+      "exportSha256": "d54f65c263e6e710780ca0573099e6d252db18ba03f3b8e74a00e8e5b488e372",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/implementation-status.md",
+      "sourceSha256": "1b2df42e5408950046568b84c854d2c5f74c2984a8d427268ab8a40c5cdd1684",
+      "exportSha256": "7a2757562e982754c5e4518e1f08e9f108196743c29ea4f064faf1133094ede1",
+      "transformations": [
+        "Replace private installation chronology with public scope and procedures"
+      ]
+    },
+    {
+      "path": "docs/install-lock.md",
+      "sourceSha256": "b650741c2579ae0c2c50881c16acdec0f74f078c1956933d1382bfda4ca0729c",
+      "exportSha256": "b650741c2579ae0c2c50881c16acdec0f74f078c1956933d1382bfda4ca0729c",
+      "transformations": []
+    },
+    {
+      "path": "docs/installation-identity.md",
+      "sourceSha256": "65e6f6be18f849c0c073238a7fe572b88b167b1a1a7e31e4a3ed57cf833885a9",
+      "exportSha256": "65e6f6be18f849c0c073238a7fe572b88b167b1a1a7e31e4a3ed57cf833885a9",
+      "transformations": []
+    },
+    {
+      "path": "docs/installation-readiness.md",
+      "sourceSha256": "500e44ca0a664f979ec687889d33e7afe5e7c0230bee623ec2ed44628a7a4543",
+      "exportSha256": "500e44ca0a664f979ec687889d33e7afe5e7c0230bee623ec2ed44628a7a4543",
+      "transformations": []
+    },
+    {
+      "path": "docs/installer-materialization.md",
+      "sourceSha256": "7ce0d3efbf0b84cc80534aec8e906b8d613930b6773908f9d51e68f178267462",
+      "exportSha256": "3f4a9e6af080ba1aab480214fb10b43db4a56c5bed0cb45977a28032e74c1db1",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/installer-parent.md",
+      "sourceSha256": "d4993f4266ee7745b31c8c302864d9ca024fa5ce5875faf591486a6ab6c587cf",
+      "exportSha256": "d4993f4266ee7745b31c8c302864d9ca024fa5ce5875faf591486a6ab6c587cf",
+      "transformations": []
+    },
+    {
+      "path": "docs/isolated-feed-qualification.md",
+      "sourceSha256": "4c41edf03486512aab6000810b2fccb62f4ac2967b77e3d38ac3b123f1e37758",
+      "exportSha256": "4c41edf03486512aab6000810b2fccb62f4ac2967b77e3d38ac3b123f1e37758",
+      "transformations": []
+    },
+    {
+      "path": "docs/maintenance-broker-security.md",
+      "sourceSha256": "51922c26101b8296f81c1197d9d6af2fe1cba97fff9f81b7564515d7a5e3c3a3",
+      "exportSha256": "73cb6da075b667befe908bd8f5e8355970b078b81a73f9824de72a812dcbd6dc",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/maintenance-scanner-rollout.md",
+      "sourceSha256": "2200f1604b89814e293c75c815014cddbcb538a97ba254eda8a7e0e7028e5074",
+      "exportSha256": "2200f1604b89814e293c75c815014cddbcb538a97ba254eda8a7e0e7028e5074",
+      "transformations": []
+    },
+    {
+      "path": "docs/migration-snapshot.md",
+      "sourceSha256": "c7f26b8a86b55f6b926f8be0b5c38e10b8e60845b9a0ca5bf21492cf78f273c7",
+      "exportSha256": "eab6cfa8e573b10840d8a7b76d8c84e2e2f4c862fed84dc2da18985868840d6e",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/model-provider-transport.md",
+      "sourceSha256": "0a9251d7213a61b801d753071c1594ed49d1ec022464b95aaf0dddd2ed65df07",
+      "exportSha256": "0a9251d7213a61b801d753071c1594ed49d1ec022464b95aaf0dddd2ed65df07",
+      "transformations": []
+    },
+    {
+      "path": "docs/model-routing.md",
+      "sourceSha256": "8a8356f868261e0b51844cbd13c408c7d29ddc6edd436f0f8bbe05b1ec091412",
+      "exportSha256": "0c2106f5bd2dface182532dfd7ccc6f8b2f41c231ff507b0aa4bbbaa1eebaf46",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/mysql-recovery-tools.md",
+      "sourceSha256": "4e4563f1931f643f6aedf776d42625f8a4f49d407ac7a55ff9c681b32416502b",
+      "exportSha256": "bb9306d78328520d809d35762edd414f51a562b1fab5a2b5d72b54772984ee3c",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/node-shutdown.md",
+      "sourceSha256": "454e1536291e3d7b2cf24e0ac14f70c8b62812b219b57b23aac110011c92f771",
+      "exportSha256": "454e1536291e3d7b2cf24e0ac14f70c8b62812b219b57b23aac110011c92f771",
+      "transformations": []
+    },
+    {
+      "path": "docs/operations.md",
+      "sourceSha256": "925c85bb58d1fa76e623d3bdb54ae2f758a5d75adbac7e006db6e2ef1e24598e",
+      "exportSha256": "212a1ea8b8dd197fe46e54b3d6068d3b8661f127bf213fff9c5c243aaa5ca649",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/protected-app-metadata.md",
+      "sourceSha256": "51e96154891ac21fd4d89479f2fd2110d041f726339713387cb399e0fc452353",
+      "exportSha256": "51e96154891ac21fd4d89479f2fd2110d041f726339713387cb399e0fc452353",
+      "transformations": []
+    },
+    {
+      "path": "docs/provider-preflight.md",
+      "sourceSha256": "64cf3bd511901bd69795c97923584f612e8e3c23340943ec788f9b95b18d4d1d",
+      "exportSha256": "74a97de87627832c1e86557c474f597356ab978d5760b8ff8c5410a56dfec5c3",
+      "transformations": [
+        "Replace private installation chronology with public scope and procedures"
+      ]
+    },
+    {
+      "path": "docs/public-dependency-advisories.md",
+      "sourceSha256": "ba8b462f34c7420646766eff21cebd2a65c2a7660157503c54e289ac7c286529",
+      "exportSha256": "ba8b462f34c7420646766eff21cebd2a65c2a7660157503c54e289ac7c286529",
+      "transformations": []
+    },
+    {
+      "path": "docs/quota-admission.md",
+      "sourceSha256": "696a14b34d1918da4c99e3429561781748868fd1d53ca2b7595daa29c5cc4e77",
+      "exportSha256": "696a14b34d1918da4c99e3429561781748868fd1d53ca2b7595daa29c5cc4e77",
+      "transformations": []
+    },
+    {
+      "path": "docs/quota-command-supervision.md",
+      "sourceSha256": "3aee465aa71659ba8d9b9908487327b0e80171b063edc961616248bb58c5c229",
+      "exportSha256": "3aee465aa71659ba8d9b9908487327b0e80171b063edc961616248bb58c5c229",
+      "transformations": []
+    },
+    {
+      "path": "docs/recovery-catalog.md",
+      "sourceSha256": "d2950d486d0078540e799b6393890671f9cfc522b8e3b2d1bec77ea1bb7bd7e6",
+      "exportSha256": "d2950d486d0078540e799b6393890671f9cfc522b8e3b2d1bec77ea1bb7bd7e6",
+      "transformations": []
+    },
+    {
+      "path": "docs/runtime-image-scanner-capacity.md",
+      "sourceSha256": "03c2a0c6861d463bf5e334c863965c97e032086ea2ec5e092237e42ae2a4feef",
+      "exportSha256": "03c2a0c6861d463bf5e334c863965c97e032086ea2ec5e092237e42ae2a4feef",
+      "transformations": []
+    },
+    {
+      "path": "docs/runtime-image-scanner.md",
+      "sourceSha256": "5371a9ca9fd74013d87bf220d02d6b423378bb5803809b4626a7212610413dd0",
+      "exportSha256": "6e1ada6a94f23f34e19e800ffc98ee3a7c8a8178ce4c834b1feb08b721624e67",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/runtime-layout.md",
+      "sourceSha256": "93cf7560375c25eff023887df70e2f160828dbc8e42b869bf3600e51ecc35496",
+      "exportSha256": "93cf7560375c25eff023887df70e2f160828dbc8e42b869bf3600e51ecc35496",
+      "transformations": []
+    },
+    {
+      "path": "docs/runtime-pair-init.md",
+      "sourceSha256": "fe6f858de75503b22636e0a941f8f9187f35074dd0795086ac7cc5b603af53f2",
+      "exportSha256": "fe6f858de75503b22636e0a941f8f9187f35074dd0795086ac7cc5b603af53f2",
+      "transformations": []
+    },
+    {
+      "path": "docs/shared-testing-allowance.md",
+      "sourceSha256": "3b2d8251b188ae1accbd12bab34b613f1cc2c16ffad601978fd1ca096eb6c6f3",
+      "exportSha256": "325c638c0c7947a8130db791fb0e8ec2f8d80d592777cead6fb106499602c640",
+      "transformations": [
+        "Replace private installation chronology with public scope and procedures"
+      ]
+    },
+    {
+      "path": "docs/source-selection.md",
+      "sourceSha256": "0201df368f9fe021abb1aecabb97bb5b1e5a8e78c5f6afe8a6141049771752de",
+      "exportSha256": "6899fd36d00c15712ebd6025177e4ca565bb9eefafc3bd6f1ee6c34cc59c271d",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/source-verification.md",
+      "sourceSha256": "d3528037384b6d8963577706a3119f87280ec2cdd243f8c53bc5b9a44b973ae9",
+      "exportSha256": "aec790269a0d7a181ae2ca92f4e40b420ac81d264ced5005b2a62137610ae7aa",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/sse-shutdown.md",
+      "sourceSha256": "5804995e90776ddd8259d521aa1365013dc650977c692d5be869c28dc0492fb1",
+      "exportSha256": "5804995e90776ddd8259d521aa1365013dc650977c692d5be869c28dc0492fb1",
+      "transformations": []
+    },
+    {
+      "path": "docs/startup-binding.md",
+      "sourceSha256": "44b5849e7348ea5223496976d41d789b7f54e3c9439285232b5335ef3eac8408",
+      "exportSha256": "44b5849e7348ea5223496976d41d789b7f54e3c9439285232b5335ef3eac8408",
+      "transformations": []
+    },
+    {
+      "path": "docs/storage-quota.md",
+      "sourceSha256": "5970f8f41bda9340389b7bb72237e1670d67fa3344a9af334d9aaabb9b49e478",
+      "exportSha256": "3f93b51d4806b4e10cad6edf345f746302e9865ab221983d22b610fa00ea9dbd",
+      "transformations": [
+        "Remove link to private installation evidence or trial access tooling"
+      ]
+    },
+    {
+      "path": "docs/third-party-licenses.md",
+      "sourceSha256": "c7d5f3e866423037032e712712d75fad98626339b9032cca482b5b43b960a775",
+      "exportSha256": "c7d5f3e866423037032e712712d75fad98626339b9032cca482b5b43b960a775",
+      "transformations": []
+    },
+    {
+      "path": "models/catalog.json",
+      "sourceSha256": "ef045bfaeec721c69a2753c61c5222cfa2a261b7f4c90e7246aacb8b2b229d2c",
+      "exportSha256": "ef045bfaeec721c69a2753c61c5222cfa2a261b7f4c90e7246aacb8b2b229d2c",
+      "transformations": []
+    },
+    {
+      "path": "models/dms-reviewed-public-npm.json",
+      "sourceSha256": "cf8752fce6e6c2c9a986c1d8c73c32f89228119d31ad1824de2e5ad0d7ccefbf",
+      "exportSha256": "cf8752fce6e6c2c9a986c1d8c73c32f89228119d31ad1824de2e5ad0d7ccefbf",
+      "transformations": []
+    },
+    {
+      "path": "models/integrations.json",
+      "sourceSha256": "b2b18000450aaae40e72fb60e0bcaa6f8f5fb473bbc9c8e61cefbbfb41d8a1d4",
+      "exportSha256": "b2b18000450aaae40e72fb60e0bcaa6f8f5fb473bbc9c8e61cefbbfb41d8a1d4",
+      "transformations": []
+    },
+    {
+      "path": "models/npm-toolchain-security-updates.json",
+      "sourceSha256": "4cb69232b922120c460984ee19a1e95eb545d140e0fe50439d4c0b6b60fd9470",
+      "exportSha256": "4cb69232b922120c460984ee19a1e95eb545d140e0fe50439d4c0b6b60fd9470",
+      "transformations": []
+    },
+    {
+      "path": "models/platform-reviewed-public-npm.json",
+      "sourceSha256": "92cc2e887e656159489eb5a267adfb615bc1cbbc4dc80ecc3fa726ee7b9fd8db",
+      "exportSha256": "92cc2e887e656159489eb5a267adfb615bc1cbbc4dc80ecc3fa726ee7b9fd8db",
+      "transformations": []
+    },
+    {
+      "path": "package-lock.json",
+      "sourceSha256": "5a9fc4d49f1cdc4dac59076d56e082065c2eb55a7dd7d787382435899d995b07",
+      "exportSha256": "5a9fc4d49f1cdc4dac59076d56e082065c2eb55a7dd7d787382435899d995b07",
+      "transformations": []
+    },
+    {
+      "path": "package.json",
+      "sourceSha256": "c70fbd6bf40b624d557ff64b49337ef106d156b6d2783a04af8c9c3c8960b4c5",
+      "exportSha256": "c70fbd6bf40b624d557ff64b49337ef106d156b6d2783a04af8c9c3c8960b4c5",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/package.json",
+      "sourceSha256": "d3f37d93a0f2f31e1c8c8cda29cc710830bad0d9b35a44971da1bec4583e5d23",
+      "exportSha256": "d3f37d93a0f2f31e1c8c8cda29cc710830bad0d9b35a44971da1bec4583e5d23",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/access.ts",
+      "sourceSha256": "79a043efd3d728dddc1802a0a24a7d6ae4890c8a8d0b2cd6be27a957743eea62",
+      "exportSha256": "79a043efd3d728dddc1802a0a24a7d6ae4890c8a8d0b2cd6be27a957743eea62",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/app-accounts.ts",
+      "sourceSha256": "c5b9fc3f215983fc3e3f50cb1dec6eba3965e3ba602703cae44e5529f383fa9f",
+      "exportSha256": "c5b9fc3f215983fc3e3f50cb1dec6eba3965e3ba602703cae44e5529f383fa9f",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/broker.ts",
+      "sourceSha256": "a187b8b900702883ab3f4b20bdfd4e137f2b73dc042b23c9a27b9d7f4d202149",
+      "exportSha256": "a187b8b900702883ab3f4b20bdfd4e137f2b73dc042b23c9a27b9d7f4d202149",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/connection-context.ts",
+      "sourceSha256": "3efcb2b1297901f417a6eebf0a86b9086362d0d780a46c429b2082574931ba5e",
+      "exportSha256": "3efcb2b1297901f417a6eebf0a86b9086362d0d780a46c429b2082574931ba5e",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/connection-revocation.ts",
+      "sourceSha256": "ab3a401db754d29565cdeb5841e341cf44e11314601d2d18303826b2ae0bf1be",
+      "exportSha256": "ab3a401db754d29565cdeb5841e341cf44e11314601d2d18303826b2ae0bf1be",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/connector-adapters.ts",
+      "sourceSha256": "49ef1c54812db7dbc646046b8618cda3d0c958ee03927d9f2459848293157059",
+      "exportSha256": "49ef1c54812db7dbc646046b8618cda3d0c958ee03927d9f2459848293157059",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/connectors.ts",
+      "sourceSha256": "20d89e164fabb55292adfed5cd7d076893add8e3ae843b2c3532cedd0346fb82",
+      "exportSha256": "20d89e164fabb55292adfed5cd7d076893add8e3ae843b2c3532cedd0346fb82",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/directory.ts",
+      "sourceSha256": "32b1465b6331393c60f68998e2dc80a34195cf24ac79eeefe7cad4e3932f744d",
+      "exportSha256": "32b1465b6331393c60f68998e2dc80a34195cf24ac79eeefe7cad4e3932f744d",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/index.ts",
+      "sourceSha256": "c7c8465a038597a616b18ece11e4c2dec8befca02a99fede5da8254e3e6e5894",
+      "exportSha256": "c7c8465a038597a616b18ece11e4c2dec8befca02a99fede5da8254e3e6e5894",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/migration-snapshot.ts",
+      "sourceSha256": "d8a0a2bf71a2afabc8fc239012b2accbfac59f0f78c68db15dda15c39ffe1e58",
+      "exportSha256": "d8a0a2bf71a2afabc8fc239012b2accbfac59f0f78c68db15dda15c39ffe1e58",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/model-http.ts",
+      "sourceSha256": "3c5ac0c8ad45c4cdb7de79a09bff1f44168c4054a6c435343e9fb3e45362ef67",
+      "exportSha256": "3c5ac0c8ad45c4cdb7de79a09bff1f44168c4054a6c435343e9fb3e45362ef67",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/models.ts",
+      "sourceSha256": "c4b0833f6a27cc40988586c368b5252cb6e245cde57e14bee543708291c090c1",
+      "exportSha256": "c4b0833f6a27cc40988586c368b5252cb6e245cde57e14bee543708291c090c1",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/research-context.ts",
+      "sourceSha256": "8bf74c01e8cbe161fd3184758a9c42e7cfeba6e384bfe0eaf775566324c84ca1",
+      "exportSha256": "8bf74c01e8cbe161fd3184758a9c42e7cfeba6e384bfe0eaf775566324c84ca1",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/schemas.ts",
+      "sourceSha256": "1863d8053f609526360d3b136891d6a01c0c2a4d3c0c3bf2fa6c63d840cd26ec",
+      "exportSha256": "1863d8053f609526360d3b136891d6a01c0c2a4d3c0c3bf2fa6c63d840cd26ec",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/security.ts",
+      "sourceSha256": "7213d84ed6b4e726799c3c1176231abd4bbede6b92a67264fd019778e0d66370",
+      "exportSha256": "7213d84ed6b4e726799c3c1176231abd4bbede6b92a67264fd019778e0d66370",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/source-hash.ts",
+      "sourceSha256": "3f477a066840308be415d7e18a87f82948f12832a503722cad81474e548a20c2",
+      "exportSha256": "3f477a066840308be415d7e18a87f82948f12832a503722cad81474e548a20c2",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/source-selection.ts",
+      "sourceSha256": "600f533fd398dea4699329c8036da85165988027d7ad09d0d3800c092f96dadd",
+      "exportSha256": "600f533fd398dea4699329c8036da85165988027d7ad09d0d3800c092f96dadd",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/stripe-webhook.ts",
+      "sourceSha256": "a9d08a90ff642c87a660eb4afe056bd8bf12218cb3801581efc591768ccf5e2e",
+      "exportSha256": "a9d08a90ff642c87a660eb4afe056bd8bf12218cb3801581efc591768ccf5e2e",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/trusted-broker-http.ts",
+      "sourceSha256": "611058ece5c465790033e047a2acecb70f4302e240233106680ce5ef839d6ab7",
+      "exportSha256": "611058ece5c465790033e047a2acecb70f4302e240233106680ce5ef839d6ab7",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/src/types.ts",
+      "sourceSha256": "96c9dbf03eca2a56959bd89c7d59d17b42fd80d34a14edcd8a0ecdc1fcf4433f",
+      "exportSha256": "96c9dbf03eca2a56959bd89c7d59d17b42fd80d34a14edcd8a0ecdc1fcf4433f",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/test/app-accounts.test.ts",
+      "sourceSha256": "f37354384ece6e807489b9594247c079c3197d3e591889bb1ad4bf8fd5003a90",
+      "exportSha256": "f37354384ece6e807489b9594247c079c3197d3e591889bb1ad4bf8fd5003a90",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/test/broker-transport.test.ts",
+      "sourceSha256": "77ff0402462c5d4b88d2016bbc1da70e20d8b1549260adf9fd09bc84f79e3822",
+      "exportSha256": "77ff0402462c5d4b88d2016bbc1da70e20d8b1549260adf9fd09bc84f79e3822",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/test/connection-revocation.test.ts",
+      "sourceSha256": "afb3df1f84f9f157d77ebb4c8fdcaa37345dc595aca03224a00ed00c2609a993",
+      "exportSha256": "afb3df1f84f9f157d77ebb4c8fdcaa37345dc595aca03224a00ed00c2609a993",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/test/core.test.ts",
+      "sourceSha256": "6bee6ba40f561bee444eec2714d02f04f909a7345af7fb9d6f8572282963e4f0",
+      "exportSha256": "6bee6ba40f561bee444eec2714d02f04f909a7345af7fb9d6f8572282963e4f0",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/test/generation.test.ts",
+      "sourceSha256": "862a86b2be5ad25806a061a58e6fdb0216d548787365466525d67e0a72d67f1d",
+      "exportSha256": "862a86b2be5ad25806a061a58e6fdb0216d548787365466525d67e0a72d67f1d",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/test/migration-snapshot-fixture.ts",
+      "sourceSha256": "8cbaccd6d332d8079b5ab66485a1e0d7135239e8b953909424239b1433efce0f",
+      "exportSha256": "8cbaccd6d332d8079b5ab66485a1e0d7135239e8b953909424239b1433efce0f",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/test/migration-snapshot.test.ts",
+      "sourceSha256": "13fb2b6a524b61436c48df02a9f07f6293f8a2fee05202c7698bea657e2b0691",
+      "exportSha256": "13fb2b6a524b61436c48df02a9f07f6293f8a2fee05202c7698bea657e2b0691",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/test/model-http.test.ts",
+      "sourceSha256": "5ffe725c01eeab82d016f070d75b1b492fccee14778a494314c4adf4d7b38f59",
+      "exportSha256": "5ffe725c01eeab82d016f070d75b1b492fccee14778a494314c4adf4d7b38f59",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/test/model-routing.test.ts",
+      "sourceSha256": "bcdaefdc0e7488587e5198aac2ac2286035e11b6fa0b4d1a309e58f25f7953fc",
+      "exportSha256": "bcdaefdc0e7488587e5198aac2ac2286035e11b6fa0b4d1a309e58f25f7953fc",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/test/model-snapshot.test.ts",
+      "sourceSha256": "27a573e3a07e1ff5d163efdd25c3b9ae6fbaa58701bfd436a27ce118f6e43055",
+      "exportSha256": "27a573e3a07e1ff5d163efdd25c3b9ae6fbaa58701bfd436a27ce118f6e43055",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/test/research-generation.test.ts",
+      "sourceSha256": "73dcc300a9c739dddb296e447973a4938194cb3c3cb24bf6599965e9f0ee486e",
+      "exportSha256": "73dcc300a9c739dddb296e447973a4938194cb3c3cb24bf6599965e9f0ee486e",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/test/security.test.ts",
+      "sourceSha256": "5c01ab0d7e9d421092be3fd9df57d0fa7f05027524406f4c2da7d700a086abad",
+      "exportSha256": "5c01ab0d7e9d421092be3fd9df57d0fa7f05027524406f4c2da7d700a086abad",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/test/source-selection.test.ts",
+      "sourceSha256": "0bf76bde6f943f401092dfb7856c27ac12906d11ab7674ac154c7306d1c5d8c3",
+      "exportSha256": "0bf76bde6f943f401092dfb7856c27ac12906d11ab7674ac154c7306d1c5d8c3",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/test/stripe-webhook.test.ts",
+      "sourceSha256": "e47fad9a19ec1dceacf8aa023355384979ed3ab2a122f19b720a6d3102ee23eb",
+      "exportSha256": "e47fad9a19ec1dceacf8aa023355384979ed3ab2a122f19b720a6d3102ee23eb",
+      "transformations": []
+    },
+    {
+      "path": "packages/core/test/trusted-broker-clients.test.ts",
+      "sourceSha256": "4545e436cdb39279dd8c2b9b07fc7dc4e995fd8686ef98c2fbbe1c61c76410f5",
+      "exportSha256": "4545e436cdb39279dd8c2b9b07fc7dc4e995fd8686ef98c2fbbe1c61c76410f5",
+      "transformations": []
+    },
+    {
+      "path": "scripts/autosoft.sh",
+      "sourceSha256": "ad0bc924aa26bdaf5cca594a96f955457eb8beef423e76ad993ac6d042aae743",
+      "exportSha256": "ad0bc924aa26bdaf5cca594a96f955457eb8beef423e76ad993ac6d042aae743",
+      "transformations": []
+    },
+    {
+      "path": "scripts/backup_quiescence.py",
+      "sourceSha256": "f7bf97aeb4d6e6cb97b94863ac08977d467a8d8470e3bc1fba7e4a19bd60e48a",
+      "exportSha256": "f7bf97aeb4d6e6cb97b94863ac08977d467a8d8470e3bc1fba7e4a19bd60e48a",
+      "transformations": []
+    },
+    {
+      "path": "scripts/backup_recovery.py",
+      "sourceSha256": "b1159f27c135ac1173504b8fe2c0894d67d7a8c4abb66a3baa902978670783f9",
+      "exportSha256": "b1159f27c135ac1173504b8fe2c0894d67d7a8c4abb66a3baa902978670783f9",
+      "transformations": []
+    },
+    {
+      "path": "scripts/bootstrap.py",
+      "sourceSha256": "cce4bef2d3e887f525b7eeefa61b5888b09e261bfd1987b8bb2112531d703e87",
+      "exportSha256": "cce4bef2d3e887f525b7eeefa61b5888b09e261bfd1987b8bb2112531d703e87",
+      "transformations": []
+    },
+    {
+      "path": "scripts/build-company-release.sh",
+      "sourceSha256": "d5349a6757d2056ffaecf15800d375cec11539b229497ab26faf585631675ff5",
+      "exportSha256": "d5349a6757d2056ffaecf15800d375cec11539b229497ab26faf585631675ff5",
+      "transformations": []
+    },
+    {
+      "path": "scripts/certificates.sh",
+      "sourceSha256": "b91dd6bbdbe484090d989670287db387855085e302657fd44951cc8488ab51e6",
+      "exportSha256": "b91dd6bbdbe484090d989670287db387855085e302657fd44951cc8488ab51e6",
+      "transformations": []
+    },
+    {
+      "path": "scripts/check-deployment.mjs",
+      "sourceSha256": "91c848c08805376fa106d4e52811f2c5e37a836820966c63b7975e8ab19bb07e",
+      "exportSha256": "91c848c08805376fa106d4e52811f2c5e37a836820966c63b7975e8ab19bb07e",
+      "transformations": []
+    },
+    {
+      "path": "scripts/check-platform-image.py",
+      "sourceSha256": "1472fb60280c83ba997b0cca73ddb32b3bd4cbd353ff7dbdd150e89f1e8870b3",
+      "exportSha256": "1472fb60280c83ba997b0cca73ddb32b3bd4cbd353ff7dbdd150e89f1e8870b3",
+      "transformations": []
+    },
+    {
+      "path": "scripts/checkpoint_admission.py",
+      "sourceSha256": "5c43553ea88430da637abfaeef51123851a95957eb2034cb8ddc4208ddc099f0",
+      "exportSha256": "5c43553ea88430da637abfaeef51123851a95957eb2034cb8ddc4208ddc099f0",
+      "transformations": []
+    },
+    {
+      "path": "scripts/company_captured_loader.py",
+      "sourceSha256": "83b68d84323471a22729e827fc947b4ad73c8d5dbc560b4a18d6c64d98826b4c",
+      "exportSha256": "83b68d84323471a22729e827fc947b4ad73c8d5dbc560b4a18d6c64d98826b4c",
+      "transformations": []
+    },
+    {
+      "path": "scripts/company_platform_store.py",
+      "sourceSha256": "02322f2430027862a617552106c3f56c4322789cc0089bc1beb14a5425fd189e",
+      "exportSha256": "02322f2430027862a617552106c3f56c4322789cc0089bc1beb14a5425fd189e",
+      "transformations": []
+    },
+    {
+      "path": "scripts/company_seed_backend_native_client_v1.py",
+      "sourceSha256": "87462baf4afe76b3c10213c3dc95606c6d260f41c4d52bdd7c285f943f0fa1d8",
+      "exportSha256": "265f2135d7ebd25acbe8ed5bb79e14a4a6923b7f210371176ae0b7525e10af08",
+      "transformations": [
+        "Use checkout-relative source and disable historical operator-specific SSH station defaults"
+      ]
+    },
+    {
+      "path": "scripts/company_seed_backend_native_client_v2.py",
+      "sourceSha256": "2a691a5c926591e7cde18f59a467593471f5ebd5e005b91071305122881b3093",
+      "exportSha256": "d7ad09fa1f37079034d1e4bb39f0e3c22ec12f037cb30c072102aa47411ca502",
+      "transformations": [
+        "Use checkout-relative source and disable historical operator-specific SSH station defaults"
+      ]
+    },
+    {
+      "path": "scripts/company_seed_backend_native_client_v3.py",
+      "sourceSha256": "f8d728abcd5a86472b7ea4fe3c2383272fe3a5300d02dfd91a24a0d6e592b695",
+      "exportSha256": "326b8164de305181da01ecc916bb12d1e21bb0f5b06aea44a5277f25465de1db",
+      "transformations": [
+        "Use checkout-relative source and disable historical operator-specific SSH station defaults"
+      ]
+    },
+    {
+      "path": "scripts/company_seed_runner_native_client_v1.py",
+      "sourceSha256": "d390c85eaf8c3e50192482b65fe4a52af0cb45da1a17ac8703486adc37551ccd",
+      "exportSha256": "037ce590562998e6ff3291456a1f8097b627416dd42a304508e39af119d0c96f",
+      "transformations": [
+        "Use checkout-relative source and disable historical operator-specific SSH station defaults"
+      ]
+    },
+    {
+      "path": "scripts/company_source.py",
+      "sourceSha256": "5819cb5de0c41bda6369fba308d4c1fc497068b4a533f4e7e2a4fad597e94bad",
+      "exportSha256": "5819cb5de0c41bda6369fba308d4c1fc497068b4a533f4e7e2a4fad597e94bad",
+      "transformations": []
+    },
+    {
+      "path": "scripts/company_source_guard.py",
+      "sourceSha256": "2e4945de134a8d22fc913bbc075f1427e7a370ad383daf5a238cd27c8be9b6e9",
+      "exportSha256": "2e4945de134a8d22fc913bbc075f1427e7a370ad383daf5a238cd27c8be9b6e9",
+      "transformations": []
+    },
+    {
+      "path": "scripts/company_source_guard_backend.py",
+      "sourceSha256": "08819a69449f28c4b568d58930ead4bade0475726138fa039945f2365322126d",
+      "exportSha256": "08819a69449f28c4b568d58930ead4bade0475726138fa039945f2365322126d",
+      "transformations": []
+    },
+    {
+      "path": "scripts/company_source_tree.py",
+      "sourceSha256": "cf30b7fc2327f182401781e897da4823dac44ba1afd25e5d7d681ddd93317f67",
+      "exportSha256": "cf30b7fc2327f182401781e897da4823dac44ba1afd25e5d7d681ddd93317f67",
+      "transformations": []
+    },
+    {
+      "path": "scripts/directory-identity-setup.mjs",
+      "sourceSha256": "f6f905beff8c38aae98c60c2f8e9fe57a0c43801e018d9a65b34111ec2e25196",
+      "exportSha256": "f6f905beff8c38aae98c60c2f8e9fe57a0c43801e018d9a65b34111ec2e25196",
+      "transformations": []
+    },
+    {
+      "path": "scripts/directory-identity-setup.test.mjs",
+      "sourceSha256": "90959d356b42955e2908995981210397b2b8711c6645942284e7cc0b5956a61d",
+      "exportSha256": "90959d356b42955e2908995981210397b2b8711c6645942284e7cc0b5956a61d",
+      "transformations": []
+    },
+    {
+      "path": "scripts/host_kernel_security.py",
+      "sourceSha256": "9d36e253468b1fa9a679e4035a4a0d9bb7105e0aca214082064d56848f1f6565",
+      "exportSha256": "9d36e253468b1fa9a679e4035a4a0d9bb7105e0aca214082064d56848f1f6565",
+      "transformations": []
+    },
+    {
+      "path": "scripts/host_package_inventory.py",
+      "sourceSha256": "d5490a44bc15ad9496bef344c1e4c4ea7911ac8acb32c887b2f49cd8061cccee",
+      "exportSha256": "d5490a44bc15ad9496bef344c1e4c4ea7911ac8acb32c887b2f49cd8061cccee",
+      "transformations": []
+    },
+    {
+      "path": "scripts/host_queries.py",
+      "sourceSha256": "7c4837b12b05ac886ed467611a2cf74da45e1a16997da4a4aac15899bff11d8b",
+      "exportSha256": "7c4837b12b05ac886ed467611a2cf74da45e1a16997da4a4aac15899bff11d8b",
+      "transformations": []
+    },
+    {
+      "path": "scripts/host_remediation.py",
+      "sourceSha256": "459615f002482395cb8ea3c1679b60434aa01de72443e8c5597f5d368a22585c",
+      "exportSha256": "459615f002482395cb8ea3c1679b60434aa01de72443e8c5597f5d368a22585c",
+      "transformations": []
+    },
+    {
+      "path": "scripts/identity.py",
+      "sourceSha256": "971ff105c5b72876ca9c155bc59c59422e352dd2871042f00a6be19c52c78cf1",
+      "exportSha256": "971ff105c5b72876ca9c155bc59c59422e352dd2871042f00a6be19c52c78cf1",
+      "transformations": []
+    },
+    {
+      "path": "scripts/install-lock.sh",
+      "sourceSha256": "e55dc2312d1fc210f04b8efdeed373bfec7e6e7bcdca08fcd9c7838cc7a2b002",
+      "exportSha256": "e55dc2312d1fc210f04b8efdeed373bfec7e6e7bcdca08fcd9c7838cc7a2b002",
+      "transformations": []
+    },
+    {
+      "path": "scripts/install-runtime-gate.sh",
+      "sourceSha256": "9453f887fd647af9efdf149a18898b6312382e95c668a14cf3fbb3a3917272e9",
+      "exportSha256": "9453f887fd647af9efdf149a18898b6312382e95c668a14cf3fbb3a3917272e9",
+      "transformations": []
+    },
+    {
+      "path": "scripts/install.sh",
+      "sourceSha256": "1ab40300493efbe8f72d986a2f1e68d136c9a0f9674fc5cb79d05a3e1d07df2e",
+      "exportSha256": "1ab40300493efbe8f72d986a2f1e68d136c9a0f9674fc5cb79d05a3e1d07df2e",
+      "transformations": []
+    },
+    {
+      "path": "scripts/installation-status.py",
+      "sourceSha256": "d226d286a05ab745093c110f036c4b6a92bdda7ad2bbe358b6355ebd28290d1a",
+      "exportSha256": "d226d286a05ab745093c110f036c4b6a92bdda7ad2bbe358b6355ebd28290d1a",
+      "transformations": []
+    },
+    {
+      "path": "scripts/installation_identity.py",
+      "sourceSha256": "2ab7119a9e1d94d54fa1a4557c86a69274d3b9564f3455d19face5a7f752b763",
+      "exportSha256": "2ab7119a9e1d94d54fa1a4557c86a69274d3b9564f3455d19face5a7f752b763",
+      "transformations": []
+    },
+    {
+      "path": "scripts/installer_materialize.py",
+      "sourceSha256": "35d87411a01e8edebb7aad4ec48434d90a52ecb9f1835bd02d3c413ce10a7bb8",
+      "exportSha256": "35d87411a01e8edebb7aad4ec48434d90a52ecb9f1835bd02d3c413ce10a7bb8",
+      "transformations": []
+    },
+    {
+      "path": "scripts/installer_parent.py",
+      "sourceSha256": "e8d0c9de63eec5f68f20cc559030c728f97d4c21090dc343370209472491c547",
+      "exportSha256": "e8d0c9de63eec5f68f20cc559030c728f97d4c21090dc343370209472491c547",
+      "transformations": []
+    },
+    {
+      "path": "scripts/keycloak-provision.mjs",
+      "sourceSha256": "82046d0dd3169f84c289816ab0d28bd85ff4d864f16c0c833960ea1643140cb3",
+      "exportSha256": "82046d0dd3169f84c289816ab0d28bd85ff4d864f16c0c833960ea1643140cb3",
+      "transformations": []
+    },
+    {
+      "path": "scripts/keycloak-start.sh",
+      "sourceSha256": "c72f16462895741ac72a0c294d23b3186b077ec9b580ec04fa2866c18e3ed417",
+      "exportSha256": "c72f16462895741ac72a0c294d23b3186b077ec9b580ec04fa2866c18e3ed417",
+      "transformations": []
+    },
+    {
+      "path": "scripts/lib.sh",
+      "sourceSha256": "a8400b0938949315e13602788b24fcd1ae710d5ae46b395bcaa92db1d637b594",
+      "exportSha256": "a8400b0938949315e13602788b24fcd1ae710d5ae46b395bcaa92db1d637b594",
+      "transformations": []
+    },
+    {
+      "path": "scripts/maintenance-broker-security.mjs",
+      "sourceSha256": "1cfce5ffb6ca3f97dbce36c8ecc6e06e8d3460f7c56e6cf2f39e98bbc3da73f4",
+      "exportSha256": "1cfce5ffb6ca3f97dbce36c8ecc6e06e8d3460f7c56e6cf2f39e98bbc3da73f4",
+      "transformations": []
+    },
+    {
+      "path": "scripts/maintenance.py",
+      "sourceSha256": "84ce5305b4877ea4429d2e2eef92dd12a9bdad42c79ab8ad431ed807f5dfda5a",
+      "exportSha256": "84ce5305b4877ea4429d2e2eef92dd12a9bdad42c79ab8ad431ed807f5dfda5a",
+      "transformations": []
+    },
+    {
+      "path": "scripts/maintenance_broker_security.py",
+      "sourceSha256": "e9fb7d175548ff3a4ddd84e6a0aecb1706da28c29df328f294dc3badbd6ad74d",
+      "exportSha256": "e9fb7d175548ff3a4ddd84e6a0aecb1706da28c29df328f294dc3badbd6ad74d",
+      "transformations": []
+    },
+    {
+      "path": "scripts/maintenance_image_export.py",
+      "sourceSha256": "ddf14e0c56aa594b5f2fb71908c3b8129062a7f7e107c4250f7c70caf283b900",
+      "exportSha256": "ddf14e0c56aa594b5f2fb71908c3b8129062a7f7e107c4250f7c70caf283b900",
+      "transformations": []
+    },
+    {
+      "path": "scripts/maintenance_scanner.py",
+      "sourceSha256": "6690302c43a4427c91d42d669da034b925135065ac0785c7130eb65d249463e2",
+      "exportSha256": "6690302c43a4427c91d42d669da034b925135065ac0785c7130eb65d249463e2",
+      "transformations": []
+    },
+    {
+      "path": "scripts/model-budget-handover.py",
+      "sourceSha256": "7210a8948440495f96c29446b8324fea88b748c11195aefd9b06e39939d66905",
+      "exportSha256": "7210a8948440495f96c29446b8324fea88b748c11195aefd9b06e39939d66905",
+      "transformations": []
+    },
+    {
+      "path": "scripts/model-test-budget-maintain.py",
+      "sourceSha256": "0afd430e4be14fe92ae33a26ac39c7c792414fd2517f17c846206bd5236e1b69",
+      "exportSha256": "0afd430e4be14fe92ae33a26ac39c7c792414fd2517f17c846206bd5236e1b69",
+      "transformations": []
+    },
+    {
+      "path": "scripts/model-test-budget.py",
+      "sourceSha256": "b35c459f85f23bd4bc789ce1b671f0e3d5fed83d390a874c885274f3838786ab",
+      "exportSha256": "b35c459f85f23bd4bc789ce1b671f0e3d5fed83d390a874c885274f3838786ab",
+      "transformations": []
+    },
+    {
+      "path": "scripts/platform_git_runner.py",
+      "sourceSha256": "1c71bcea9256c3b26a5816f3e8ea5acff0e7b3d83064306ec4f10787397d56e2",
+      "exportSha256": "1c71bcea9256c3b26a5816f3e8ea5acff0e7b3d83064306ec4f10787397d56e2",
+      "transformations": []
+    },
+    {
+      "path": "scripts/platform_source.py",
+      "sourceSha256": "75e2c70191163f723e537b15a024595156e8cd6991807385ecb07c83c02772d0",
+      "exportSha256": "75e2c70191163f723e537b15a024595156e8cd6991807385ecb07c83c02772d0",
+      "transformations": []
+    },
+    {
+      "path": "scripts/provider-preflight.py",
+      "sourceSha256": "3b4e10694e04ba95844654ac4da241daf0d435707c666052ef61e18af5257a73",
+      "exportSha256": "3b4e10694e04ba95844654ac4da241daf0d435707c666052ef61e18af5257a73",
+      "transformations": []
+    },
+    {
+      "path": "scripts/public-npm-advisories.py",
+      "sourceSha256": "fb6fc86cee4eaba2b8ce99142ee7499ef33b146b9544b2781a0cb1edf1f3641e",
+      "exportSha256": "fb6fc86cee4eaba2b8ce99142ee7499ef33b146b9544b2781a0cb1edf1f3641e",
+      "transformations": []
+    },
+    {
+      "path": "scripts/public-release-check.py",
+      "sourceSha256": "9a3de4c6ea940d28e31911e09d57f1c52b6b63ce6d38fa91ff60c66b705dfe36",
+      "exportSha256": "9a3de4c6ea940d28e31911e09d57f1c52b6b63ce6d38fa91ff60c66b705dfe36",
+      "transformations": []
+    },
+    {
+      "path": "scripts/public-release-check.test.py",
+      "sourceSha256": "0c595db989cf3c5aaac7d8c4bbd9739a02cd9eb23dd22e0dfbb9fe4945dd86a4",
+      "exportSha256": "0c595db989cf3c5aaac7d8c4bbd9739a02cd9eb23dd22e0dfbb9fe4945dd86a4",
+      "transformations": []
+    },
+    {
+      "path": "scripts/public-release-export.py",
+      "sourceSha256": "51f00b915a04d0427a98def3b64996d483949e11ef6e8124967488e65b1e0d23",
+      "exportSha256": "51f00b915a04d0427a98def3b64996d483949e11ef6e8124967488e65b1e0d23",
+      "transformations": []
+    },
+    {
+      "path": "scripts/public-release-export.test.py",
+      "sourceSha256": "efab59b8f9972ff4ecfdba5f340def79677aeccb2ac14dec69eb57ad5fc98a31",
+      "exportSha256": "efab59b8f9972ff4ecfdba5f340def79677aeccb2ac14dec69eb57ad5fc98a31",
+      "transformations": []
+    },
+    {
+      "path": "scripts/public-release-reviewed-fixtures.json",
+      "sourceSha256": "c7bff2955841e5a4000c616a327961a15c53b33839b734d0db9a438f913d5319",
+      "exportSha256": "c7bff2955841e5a4000c616a327961a15c53b33839b734d0db9a438f913d5319",
+      "transformations": []
+    },
+    {
+      "path": "scripts/qualify-filesystem.py",
+      "sourceSha256": "d5adb3dd23782958a2be0fd7494158a1f6b8015323f0be1f1e2db511453ec4c0",
+      "exportSha256": "d5adb3dd23782958a2be0fd7494158a1f6b8015323f0be1f1e2db511453ec4c0",
+      "transformations": []
+    },
+    {
+      "path": "scripts/qualify-samba.py",
+      "sourceSha256": "f9d74d530458091a164d66c8f579292b129e1e66a4e54ef3f7910866fb781408",
+      "exportSha256": "f9d74d530458091a164d66c8f579292b129e1e66a4e54ef3f7910866fb781408",
+      "transformations": []
+    },
+    {
+      "path": "scripts/qualify-trivy-feed.py",
+      "sourceSha256": "20c1f8c391ca3fad2163acd890e4ceea0488d84a36e0dbe046d6e7ec3fbc81ae",
+      "exportSha256": "20c1f8c391ca3fad2163acd890e4ceea0488d84a36e0dbe046d6e7ec3fbc81ae",
+      "transformations": []
+    },
+    {
+      "path": "scripts/quota-helper.py",
+      "sourceSha256": "42b570689465f6cad6960d6128d549d225bd2047cf2fe10d0517ac94d146d802",
+      "exportSha256": "42b570689465f6cad6960d6128d549d225bd2047cf2fe10d0517ac94d146d802",
+      "transformations": []
+    },
+    {
+      "path": "scripts/quota_allocation.py",
+      "sourceSha256": "aaf32a5f8bc79c434b18ccd943ddb50c05e1d2f8c8b1337c106d2e7d498fb850",
+      "exportSha256": "aaf32a5f8bc79c434b18ccd943ddb50c05e1d2f8c8b1337c106d2e7d498fb850",
+      "transformations": []
+    },
+    {
+      "path": "scripts/quota_runtime.py",
+      "sourceSha256": "785cf417ecd6d2738de7e2fde4775bd2eae8860a2641390cca2eb244fed461e0",
+      "exportSha256": "785cf417ecd6d2738de7e2fde4775bd2eae8860a2641390cca2eb244fed461e0",
+      "transformations": []
+    },
+    {
+      "path": "scripts/recovery_catalog.py",
+      "sourceSha256": "aab9c63a725407d5f51135774416734de175a6e36ececbe393f719e5230a1460",
+      "exportSha256": "aab9c63a725407d5f51135774416734de175a6e36ececbe393f719e5230a1460",
+      "transformations": []
+    },
+    {
+      "path": "scripts/recovery_chain.py",
+      "sourceSha256": "1ac3d84af97dd4bf55273cc66d805a3b92e178148e966920e90785dc697b99f9",
+      "exportSha256": "1ac3d84af97dd4bf55273cc66d805a3b92e178148e966920e90785dc697b99f9",
+      "transformations": []
+    },
+    {
+      "path": "scripts/recovery_services.py",
+      "sourceSha256": "63fdecb76804d6cead4ea984190b22019b7947828ee1c90827de6c82676027db",
+      "exportSha256": "63fdecb76804d6cead4ea984190b22019b7947828ee1c90827de6c82676027db",
+      "transformations": []
+    },
+    {
+      "path": "scripts/recovery_tools.py",
+      "sourceSha256": "03518ed74aa09501122526581470892f8a6977ea07f576c9fac72e6f35732e49",
+      "exportSha256": "03518ed74aa09501122526581470892f8a6977ea07f576c9fac72e6f35732e49",
+      "transformations": []
+    },
+    {
+      "path": "scripts/refresh-sources.py",
+      "sourceSha256": "c0a898a3f57f14d2dcfcaa67cdea01606355bf2854d4001b6ddd1a83a145031e",
+      "exportSha256": "c0a898a3f57f14d2dcfcaa67cdea01606355bf2854d4001b6ddd1a83a145031e",
+      "transformations": []
+    },
+    {
+      "path": "scripts/registry_manifest.py",
+      "sourceSha256": "d9d7b3f4c57af9b16352f86b04cd684596ad51856f55847fbd34837bca9cc2d2",
+      "exportSha256": "d9d7b3f4c57af9b16352f86b04cd684596ad51856f55847fbd34837bca9cc2d2",
+      "transformations": []
+    },
+    {
+      "path": "scripts/release-manifest.py",
+      "sourceSha256": "37bc9377110ee89b1618d3fd3fba6e88dba8a4a1537de0c0b4e9607dbe365e05",
+      "exportSha256": "37bc9377110ee89b1618d3fd3fba6e88dba8a4a1537de0c0b4e9607dbe365e05",
+      "transformations": []
+    },
+    {
+      "path": "scripts/resolve-images.py",
+      "sourceSha256": "72a86a777401277acb09389b36656c4a4325ce83a5f95298ebccb7c55955c705",
+      "exportSha256": "72a86a777401277acb09389b36656c4a4325ce83a5f95298ebccb7c55955c705",
+      "transformations": []
+    },
+    {
+      "path": "scripts/runtime_layout.py",
+      "sourceSha256": "3d26b79d60113b6088402fa116734d6b543076c9a87f39b78db5c6af9e5d87b9",
+      "exportSha256": "3d26b79d60113b6088402fa116734d6b543076c9a87f39b78db5c6af9e5d87b9",
+      "transformations": []
+    },
+    {
+      "path": "scripts/runtime_pair_init.py",
+      "sourceSha256": "4df1dd75aefd0fc51323b0ec7eb411fbe2dc4aab6b32624cb31034abb805c2da",
+      "exportSha256": "4df1dd75aefd0fc51323b0ec7eb411fbe2dc4aab6b32624cb31034abb805c2da",
+      "transformations": []
+    },
+    {
+      "path": "scripts/security-check.sh",
+      "sourceSha256": "7136699a0538a056cf00ab81d9a3a6bb2a3937585c83f42792f6d2ff85d978c5",
+      "exportSha256": "7136699a0538a056cf00ab81d9a3a6bb2a3937585c83f42792f6d2ff85d978c5",
+      "transformations": []
+    },
+    {
+      "path": "scripts/sign-company-release.sh",
+      "sourceSha256": "2d1a55973f38dc99fa0e4c5484e687a94c28187202b4160f5d5432dc7a25cd38",
+      "exportSha256": "2d1a55973f38dc99fa0e4c5484e687a94c28187202b4160f5d5432dc7a25cd38",
+      "transformations": []
+    },
+    {
+      "path": "scripts/stage-source.py",
+      "sourceSha256": "5e0afe6196a83ac5eef51f3483d1f51bc8f46e658d4e1be58751e433172c5380",
+      "exportSha256": "5e0afe6196a83ac5eef51f3483d1f51bc8f46e658d4e1be58751e433172c5380",
+      "transformations": []
+    },
+    {
+      "path": "scripts/startup_binding.py",
+      "sourceSha256": "54dba095654f37a349521e325480e04f0e96c2a73698c86719a7d49028765d67",
+      "exportSha256": "54dba095654f37a349521e325480e04f0e96c2a73698c86719a7d49028765d67",
+      "transformations": []
+    },
+    {
+      "path": "scripts/storage-guard.sh",
+      "sourceSha256": "249fded89de4afcfce4e487978e76d40534a891e4582923c1946e4755aefff82",
+      "exportSha256": "249fded89de4afcfce4e487978e76d40534a891e4582923c1946e4755aefff82",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-backup-crash-linux.py",
+      "sourceSha256": "933cf942bd1e45f7737b93f62e8728519c99b907699092363f031fff05a0bed8",
+      "exportSha256": "933cf942bd1e45f7737b93f62e8728519c99b907699092363f031fff05a0bed8",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-backup-quiescence.py",
+      "sourceSha256": "81103fca6f775577cb8c8f7210460aaa93d556356ac32f6aef9385447d0eb3b4",
+      "exportSha256": "81103fca6f775577cb8c8f7210460aaa93d556356ac32f6aef9385447d0eb3b4",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-backup-recovery.py",
+      "sourceSha256": "993d7fdb85b2529e6137a4936fc68d1798bafdf0bd8e23a32248b99b93bfc1c5",
+      "exportSha256": "993d7fdb85b2529e6137a4936fc68d1798bafdf0bd8e23a32248b99b93bfc1c5",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-company-linux.sh",
+      "sourceSha256": "3cfc491af77d195cc11a0cfc0842dc20073695669ffddad4ebd067deecfca838",
+      "exportSha256": "3cfc491af77d195cc11a0cfc0842dc20073695669ffddad4ebd067deecfca838",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-company-release.py",
+      "sourceSha256": "18337286c1dba4b72c9b20e759fdb63eb0acad65ce8ca67a7e8dad0af120044d",
+      "exportSha256": "18337286c1dba4b72c9b20e759fdb63eb0acad65ce8ca67a7e8dad0af120044d",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-company-source.py",
+      "sourceSha256": "af27839a1d25fb06794c8fe9deeb07ae90362b4de25f2beb84e73249acdee124",
+      "exportSha256": "af27839a1d25fb06794c8fe9deeb07ae90362b4de25f2beb84e73249acdee124",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-deployment.py",
+      "sourceSha256": "809de07f430b6100f8e174d5a12f7b7fc30b695bbdd9e85be629e50866c5cc04",
+      "exportSha256": "809de07f430b6100f8e174d5a12f7b7fc30b695bbdd9e85be629e50866c5cc04",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-foundation.py",
+      "sourceSha256": "ae6c31d4a898a1a1f466e97720768b713474eb31b841b4247d2767cc8848dd5d",
+      "exportSha256": "6fe78f2194f52b6a2a12851b782ee41959595dc7ccae5a38fee7169f83e17f5e",
+      "transformations": [
+        "Report the actual test host instead of historical trial host metadata"
+      ]
+    },
+    {
+      "path": "scripts/test-host-kernel-security.py",
+      "sourceSha256": "54a95cf82f4a3fe14d8b58a5b6206c0bca6c4d7683f3d440829e18e566f8001e",
+      "exportSha256": "54a95cf82f4a3fe14d8b58a5b6206c0bca6c4d7683f3d440829e18e566f8001e",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-host-package-inventory.py",
+      "sourceSha256": "014df286d8a0e2154dd12885d9c94415971c7c0ed25b03486afd7e963ebbc142",
+      "exportSha256": "014df286d8a0e2154dd12885d9c94415971c7c0ed25b03486afd7e963ebbc142",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-host-queries.py",
+      "sourceSha256": "1e26621bd38ae56ed05e2aa086cc40bf44806744f624a3385462a56d5daf83e8",
+      "exportSha256": "1e26621bd38ae56ed05e2aa086cc40bf44806744f624a3385462a56d5daf83e8",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-host-remediation.py",
+      "sourceSha256": "e0d40a80ce6ce7ef1946954d4ef821384bbae526b9189f9928945792e21a5480",
+      "exportSha256": "e0d40a80ce6ce7ef1946954d4ef821384bbae526b9189f9928945792e21a5480",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-identity-login.py",
+      "sourceSha256": "4cff114cf179c507e9b0a9a03f6f33435e23bf3fbbb8a66d8910a850535343df",
+      "exportSha256": "4cff114cf179c507e9b0a9a03f6f33435e23bf3fbbb8a66d8910a850535343df",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-identity.py",
+      "sourceSha256": "9a2066858cd610b765d1df9336c17d93dec4f81ce9bea3bf04c1ff57cddb523f",
+      "exportSha256": "9a2066858cd610b765d1df9336c17d93dec4f81ce9bea3bf04c1ff57cddb523f",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-install-lock-verification.py",
+      "sourceSha256": "8b6a69eda6b3b8b528c459140215ea24951d5500ee8cf7477fd386bab64f52df",
+      "exportSha256": "8b6a69eda6b3b8b528c459140215ea24951d5500ee8cf7477fd386bab64f52df",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-install-lock.py",
+      "sourceSha256": "3e923f4c883e80031b4b49ea365325506cf5d516bb76015e8b7d27b0afbc10a7",
+      "exportSha256": "3e923f4c883e80031b4b49ea365325506cf5d516bb76015e8b7d27b0afbc10a7",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-install-runtime-gate.py",
+      "sourceSha256": "042e88419de2dc1beba4ffc32834a6dc3b6267dc9e0540b3ec64d0882f28184f",
+      "exportSha256": "042e88419de2dc1beba4ffc32834a6dc3b6267dc9e0540b3ec64d0882f28184f",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-installation-budgets.py",
+      "sourceSha256": "efa1549f872f0776eca3f2bed3267b35e97fb45f0e083447a36ac0aace4036f0",
+      "exportSha256": "efa1549f872f0776eca3f2bed3267b35e97fb45f0e083447a36ac0aace4036f0",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-installation-identity.py",
+      "sourceSha256": "8ae6b49a68e746f2888b1d44785db0cfd66f3fd86f4e10994f34b49ed3c74f21",
+      "exportSha256": "8ae6b49a68e746f2888b1d44785db0cfd66f3fd86f4e10994f34b49ed3c74f21",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-installation-status.py",
+      "sourceSha256": "ae0e50b48b463cb989ad5b4c118eaea2daaa04bea29efc6e62747a4933a0f56f",
+      "exportSha256": "ae0e50b48b463cb989ad5b4c118eaea2daaa04bea29efc6e62747a4933a0f56f",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-installation-wiring.py",
+      "sourceSha256": "11f6e284721ea48a3987a36810dafde2c88ce44a74f5ecc5c043dca687f51768",
+      "exportSha256": "11f6e284721ea48a3987a36810dafde2c88ce44a74f5ecc5c043dca687f51768",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-installer-parent.py",
+      "sourceSha256": "7a4cca80c1d0d584d17e3e156d4bcfd496b49d1640011532c7c0156dd662f7a3",
+      "exportSha256": "7a4cca80c1d0d584d17e3e156d4bcfd496b49d1640011532c7c0156dd662f7a3",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-logging.py",
+      "sourceSha256": "873b73f952785d76af068a889da0fd9345ece408e57090a0b34eb56d1ace5a3c",
+      "exportSha256": "873b73f952785d76af068a889da0fd9345ece408e57090a0b34eb56d1ace5a3c",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-maintenance-broker-security.mjs",
+      "sourceSha256": "4489cff9534e7ae560b76abacf7c37f40fc86bf6189d4f68257d4205dd82171f",
+      "exportSha256": "4489cff9534e7ae560b76abacf7c37f40fc86bf6189d4f68257d4205dd82171f",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-maintenance-broker-security.py",
+      "sourceSha256": "ea8ba315b61b7b884c06833c187b4081ac67f5d13d750efbbc99d11d959067ad",
+      "exportSha256": "ea8ba315b61b7b884c06833c187b4081ac67f5d13d750efbbc99d11d959067ad",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-maintenance-feed-guard.py",
+      "sourceSha256": "b79b0ba187e2db4ad590e9608b06c3d56efc98e398cfe32add2a45b8d8020161",
+      "exportSha256": "b79b0ba187e2db4ad590e9608b06c3d56efc98e398cfe32add2a45b8d8020161",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-maintenance-image-export.py",
+      "sourceSha256": "594859d5deb76f9b394c6f043d0930dc67d58d3ed3e57b0a2eb4aca52dbc41bf",
+      "exportSha256": "594859d5deb76f9b394c6f043d0930dc67d58d3ed3e57b0a2eb4aca52dbc41bf",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-maintenance-scanner-coverage.py",
+      "sourceSha256": "63634399f216dc195888e8a4036926a5d540cffd33516101d0619c2e5c4a28e8",
+      "exportSha256": "63634399f216dc195888e8a4036926a5d540cffd33516101d0619c2e5c4a28e8",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-maintenance-scanner-diagnostics.py",
+      "sourceSha256": "fd87df046bbfd344e05e890f669e54d608d1e68d6a9d0753dd7e58c25ea4c6f1",
+      "exportSha256": "fd87df046bbfd344e05e890f669e54d608d1e68d6a9d0753dd7e58c25ea4c6f1",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-maintenance-scanner-image-memory.py",
+      "sourceSha256": "aa20d392f3384987850786c1362154670aadb39475cf2308e610f3d3c0ad220f",
+      "exportSha256": "aa20d392f3384987850786c1362154670aadb39475cf2308e610f3d3c0ad220f",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-maintenance-scanner.py",
+      "sourceSha256": "99b7dcd65e6a40aa770f1351ba448ecbbd43ae072f86686b3d2e80379536736c",
+      "exportSha256": "99b7dcd65e6a40aa770f1351ba448ecbbd43ae072f86686b3d2e80379536736c",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-pki.py",
+      "sourceSha256": "d85a8cf58680098a4c1989f9d01680e5c92f8a2d0a6fc07ba81fc914fc703de9",
+      "exportSha256": "d85a8cf58680098a4c1989f9d01680e5c92f8a2d0a6fc07ba81fc914fc703de9",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-platform-runtime.mjs",
+      "sourceSha256": "a4e2a13cde2353aaea2e7025ca6bcaed52eba99e6e3a3859e845aa875a2e7f7e",
+      "exportSha256": "a4e2a13cde2353aaea2e7025ca6bcaed52eba99e6e3a3859e845aa875a2e7f7e",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-qualify-trivy-feed.py",
+      "sourceSha256": "577492d1157712bc8219187b4167ea62444561c5c915d260bd906ab5cbe7ad56",
+      "exportSha256": "577492d1157712bc8219187b4167ea62444561c5c915d260bd906ab5cbe7ad56",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-quota-admission.py",
+      "sourceSha256": "bbf8eae51ac514fc85484968c12e33c30dd6f04d08282ae230f6311db4702c6a",
+      "exportSha256": "bbf8eae51ac514fc85484968c12e33c30dd6f04d08282ae230f6311db4702c6a",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-quota-command.py",
+      "sourceSha256": "24fe6b9bc79ba808dab6dc04bb5b265705dbfbb117fa469ab8889f0507990925",
+      "exportSha256": "24fe6b9bc79ba808dab6dc04bb5b265705dbfbb117fa469ab8889f0507990925",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-quota-helper.py",
+      "sourceSha256": "df44ff7c99277498f6d749b11255610a5633a73022fe33216f43b913c0dd8eb8",
+      "exportSha256": "df44ff7c99277498f6d749b11255610a5633a73022fe33216f43b913c0dd8eb8",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-quota-service.py",
+      "sourceSha256": "4793d5b8071118c4e5a2de22299a7891ec00e50ea9c9dec67f3d527d32c22190",
+      "exportSha256": "4793d5b8071118c4e5a2de22299a7891ec00e50ea9c9dec67f3d527d32c22190",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-recovery-catalog.py",
+      "sourceSha256": "628739cfb4fe67bfceb5e0b4a714b8561b7cc6afac20a95c4a54fb07f8d222a5",
+      "exportSha256": "628739cfb4fe67bfceb5e0b4a714b8561b7cc6afac20a95c4a54fb07f8d222a5",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-recovery-chain-linux.py",
+      "sourceSha256": "88da2f2b36e5ca407e98d78898ba873e6f80a96db3f0e010f385899d2d78f021",
+      "exportSha256": "88da2f2b36e5ca407e98d78898ba873e6f80a96db3f0e010f385899d2d78f021",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-recovery-chain.py",
+      "sourceSha256": "39fa48f3cb8612104c85da851bd362ccad99414d8b33eabf255e220b3f34f1bd",
+      "exportSha256": "39fa48f3cb8612104c85da851bd362ccad99414d8b33eabf255e220b3f34f1bd",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-recovery-services.py",
+      "sourceSha256": "06d0229f1d84f6c2113589458f65d3cf685108174413ef43581ae83ef27d80a7",
+      "exportSha256": "06d0229f1d84f6c2113589458f65d3cf685108174413ef43581ae83ef27d80a7",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-recovery-tools.py",
+      "sourceSha256": "4a31cb33bf3b755396cf274d3526a287d6b37e3fa04b5d5e864242521ac9ff0d",
+      "exportSha256": "4a31cb33bf3b755396cf274d3526a287d6b37e3fa04b5d5e864242521ac9ff0d",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-registry-manifest.py",
+      "sourceSha256": "656d8c67e3d7192afad2ecc88aabdb9a274edb4c8bc14e087ff59c7161bf9282",
+      "exportSha256": "656d8c67e3d7192afad2ecc88aabdb9a274edb4c8bc14e087ff59c7161bf9282",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-routing.py",
+      "sourceSha256": "978ab634bf37c9a377d8b10310fcd4076f39231be07847823d9bf61453c15c3e",
+      "exportSha256": "978ab634bf37c9a377d8b10310fcd4076f39231be07847823d9bf61453c15c3e",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-runtime-layout.py",
+      "sourceSha256": "4ad1b5769ebf658b13df0f8496795a8453220073ea181c8660056892896f8761",
+      "exportSha256": "4ad1b5769ebf658b13df0f8496795a8453220073ea181c8660056892896f8761",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-runtime-pair-init.py",
+      "sourceSha256": "12230a67f87a27676b6d6bfbd565f755a644bed090c36e5cff93a3f10694a5a8",
+      "exportSha256": "12230a67f87a27676b6d6bfbd565f755a644bed090c36e5cff93a3f10694a5a8",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-samba.py",
+      "sourceSha256": "aee18b0660476e5ad80c12bff05c1643bf6db55a4f1d7a67a982eac06ea250b7",
+      "exportSha256": "aee18b0660476e5ad80c12bff05c1643bf6db55a4f1d7a67a982eac06ea250b7",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-seed-backend-history.py",
+      "sourceSha256": "93624081336fcd8150654d7bc869c6e94df24affc53cac502f61193e0ed97746",
+      "exportSha256": "93624081336fcd8150654d7bc869c6e94df24affc53cac502f61193e0ed97746",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-services.py",
+      "sourceSha256": "7ae18faae5517903aa3629fd281f90dcc893eb7cb6c53adae4f6503ac82eec73",
+      "exportSha256": "7ae18faae5517903aa3629fd281f90dcc893eb7cb6c53adae4f6503ac82eec73",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-startup-binding.py",
+      "sourceSha256": "c99e7d5f4231bfcc0283db91a7ca29a1fa552f965a1dfe235cdc8eb9b3010387",
+      "exportSha256": "c99e7d5f4231bfcc0283db91a7ca29a1fa552f965a1dfe235cdc8eb9b3010387",
+      "transformations": []
+    },
+    {
+      "path": "scripts/test-storage-recovery.py",
+      "sourceSha256": "aaffe1d03ca1f8ac60a76a772f60c55fff70298688126cd290a98e77c8795e48",
+      "exportSha256": "aaffe1d03ca1f8ac60a76a772f60c55fff70298688126cd290a98e77c8795e48",
+      "transformations": []
+    },
+    {
+      "path": "scripts/trim-platform-runtime-tools.mjs",
+      "sourceSha256": "d1370a6edbb81427aa630b3e72013d8855bb613c27e7e7fe62d5d33b92e26a8d",
+      "exportSha256": "d1370a6edbb81427aa630b3e72013d8855bb613c27e7e7fe62d5d33b92e26a8d",
+      "transformations": []
+    },
+    {
+      "path": "scripts/unpack-source.py",
+      "sourceSha256": "484bb66ced2ff9269188277fd74a7ad4e80eec60d29b9beff6b9be9fe5145951",
+      "exportSha256": "484bb66ced2ff9269188277fd74a7ad4e80eec60d29b9beff6b9be9fe5145951",
+      "transformations": []
+    },
+    {
+      "path": "scripts/update-npm-toolchain-dependencies.mjs",
+      "sourceSha256": "801164be8b1b2e6f83e839098a0a26683bc4a30b14ecc2eae4e0aa1e3b6f0179",
+      "exportSha256": "801164be8b1b2e6f83e839098a0a26683bc4a30b14ecc2eae4e0aa1e3b6f0179",
+      "transformations": []
+    },
+    {
+      "path": "scripts/verify-release.py",
+      "sourceSha256": "c23d63100cb86e32c8c456aa14eb5cd771c4679a5fc6df499740182d686e164c",
+      "exportSha256": "c23d63100cb86e32c8c456aa14eb5cd771c4679a5fc6df499740182d686e164c",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/acceptance.go",
+      "sourceSha256": "ac5fb8df24e3f2235e584fa21ebde7f7b8d77e239334c0fd361cd035cff46c71",
+      "exportSha256": "ac5fb8df24e3f2235e584fa21ebde7f7b8d77e239334c0fd361cd035cff46c71",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/acceptance_test.go",
+      "sourceSha256": "68eb332d13ac7494b1ceb8273a6c342a167b7ea3f30c8e3a5dd07165b927643f",
+      "exportSha256": "68eb332d13ac7494b1ceb8273a6c342a167b7ea3f30c8e3a5dd07165b927643f",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/access_policy.go",
+      "sourceSha256": "2fad4431885b706ffa3a480ed34e871f379a2d482c874d9cac10434afc62db2c",
+      "exportSha256": "2fad4431885b706ffa3a480ed34e871f379a2d482c874d9cac10434afc62db2c",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/access_policy_test.go",
+      "sourceSha256": "69f952f34708d996c532dfaf31e58f53899bb6e687f881c54b92cf830161cb94",
+      "exportSha256": "69f952f34708d996c532dfaf31e58f53899bb6e687f881c54b92cf830161cb94",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/app_accounts.go",
+      "sourceSha256": "566d71fc598ff8e16a6b1f2e8d3b67e0382bdc120ceac35c240b2ea084b55e9e",
+      "exportSha256": "566d71fc598ff8e16a6b1f2e8d3b67e0382bdc120ceac35c240b2ea084b55e9e",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/app_accounts_test.go",
+      "sourceSha256": "c4a9ee639d18d2ecbbcba2c554991d7fb34117d5f6d30e573351e1b4f9be8f45",
+      "exportSha256": "c4a9ee639d18d2ecbbcba2c554991d7fb34117d5f6d30e573351e1b4f9be8f45",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/app_hosts_test.go",
+      "sourceSha256": "a6bf781f7c02039288f196e354eaecea20cca42bc17291df4175eadad08e205f",
+      "exportSha256": "a6bf781f7c02039288f196e354eaecea20cca42bc17291df4175eadad08e205f",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/app_jwks.go",
+      "sourceSha256": "7325625a68b955078d2aa10f4cf7ca40f50d976dd697da9fa89e52efb668a2f5",
+      "exportSha256": "7325625a68b955078d2aa10f4cf7ca40f50d976dd697da9fa89e52efb668a2f5",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/app_jwks_test.go",
+      "sourceSha256": "f411e199cb07f8b0cd6e5e09c03c9a5a073e82d72804c9e88123ef5d42329503",
+      "exportSha256": "f411e199cb07f8b0cd6e5e09c03c9a5a073e82d72804c9e88123ef5d42329503",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/app_tls.go",
+      "sourceSha256": "8aa9d5b68e4f972f873c7de0a490223f73559f2b6f11c5db220468abc21ac0f2",
+      "exportSha256": "8aa9d5b68e4f972f873c7de0a490223f73559f2b6f11c5db220468abc21ac0f2",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/app_tls_ownership_linux_test.go",
+      "sourceSha256": "49c62c8c630519166c0ffbc44f738f936977df5e1babbf80a02f216f5d40d7ad",
+      "exportSha256": "49c62c8c630519166c0ffbc44f738f936977df5e1babbf80a02f216f5d40d7ad",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/app_tls_rotation.go",
+      "sourceSha256": "7e95ac54d28fa215ae446e5f04368338cd156d9e7172f3e4eb32f6f7c39d5c81",
+      "exportSha256": "7e95ac54d28fa215ae446e5f04368338cd156d9e7172f3e4eb32f6f7c39d5c81",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/app_tls_rotation_test.go",
+      "sourceSha256": "662b5616f601022971ae0f2bcd4300dbb9c4f10e72e2c03d678b33bb4b159121",
+      "exportSha256": "662b5616f601022971ae0f2bcd4300dbb9c4f10e72e2c03d678b33bb4b159121",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/app_tls_test.go",
+      "sourceSha256": "074c1f29bf65e0e3a33a9d1b8223fc95680a70ae7a9a060dd7ac4fa350842464",
+      "exportSha256": "074c1f29bf65e0e3a33a9d1b8223fc95680a70ae7a9a060dd7ac4fa350842464",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/app_user_profile.go",
+      "sourceSha256": "d104b372a1944178dbae498d7315875892cb20195201ea24bf424c12b00e7862",
+      "exportSha256": "d104b372a1944178dbae498d7315875892cb20195201ea24bf424c12b00e7862",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/cancellation.go",
+      "sourceSha256": "9dfd2c47a82990c0b19e1453c27917f71e7d01d734a53988c326479da433851b",
+      "exportSha256": "9dfd2c47a82990c0b19e1453c27917f71e7d01d734a53988c326479da433851b",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/cancellation_test.go",
+      "sourceSha256": "d9b28c720ad28161a036665a844e5b6dc95456e6711487484e0d6222e1d557da",
+      "exportSha256": "d9b28c720ad28161a036665a844e5b6dc95456e6711487484e0d6222e1d557da",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/candidate_stop.go",
+      "sourceSha256": "fa90d1e369cc8fa1925562647a70aa280ed2fd4830747b5a937075fe7c399f4d",
+      "exportSha256": "fa90d1e369cc8fa1925562647a70aa280ed2fd4830747b5a937075fe7c399f4d",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/candidate_stop_test.go",
+      "sourceSha256": "f614b63ba68ed7e174bcccd92f85b5f3273eb0a423092985137df7036314044f",
+      "exportSha256": "f614b63ba68ed7e174bcccd92f85b5f3273eb0a423092985137df7036314044f",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/connection_revocation.go",
+      "sourceSha256": "d837eb6633b9a8e4435311fc7d03364fe3d78046c0144e6d2d097dcd1cf035f2",
+      "exportSha256": "d837eb6633b9a8e4435311fc7d03364fe3d78046c0144e6d2d097dcd1cf035f2",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/connection_revocation_test.go",
+      "sourceSha256": "389db583b22465f248d46c02993e4c9efb7e907e32012f2fa36fbefab2b04ebc",
+      "exportSha256": "389db583b22465f248d46c02993e4c9efb7e907e32012f2fa36fbefab2b04ebc",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/connector_dispatch.go",
+      "sourceSha256": "b10eb264bc4ac8a434eeff4a1eea5323e0a15e1a40dd4b029bf607194104a2a3",
+      "exportSha256": "b10eb264bc4ac8a434eeff4a1eea5323e0a15e1a40dd4b029bf607194104a2a3",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/connector_dispatch_test.go",
+      "sourceSha256": "e8b90f970e604d92b29447c1fe422ea0ba08f3637872419cf12c0982de7ecd0b",
+      "exportSha256": "e8b90f970e604d92b29447c1fe422ea0ba08f3637872419cf12c0982de7ecd0b",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/connectors.go",
+      "sourceSha256": "1bf166f9f128edf9228fe8c2a3da3a3c30b3e7a2679d1758cdd8eca5e5006a1d",
+      "exportSha256": "1bf166f9f128edf9228fe8c2a3da3a3c30b3e7a2679d1758cdd8eca5e5006a1d",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/connectors_test.go",
+      "sourceSha256": "d659263564f7ccf3d2a4be15a56477598967c095c802276093df941197cb9b13",
+      "exportSha256": "d659263564f7ccf3d2a4be15a56477598967c095c802276093df941197cb9b13",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/deploy.go",
+      "sourceSha256": "1a3c33a5d2a8586e78741ea248a8e2be211bbe9e6c36df6e4786402d1bf0c468",
+      "exportSha256": "1a3c33a5d2a8586e78741ea248a8e2be211bbe9e6c36df6e4786402d1bf0c468",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/directory_identity.go",
+      "sourceSha256": "78950d9c5de2219ba8139b0f9ff2d2d68b2a6848dc735c123d451d9043b5c058",
+      "exportSha256": "78950d9c5de2219ba8139b0f9ff2d2d68b2a6848dc735c123d451d9043b5c058",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/directory_identity_test.go",
+      "sourceSha256": "0f980fe21a52a50130095d02dd478675f77354dfb875535dfc602aea7f131d32",
+      "exportSha256": "0f980fe21a52a50130095d02dd478675f77354dfb875535dfc602aea7f131d32",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/directory_network.go",
+      "sourceSha256": "5ce208570f0754102bd4b4ffa75b2f183aaf938c389ab8f7f03a228521900df3",
+      "exportSha256": "5ce208570f0754102bd4b4ffa75b2f183aaf938c389ab8f7f03a228521900df3",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/directory_network_test.go",
+      "sourceSha256": "5bcb6a1a97fb222f277e21ac50d18162f049f3a0da606d6a575f132ac8f89af2",
+      "exportSha256": "5bcb6a1a97fb222f277e21ac50d18162f049f3a0da606d6a575f132ac8f89af2",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/fencing.go",
+      "sourceSha256": "ffdf65fb319af1a2d6dd476875bc0afb2146eabc732d1db3503c6fa8fd7a49a5",
+      "exportSha256": "ffdf65fb319af1a2d6dd476875bc0afb2146eabc732d1db3503c6fa8fd7a49a5",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/fencing_test.go",
+      "sourceSha256": "bd7e1b042514110f980f1034ed29360038c14442599c92c334b9b43460a54f88",
+      "exportSha256": "bd7e1b042514110f980f1034ed29360038c14442599c92c334b9b43460a54f88",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/filesystem_connector.go",
+      "sourceSha256": "8af9c3953c46cd61e3ce47d7bfe9c16e5b70f33a6c04a3fdb0c01873cb3d7715",
+      "exportSha256": "8af9c3953c46cd61e3ce47d7bfe9c16e5b70f33a6c04a3fdb0c01873cb3d7715",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/filesystem_connector_test.go",
+      "sourceSha256": "b7f692ff3f8374284c020761dd6e9f629b73d6ab3edd4432d955b373a1da7051",
+      "exportSha256": "b7f692ff3f8374284c020761dd6e9f629b73d6ab3edd4432d955b373a1da7051",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/filesystem_revocation.go",
+      "sourceSha256": "1135fa38100061723a2fdbb0a9cb5329639d420ccd93ca931df0948707fd786c",
+      "exportSha256": "1135fa38100061723a2fdbb0a9cb5329639d420ccd93ca931df0948707fd786c",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/filesystem_revocation_test.go",
+      "sourceSha256": "8515ac6e7ed1782386c36b1120973ad9c54eb5fa8bae75ae59e387c2d62cedd9",
+      "exportSha256": "8515ac6e7ed1782386c36b1120973ad9c54eb5fa8bae75ae59e387c2d62cedd9",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/go.mod",
+      "sourceSha256": "76f415b859fbd4014464d7a29fdaef23d05053774595145beb8080cf789e3fd0",
+      "exportSha256": "76f415b859fbd4014464d7a29fdaef23d05053774595145beb8080cf789e3fd0",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/go.sum",
+      "sourceSha256": "bc4772bf7f82edbb4d0c1abd386b46f88fbda9373894cb62761448c4301248c4",
+      "exportSha256": "bc4772bf7f82edbb4d0c1abd386b46f88fbda9373894cb62761448c4301248c4",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/identity_policy.go",
+      "sourceSha256": "d6ac207afb53dcd0726bf0262e30a16ab475ec160706e06857b0dd2c094a0eeb",
+      "exportSha256": "d6ac207afb53dcd0726bf0262e30a16ab475ec160706e06857b0dd2c094a0eeb",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/identity_policy_test.go",
+      "sourceSha256": "7794b9dc376a61e360b91d1e1b74aef21f0f7abeed8c8cc99e714ed12e2c1806",
+      "exportSha256": "7794b9dc376a61e360b91d1e1b74aef21f0f7abeed8c8cc99e714ed12e2c1806",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/image_scanner.go",
+      "sourceSha256": "c3d69f1e0f877b5b8ee9d814f55c572dac776fdb361a058b8b537c52813c95d4",
+      "exportSha256": "c3d69f1e0f877b5b8ee9d814f55c572dac776fdb361a058b8b537c52813c95d4",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/image_scanner_network_test.go",
+      "sourceSha256": "6f68175f900221c5e1579db5a681e84afee288cfa40b371eaeeb7a60dcb2f8ad",
+      "exportSha256": "6f68175f900221c5e1579db5a681e84afee288cfa40b371eaeeb7a60dcb2f8ad",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/image_scanner_test.go",
+      "sourceSha256": "233598bbcac030a092efa6dfc56a18ceeafded3f405d32f893e0e99930d79520",
+      "exportSha256": "233598bbcac030a092efa6dfc56a18ceeafded3f405d32f893e0e99930d79520",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/main.go",
+      "sourceSha256": "956b95918f8f158febf6936700dd09d64950dbcf6466efe55a840a37105b636b",
+      "exportSha256": "956b95918f8f158febf6936700dd09d64950dbcf6466efe55a840a37105b636b",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/manifest_test.go",
+      "sourceSha256": "46869241114b102187f26e5a6b9f15268972733e1667a73e1f41437a24c1fab0",
+      "exportSha256": "46869241114b102187f26e5a6b9f15268972733e1667a73e1f41437a24c1fab0",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/migration_import_admission.go",
+      "sourceSha256": "4138a16d382d475e2ba52d7efe5ebe595b2646bf1521a0e8bded43731e2938a6",
+      "exportSha256": "4138a16d382d475e2ba52d7efe5ebe595b2646bf1521a0e8bded43731e2938a6",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/migration_import_admission_test.go",
+      "sourceSha256": "f2c7a4e50011c31e759c8a4211da3f197b89c1dbbc451f7bfbabf3629e29a499",
+      "exportSha256": "f2c7a4e50011c31e759c8a4211da3f197b89c1dbbc451f7bfbabf3629e29a499",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/migration_importer.go",
+      "sourceSha256": "aeb8b79e8459bd94517cbb3ccd12dd354eb6783d284e80fc33dfe5c566f3d391",
+      "exportSha256": "aeb8b79e8459bd94517cbb3ccd12dd354eb6783d284e80fc33dfe5c566f3d391",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/migration_rehearsal.go",
+      "sourceSha256": "ae67cc18c807677d9a7f4a38cd248b915dc5a804ddee95beb6c847c2e0410b2c",
+      "exportSha256": "ae67cc18c807677d9a7f4a38cd248b915dc5a804ddee95beb6c847c2e0410b2c",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/migration_rehearsal_test.go",
+      "sourceSha256": "ac2091d1f497d957ee148c3ac6fc01a860a910c16ff8927536c49040aa8b1afd",
+      "exportSha256": "ac2091d1f497d957ee148c3ac6fc01a860a910c16ff8927536c49040aa8b1afd",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/migration_snapshot.go",
+      "sourceSha256": "805e18423dcb79b271f9c14b28c61b09fb05d8d06cec54ffd0c5ec1e11445983",
+      "exportSha256": "805e18423dcb79b271f9c14b28c61b09fb05d8d06cec54ffd0c5ec1e11445983",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/migration_snapshot_test.go",
+      "sourceSha256": "aef3a24bc7ca21f48bfa324ed5f92fe42b6130eca9f9e041b2a2f60e35740b39",
+      "exportSha256": "aef3a24bc7ca21f48bfa324ed5f92fe42b6130eca9f9e041b2a2f60e35740b39",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/mysql_grants.go",
+      "sourceSha256": "b68b5fc8231681c0107d6c5e9ced2d91ce731740743dc26db4d4e17265d3be87",
+      "exportSha256": "b68b5fc8231681c0107d6c5e9ced2d91ce731740743dc26db4d4e17265d3be87",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/mysql_grants_database_test.go",
+      "sourceSha256": "e58164f38cb0dd596def5b1c07d3d5f0b810f5d04d6c08fd64a671b44021448d",
+      "exportSha256": "e58164f38cb0dd596def5b1c07d3d5f0b810f5d04d6c08fd64a671b44021448d",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/mysql_grants_test.go",
+      "sourceSha256": "949bc3277dd3dc1c28f6d1915bf6799eee9e1beefe6df2215b75460528e2f680",
+      "exportSha256": "949bc3277dd3dc1c28f6d1915bf6799eee9e1beefe6df2215b75460528e2f680",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/observation.go",
+      "sourceSha256": "22751998532ca901cf821427d3e31f848845288c7ae20d6c0a8729b8d5c669e1",
+      "exportSha256": "22751998532ca901cf821427d3e31f848845288c7ae20d6c0a8729b8d5c669e1",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/observation_test.go",
+      "sourceSha256": "b4b990fda6573a3d3f17b98565f0dfad02897f0444b80fbbc887fcd8a44e2d65",
+      "exportSha256": "b4b990fda6573a3d3f17b98565f0dfad02897f0444b80fbbc887fcd8a44e2d65",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/packager.go",
+      "sourceSha256": "500abb84d043a7d3318f788f6cbf0f28c6368a38464c0f84a173345e773744aa",
+      "exportSha256": "500abb84d043a7d3318f788f6cbf0f28c6368a38464c0f84a173345e773744aa",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/publication_identity_test.go",
+      "sourceSha256": "7a4f7d88db6012f9fc73ca55f5398bd7f7c0310c305381f7ef1824ac55af876c",
+      "exportSha256": "7a4f7d88db6012f9fc73ca55f5398bd7f7c0310c305381f7ef1824ac55af876c",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/recovery.go",
+      "sourceSha256": "49338b4030d5267c86c1ffca42b33f7367e091ab302aff2f8867e95e6569f4b6",
+      "exportSha256": "49338b4030d5267c86c1ffca42b33f7367e091ab302aff2f8867e95e6569f4b6",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/resources.go",
+      "sourceSha256": "96790aa8ad9f5263a312b5f5e8f9488d0d0ad34645dcccf80a18462c28929c13",
+      "exportSha256": "96790aa8ad9f5263a312b5f5e8f9488d0d0ad34645dcccf80a18462c28929c13",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/retirement_reconcile.go",
+      "sourceSha256": "fde13caf42d74dba9a3217f0cd32fc068877081b60263bf987cf43c69f645f8b",
+      "exportSha256": "fde13caf42d74dba9a3217f0cd32fc068877081b60263bf987cf43c69f645f8b",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/retirement_reconcile_test.go",
+      "sourceSha256": "3e2f439bb87c25f792814950a57b973e59d657fc94a02ae740e45537a1f434af",
+      "exportSha256": "3e2f439bb87c25f792814950a57b973e59d657fc94a02ae740e45537a1f434af",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/routing_test.go",
+      "sourceSha256": "828e98b5380508f7faacbd2b09b0a4ea6bfdec6500309d3f007474154c747a40",
+      "exportSha256": "828e98b5380508f7faacbd2b09b0a4ea6bfdec6500309d3f007474154c747a40",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/runtime_shutdown.go",
+      "sourceSha256": "0848e521d18e10285434fedeb5fa1840f8300007bf4dd48cc35798956fd91408",
+      "exportSha256": "0848e521d18e10285434fedeb5fa1840f8300007bf4dd48cc35798956fd91408",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/runtime_shutdown_test.go",
+      "sourceSha256": "d8de6ae76eb1f5f9de863898162dec384d641954cdd3b4a816613dc8ad54bdd2",
+      "exportSha256": "d8de6ae76eb1f5f9de863898162dec384d641954cdd3b4a816613dc8ad54bdd2",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/runtime_test.go",
+      "sourceSha256": "09b57159f165050f2827f744556ca2ae40a25ef8a12d89b63129dc99b28da7ea",
+      "exportSha256": "09b57159f165050f2827f744556ca2ae40a25ef8a12d89b63129dc99b28da7ea",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/security_report.go",
+      "sourceSha256": "9f76daf297bf9a59506dd08acb1ce67dc2862c450ed0f984e79ea77e2e48281d",
+      "exportSha256": "9f76daf297bf9a59506dd08acb1ce67dc2862c450ed0f984e79ea77e2e48281d",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/security_report_test.go",
+      "sourceSha256": "047031304743c8400b93221818e6ca15327c0de3c12e4178d7c7248fa35ae835",
+      "exportSha256": "047031304743c8400b93221818e6ca15327c0de3c12e4178d7c7248fa35ae835",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/service_hosts.go",
+      "sourceSha256": "a847ec710d21bea664993b2f55933636a2c29d211934899585cfb7d1a62f025b",
+      "exportSha256": "a847ec710d21bea664993b2f55933636a2c29d211934899585cfb7d1a62f025b",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/service_hosts_test.go",
+      "sourceSha256": "172e022084b5b6a6978abb67513def97ce7af06d9fc2297a2df82bcc105e6ca2",
+      "exportSha256": "172e022084b5b6a6978abb67513def97ce7af06d9fc2297a2df82bcc105e6ca2",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/source_binding.go",
+      "sourceSha256": "96dcd720e13c064d167430cb75f1ff08af1e71a43e841266fa23d4eaf0721c01",
+      "exportSha256": "96dcd720e13c064d167430cb75f1ff08af1e71a43e841266fa23d4eaf0721c01",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/source_binding_test.go",
+      "sourceSha256": "ab0ea4667b53c75570cc6e15c8069f9e9d928095ac7d99104a445b6a632c7ca3",
+      "exportSha256": "ab0ea4667b53c75570cc6e15c8069f9e9d928095ac7d99104a445b6a632c7ca3",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/telemetry.go",
+      "sourceSha256": "cf4120d202edf97f4de3ab9917d20002911ba2d1dfc9645110999204f58ba7d8",
+      "exportSha256": "cf4120d202edf97f4de3ab9917d20002911ba2d1dfc9645110999204f58ba7d8",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/telemetry_test.go",
+      "sourceSha256": "5e74a4091f0ef7263bca921c9c84a98685d189a07f58965b12fd4a78d8bc4931",
+      "exportSha256": "5e74a4091f0ef7263bca921c9c84a98685d189a07f58965b12fd4a78d8bc4931",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/verification_wire.go",
+      "sourceSha256": "fdea54ee141fedda6f9c68711dba8610002aaa68f941def4ffc0c587db7e2d6c",
+      "exportSha256": "fdea54ee141fedda6f9c68711dba8610002aaa68f941def4ffc0c587db7e2d6c",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/verification_wire_test.go",
+      "sourceSha256": "e24dd9547a188254465cf3fe8b4f8c6084ca7c821620a5879e96c1e0b1981438",
+      "exportSha256": "e24dd9547a188254465cf3fe8b4f8c6084ca7c821620a5879e96c1e0b1981438",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/verify.go",
+      "sourceSha256": "e1491a1d8b80069b72c30d80e7868f8015d91e3204f7ed950d45445eb55ed393",
+      "exportSha256": "e1491a1d8b80069b72c30d80e7868f8015d91e3204f7ed950d45445eb55ed393",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/worker_handover.go",
+      "sourceSha256": "39d5c05fb042fab76417952cb70c2658223d92ea8aeb7a7d6b74d0a88c50a1e5",
+      "exportSha256": "39d5c05fb042fab76417952cb70c2658223d92ea8aeb7a7d6b74d0a88c50a1e5",
+      "transformations": []
+    },
+    {
+      "path": "services/runtime/worker_handover_test.go",
+      "sourceSha256": "707d71c8d5690fa38093f1e95ab5b981e5806a36a4eeb9eed323ba85df24c81e",
+      "exportSha256": "707d71c8d5690fa38093f1e95ab5b981e5806a36a4eeb9eed323ba85df24c81e",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/README.md",
+      "sourceSha256": "4aadcb50b5dce33aea8849f277873be325973eb5a32ba4bd454f13a81cf6e7ed",
+      "exportSha256": "4aadcb50b5dce33aea8849f277873be325973eb5a32ba4bd454f13a81cf6e7ed",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/chat-update.json",
+      "sourceSha256": "c33aea084d7afc04c128f5087c47784be90bf28b573facdfce185e532f03ea31",
+      "exportSha256": "c33aea084d7afc04c128f5087c47784be90bf28b573facdfce185e532f03ea31",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/golden-request.json",
+      "sourceSha256": "e71d43e938b5a4884ceaf9f9cd4f7517ec3bf63ef89c5fc15805c18f5bf56995",
+      "exportSha256": "e71d43e938b5a4884ceaf9f9cd4f7517ec3bf63ef89c5fc15805c18f5bf56995",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/index.html",
+      "sourceSha256": "1a5be2855c1c27482786db03fa3d29162ec3d176e0f67c73a22f1588d99ab1ab",
+      "exportSha256": "1a5be2855c1c27482786db03fa3d29162ec3d176e0f67c73a22f1588d99ab1ab",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/manifest.json",
+      "sourceSha256": "5839e7f58d855254883b4d30e26850b6084da78844bab97943c27a6626368810",
+      "exportSha256": "5839e7f58d855254883b4d30e26850b6084da78844bab97943c27a6626368810",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/migrations/001_documents.sql",
+      "sourceSha256": "6dd8c6fb4f9903a179f918c73e86bf95746764ad3cd2d65989e8e1760da5f216",
+      "exportSha256": "6dd8c6fb4f9903a179f918c73e86bf95746764ad3cd2d65989e8e1760da5f216",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/package-lock.json",
+      "sourceSha256": "22ff55bb47da40b379c90c595b8c57216a396fa548043658dc50869a80f203e5",
+      "exportSha256": "22ff55bb47da40b379c90c595b8c57216a396fa548043658dc50869a80f203e5",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/package.json",
+      "sourceSha256": "9de12ec3a564b113cc161d58844f6581aac68164c7de233ff51f37f5252b5261",
+      "exportSha256": "9de12ec3a564b113cc161d58844f6581aac68164c7de233ff51f37f5252b5261",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/pipeline.json",
+      "sourceSha256": "c0211144a7e27982147f279ce9145d0a537eada4b6c638165ba8e2ccdb65e426",
+      "exportSha256": "c0211144a7e27982147f279ce9145d0a537eada4b6c638165ba8e2ccdb65e426",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/scripts/refresh-lock.mjs",
+      "sourceSha256": "cd70d49bdce8267670b71450c43a21ebd8207fc9089787910d5442f27a73cba5",
+      "exportSha256": "cd70d49bdce8267670b71450c43a21ebd8207fc9089787910d5442f27a73cba5",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/server.mjs",
+      "sourceSha256": "34c7ae532e76f05f42e29fdf5513c623914db21c00623d5af449821b1feda0d3",
+      "exportSha256": "34c7ae532e76f05f42e29fdf5513c623914db21c00623d5af449821b1feda0d3",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/src/auth.mjs",
+      "sourceSha256": "82f8c4c4c9f4ff00acd9822d23be73cb9d744721df02608a3db0400238b5f500",
+      "exportSha256": "82f8c4c4c9f4ff00acd9822d23be73cb9d744721df02608a3db0400238b5f500",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/src/connector.mjs",
+      "sourceSha256": "8ccbba7104d8779f31622658b02b1e5fa89b508180955877d49d9d5766bca128",
+      "exportSha256": "8ccbba7104d8779f31622658b02b1e5fa89b508180955877d49d9d5766bca128",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/src/domain.mjs",
+      "sourceSha256": "905387fa73ab25cc5d57141e303da592fac00efaea7336e1aec958bec0e6095a",
+      "exportSha256": "905387fa73ab25cc5d57141e303da592fac00efaea7336e1aec958bec0e6095a",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/src/http.mjs",
+      "sourceSha256": "4f726124f93b5806224f2d6c814ff6e481cd57be1e1ba3e32da2232d03f993ee",
+      "exportSha256": "4f726124f93b5806224f2d6c814ff6e481cd57be1e1ba3e32da2232d03f993ee",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/src/mcp.mjs",
+      "sourceSha256": "e21390edd20d387f749938f25d90f8d2b042182d883d79384c242953b017edbd",
+      "exportSha256": "e21390edd20d387f749938f25d90f8d2b042182d883d79384c242953b017edbd",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/src/mysql.mjs",
+      "sourceSha256": "c192287b5924408ac9c8596643d04cd7f37d65dc8e477f173480337d9070190f",
+      "exportSha256": "c192287b5924408ac9c8596643d04cd7f37d65dc8e477f173480337d9070190f",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/src/storage.mjs",
+      "sourceSha256": "eda59951815690ea47585c8f4d486200754f75fa35f2972144423ae1a6d13931",
+      "exportSha256": "eda59951815690ea47585c8f4d486200754f75fa35f2972144423ae1a6d13931",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/src/tls.mjs",
+      "sourceSha256": "0d7cd69d4ce5ba81d9061938cba6c5faece6257a88907dc0e0b646c4e43966a5",
+      "exportSha256": "0d7cd69d4ce5ba81d9061938cba6c5faece6257a88907dc0e0b646c4e43966a5",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/test/directory.test.mjs",
+      "sourceSha256": "6ab80bc3d547c4a45ee2940ba7123301f51d81288f43c93d62496b80bf6b04a3",
+      "exportSha256": "6ab80bc3d547c4a45ee2940ba7123301f51d81288f43c93d62496b80bf6b04a3",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/test/domain.test.mjs",
+      "sourceSha256": "b4e4c9382cd854432c237ec45ba51fdb3b11c9760ec714c14733b5298b8d0801",
+      "exportSha256": "b4e4c9382cd854432c237ec45ba51fdb3b11c9760ec714c14733b5298b8d0801",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/test/login.test.mjs",
+      "sourceSha256": "6d5b826521cdf34d60dc2230121d03d33ede7a9d78e9fbe0b38ca1dd58defe5f",
+      "exportSha256": "6d5b826521cdf34d60dc2230121d03d33ede7a9d78e9fbe0b38ca1dd58defe5f",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/test/security.test.mjs",
+      "sourceSha256": "ba1d9cd6e60ed8ca227fe5d66197ee95c7303bab0b4297c57e436af3c08b75e9",
+      "exportSha256": "ba1d9cd6e60ed8ca227fe5d66197ee95c7303bab0b4297c57e436af3c08b75e9",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/test/support.mjs",
+      "sourceSha256": "adf5ad875fc31046eac1fc95938178df0f6e05e4c92dbc2a08620c343597d74c",
+      "exportSha256": "adf5ad875fc31046eac1fc95938178df0f6e05e4c92dbc2a08620c343597d74c",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/vite.config.mjs",
+      "sourceSha256": "47dab1e99cb6af9d52f7c4c4b1f436aae81bdc78eaa6ad1c5582ca6cf0710f3d",
+      "exportSha256": "47dab1e99cb6af9d52f7c4c4b1f436aae81bdc78eaa6ad1c5582ca6cf0710f3d",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/web/auth.js",
+      "sourceSha256": "a1470238b33f44dd1abac8c4737ae620aa41f264a580e8c816825b15531af934",
+      "exportSha256": "a1470238b33f44dd1abac8c4737ae620aa41f264a580e8c816825b15531af934",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/web/main.jsx",
+      "sourceSha256": "e536cc31de788164fd6029c873e2b4aeefc4cabfaf5c77e89c55a367c64f09b9",
+      "exportSha256": "e536cc31de788164fd6029c873e2b4aeefc4cabfaf5c77e89c55a367c64f09b9",
+      "transformations": []
+    },
+    {
+      "path": "templates/dms/web/style.css",
+      "sourceSha256": "5440c2422f68c8f2beaf78fb25922a5d4cdc7e2bd789cf2494c143d1c8a4e597",
+      "exportSha256": "5440c2422f68c8f2beaf78fb25922a5d4cdc7e2bd789cf2494c143d1c8a4e597",
+      "transformations": []
+    },
+    {
+      "path": "templates/generation-guide.md",
+      "sourceSha256": "9c3ad9d81820ddd1967065c6b56deb75ebdbeaf183f9c1ad1eda6bffaec5c5fb",
+      "exportSha256": "9c3ad9d81820ddd1967065c6b56deb75ebdbeaf183f9c1ad1eda6bffaec5c5fb",
+      "transformations": []
+    },
+    {
+      "path": "test/test_checkpoint_admission.py",
+      "sourceSha256": "2c49c292bd24e9972116a0169047acd462ee0a1d9dc4609c54fa300be72be1ac",
+      "exportSha256": "2c49c292bd24e9972116a0169047acd462ee0a1d9dc4609c54fa300be72be1ac",
+      "transformations": []
+    },
+    {
+      "path": "tests/acceptance/runtime-containment.ts",
+      "sourceSha256": "27281172b06be298a7e7d2588255de027c4bb5d0a6e9379b3040709d4d6cad3f",
+      "exportSha256": "27281172b06be298a7e7d2588255de027c4bb5d0a6e9379b3040709d4d6cad3f",
+      "transformations": []
+    },
+    {
+      "path": "tests/acceptance/tsconfig.json",
+      "sourceSha256": "7822fb2eefd36af2218cabb11893a00d70d6fd98d6a8ba03f100d6e5fe438ed9",
+      "exportSha256": "7822fb2eefd36af2218cabb11893a00d70d6fd98d6a8ba03f100d6e5fe438ed9",
+      "transformations": []
+    },
+    {
+      "path": "tests/fixtures/company_authenticated_cli_compose_v2.source.txt",
+      "sourceSha256": "cac9370ad188cb6d74872606c6499cf1b09476a5a7fd5c5bd080ba703afb54e1",
+      "exportSha256": "cac9370ad188cb6d74872606c6499cf1b09476a5a7fd5c5bd080ba703afb54e1",
+      "transformations": []
+    },
+    {
+      "path": "tests/fixtures/company_bash_status_v1.source.txt",
+      "sourceSha256": "e53c7cf9dd3f936789f7cfb8d284b6c94d9e6b6e398cab2f10ace8087ec1631a",
+      "exportSha256": "e53c7cf9dd3f936789f7cfb8d284b6c94d9e6b6e398cab2f10ace8087ec1631a",
+      "transformations": []
+    },
+    {
+      "path": "tests/fixtures/company_cli_execute_bootstrap_before_public_path.source.txt",
+      "sourceSha256": "c261ddf2e71db6fb32e374ff0e741cb7c356293bef9ebbf99169ca0ca64124a1",
+      "exportSha256": "c261ddf2e71db6fb32e374ff0e741cb7c356293bef9ebbf99169ca0ca64124a1",
+      "transformations": []
+    },
+    {
+      "path": "tests/fixtures/company_seed_backend_before_stat_compat.py",
+      "sourceSha256": "41d39bcc4ffef59da27d64e924ad6434486dea4a7be13797e4b41ee4a8fbdc5a",
+      "exportSha256": "41d39bcc4ffef59da27d64e924ad6434486dea4a7be13797e4b41ee4a8fbdc5a",
+      "transformations": []
+    },
+    {
+      "path": "tests/fixtures/company_signed_execute_helpers_v1.json",
+      "sourceSha256": "22f63c95727ca8911729766db76617fd8b44ae7464b1a04cc13fa86ac522650c",
+      "exportSha256": "22f63c95727ca8911729766db76617fd8b44ae7464b1a04cc13fa86ac522650c",
+      "transformations": []
+    },
+    {
+      "path": "tests/fixtures/company_signed_execute_helpers_v2.json",
+      "sourceSha256": "b822e0c6e9348033d914a9bf6c5db938582896311c1e2e26ff23538a7beb447d",
+      "exportSha256": "b822e0c6e9348033d914a9bf6c5db938582896311c1e2e26ff23538a7beb447d",
+      "transformations": []
+    },
+    {
+      "path": "tests/fixtures/company_signed_execute_helpers_v3.json",
+      "sourceSha256": "313044bac815ad811e515bcac3b2f728cc54176e95dc8b7ba6c4130dc44281b5",
+      "exportSha256": "313044bac815ad811e515bcac3b2f728cc54176e95dc8b7ba6c4130dc44281b5",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_authenticated_seed.py",
+      "sourceSha256": "a542927968dadce36f7218f7ccb8a0210a8656ad84c8e7182873734d1bce782e",
+      "exportSha256": "a542927968dadce36f7218f7ccb8a0210a8656ad84c8e7182873734d1bce782e",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_authenticated_cli_compose.py",
+      "sourceSha256": "e64306b7fa1ffd26938c0c74b32dca6184e32559bcaa87b9cada450eb7ad65d2",
+      "exportSha256": "e64306b7fa1ffd26938c0c74b32dca6184e32559bcaa87b9cada450eb7ad65d2",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_authenticated_cli_inputs.py",
+      "sourceSha256": "31678965fbcc4e68864103588dac2c6b9ae27543a10e54ef4af04cd90b98ec7a",
+      "exportSha256": "31678965fbcc4e68864103588dac2c6b9ae27543a10e54ef4af04cd90b98ec7a",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_bash_execution_status.py",
+      "sourceSha256": "fb1039b639f8f180f9e3fbddd27806b33ed1776770dc9f6e5e356683d34f5cc1",
+      "exportSha256": "fb1039b639f8f180f9e3fbddd27806b33ed1776770dc9f6e5e356683d34f5cc1",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_binary_capture.py",
+      "sourceSha256": "d74bf813d18cf0c322bff70ca912d59b6a78bae1f8a1726b5f3199240c144176",
+      "exportSha256": "d74bf813d18cf0c322bff70ca912d59b6a78bae1f8a1726b5f3199240c144176",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_captured_loader.py",
+      "sourceSha256": "2fad12e8967c25b267420e84ffb07ae5b9bcd364e0e2439cb765e9bc424414a5",
+      "exportSha256": "2fad12e8967c25b267420e84ffb07ae5b9bcd364e0e2439cb765e9bc424414a5",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_cli_captured_publish.py",
+      "sourceSha256": "6a05879e3977cdd29b8d8e50e20e07e667f691422b2df4235e8a298b5ef2e0dd",
+      "exportSha256": "6a05879e3977cdd29b8d8e50e20e07e667f691422b2df4235e8a298b5ef2e0dd",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_cli_execute_bootstrap.py",
+      "sourceSha256": "2ede6c1ede548f39ca099204608176f2c633a7662710e2dbb77d3dfb90c011a4",
+      "exportSha256": "2ede6c1ede548f39ca099204608176f2c633a7662710e2dbb77d3dfb90c011a4",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_cli_executed_record_store.py",
+      "sourceSha256": "6c96f9c33790a1d135daf3c480c0eb61fea2b14994e9a692be7b2fdf17fe70a1",
+      "exportSha256": "6c96f9c33790a1d135daf3c480c0eb61fea2b14994e9a692be7b2fdf17fe70a1",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_cli_live_verify_caller.py",
+      "sourceSha256": "0e390eaf0b092b75c5389e402e1846bc369a85e62f3065dcb96b9302247914e1",
+      "exportSha256": "0e390eaf0b092b75c5389e402e1846bc369a85e62f3065dcb96b9302247914e1",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_cli_record.py",
+      "sourceSha256": "763af9666c616b4ee23bf72c1c1707bb31bee672ef625c8bbc88c7eccbaa0254",
+      "exportSha256": "763af9666c616b4ee23bf72c1c1707bb31bee672ef625c8bbc88c7eccbaa0254",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_cli_record_io.py",
+      "sourceSha256": "53184cc1c97ea0687ae0b687aaaf33e02bbf57cd229c7765ea77e57ef95e554d",
+      "exportSha256": "53184cc1c97ea0687ae0b687aaaf33e02bbf57cd229c7765ea77e57ef95e554d",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_cli_record_publish.py",
+      "sourceSha256": "e1cacbe26f9213ca907647ef146ed03a5cc739c9b27009f2b7bcb749e08fc390",
+      "exportSha256": "e1cacbe26f9213ca907647ef146ed03a5cc739c9b27009f2b7bcb749e08fc390",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_cli_stage_child.py",
+      "sourceSha256": "9cb10d3dcd012c3914ab710be2efb40141130823f83d966af1e04967a77358d7",
+      "exportSha256": "9cb10d3dcd012c3914ab710be2efb40141130823f83d966af1e04967a77358d7",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_cli_verify_invocation.py",
+      "sourceSha256": "b7b6f27252e351ad391d3d165f508a60d55b49272312b62749945563d3859cb5",
+      "exportSha256": "b7b6f27252e351ad391d3d165f508a60d55b49272312b62749945563d3859cb5",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_fixed_execute_child.py",
+      "sourceSha256": "0a496694d0634fffddb544ce5e0a11ebb66deeea639e413c37a45484e5e72d43",
+      "exportSha256": "0a496694d0634fffddb544ce5e0a11ebb66deeea639e413c37a45484e5e72d43",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_foundation.py",
+      "sourceSha256": "b5292aff4177cdc03d7575089e6373a2d3dc52c1c8438618209222c5f221283c",
+      "exportSha256": "b5292aff4177cdc03d7575089e6373a2d3dc52c1c8438618209222c5f221283c",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_fresh_assembly.py",
+      "sourceSha256": "4d1c246addbbc26618119b3ba6ef93986cfa26733270d57c6e1c88acd86caec6",
+      "exportSha256": "4d1c246addbbc26618119b3ba6ef93986cfa26733270d57c6e1c88acd86caec6",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_full_cli.py",
+      "sourceSha256": "a8385a146677eb280fbe757fe2de81dd6842fbdec9b04046d6ed7ef575eba0de",
+      "exportSha256": "a8385a146677eb280fbe757fe2de81dd6842fbdec9b04046d6ed7ef575eba0de",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_full_cli_package.py",
+      "sourceSha256": "21ec68cdc97eb027418731faed4b77bde6c8839dedec6ef52b52c04ee2e37128",
+      "exportSha256": "21ec68cdc97eb027418731faed4b77bde6c8839dedec6ef52b52c04ee2e37128",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_full_entry.py",
+      "sourceSha256": "497063e51007bba56ac57c9f0263bec6dbd987a90b90a028ecd0614628f5e007",
+      "exportSha256": "497063e51007bba56ac57c9f0263bec6dbd987a90b90a028ecd0614628f5e007",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_full_package.py",
+      "sourceSha256": "8db0fbf108a701a6189ce475d206cdec4f07fa2b97400ce3e58b2973382b3b22",
+      "exportSha256": "8db0fbf108a701a6189ce475d206cdec4f07fa2b97400ce3e58b2973382b3b22",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_full_package_emit.py",
+      "sourceSha256": "5629bae4e4e41260b5b92ad01addb730ca1e7cb03c25f06338e87669cc721077",
+      "exportSha256": "5629bae4e4e41260b5b92ad01addb730ca1e7cb03c25f06338e87669cc721077",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_full_package_loader.py",
+      "sourceSha256": "692fc6131dfca5f5ad9a3853d187eb37807ba19e1f4ff606f3aa9eda965f7e33",
+      "exportSha256": "692fc6131dfca5f5ad9a3853d187eb37807ba19e1f4ff606f3aa9eda965f7e33",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_full_plan.py",
+      "sourceSha256": "e5cbd610b56a855a38410e4ae96c2f11d7f10c576d14552346b5136d0a07a27f",
+      "exportSha256": "e5cbd610b56a855a38410e4ae96c2f11d7f10c576d14552346b5136d0a07a27f",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_full_retention_worker.py",
+      "sourceSha256": "fd1a75a3924c1103988f25dd0be4d12a430ae024172107ca435344ab09eb43b5",
+      "exportSha256": "fd1a75a3924c1103988f25dd0be4d12a430ae024172107ca435344ab09eb43b5",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_live_completion_receiver.py",
+      "sourceSha256": "5beb468de49d842a373b17bcb32d8a70ee06f4321bca9ca143c7e49331a72c71",
+      "exportSha256": "5beb468de49d842a373b17bcb32d8a70ee06f4321bca9ca143c7e49331a72c71",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_parent_system.py",
+      "sourceSha256": "2ab7faf7af8f490a960ced7045ba92caca81481e0b021165c316f60c276accf0",
+      "exportSha256": "2ab7faf7af8f490a960ced7045ba92caca81481e0b021165c316f60c276accf0",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_platform_issuance.py",
+      "sourceSha256": "4f37a4528dbb9cb9f2da5adb3a7726a4d127c669fffd9d609011b22bc208b5f0",
+      "exportSha256": "4f37a4528dbb9cb9f2da5adb3a7726a4d127c669fffd9d609011b22bc208b5f0",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_platform_store.py",
+      "sourceSha256": "6233e02609cc1c100d4801f0cf2aa7a4426bf5783d727be22aa61087309a9519",
+      "exportSha256": "6233e02609cc1c100d4801f0cf2aa7a4426bf5783d727be22aa61087309a9519",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_release_crypto.py",
+      "sourceSha256": "81fd35ce5e2c509a02025508bfd7b6fc844e8ed79d6fb853f3e7c17be8758807",
+      "exportSha256": "81fd35ce5e2c509a02025508bfd7b6fc844e8ed79d6fb853f3e7c17be8758807",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_release_schema4.py",
+      "sourceSha256": "8ac44d74739415a52ffc9b9976351c7d88c42378737f56922eedaa32607712f2",
+      "exportSha256": "8ac44d74739415a52ffc9b9976351c7d88c42378737f56922eedaa32607712f2",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_retention_effects.py",
+      "sourceSha256": "af491a750c2d0fba075a60c3ecdf0efcba6130c67e01925e99c3411c99f846de",
+      "exportSha256": "af491a750c2d0fba075a60c3ecdf0efcba6130c67e01925e99c3411c99f846de",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_runtime_pair_parent.py",
+      "sourceSha256": "950bf91114ba2e0a5148d8334d7fe5dddb91466e02a000513115325a3ce833a1",
+      "exportSha256": "950bf91114ba2e0a5148d8334d7fe5dddb91466e02a000513115325a3ce833a1",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_seed_backend.py",
+      "sourceSha256": "4b15eefe6164cf23777cd30a8b0af662f2592a8cd8ed45433b1ca70283ab1a82",
+      "exportSha256": "4b15eefe6164cf23777cd30a8b0af662f2592a8cd8ed45433b1ca70283ab1a82",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_seed_backend_native_v1.py",
+      "sourceSha256": "39c7c96ea2ad53dd0f2edf0dfbb919fd05191750f223a3502440b9da55faa466",
+      "exportSha256": "39c7c96ea2ad53dd0f2edf0dfbb919fd05191750f223a3502440b9da55faa466",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_seed_backend_native_v2.py",
+      "sourceSha256": "52fe11a0bdc245edc5881303a384a0c554fa44da2d35334d7fc11e7dba28484b",
+      "exportSha256": "52fe11a0bdc245edc5881303a384a0c554fa44da2d35334d7fc11e7dba28484b",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_seed_backend_native_v3.py",
+      "sourceSha256": "ab99fca610f0f83dd6fb21935638bd24cdab482e2a4d16cbe9c465cf4b936cc5",
+      "exportSha256": "ab99fca610f0f83dd6fb21935638bd24cdab482e2a4d16cbe9c465cf4b936cc5",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_seed_runner.py",
+      "sourceSha256": "fe44538e9f2c120f0dc5022d1f5b862d7283513b704be030214d223ac80f8ea8",
+      "exportSha256": "fe44538e9f2c120f0dc5022d1f5b862d7283513b704be030214d223ac80f8ea8",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_seed_runner_native_v1.py",
+      "sourceSha256": "3de60cd773890cf87bb90c927f450960189dec211913a0240f6765469c81fb17",
+      "exportSha256": "3de60cd773890cf87bb90c927f450960189dec211913a0240f6765469c81fb17",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_signed_execute_preparation.py",
+      "sourceSha256": "cf686a40862af0032a857eacb899583c39006082dd8966f0af0a08217683ea57",
+      "exportSha256": "cf686a40862af0032a857eacb899583c39006082dd8966f0af0a08217683ea57",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_source_guard.py",
+      "sourceSha256": "041610ca0a7739cad7a892a9b86a904bcff1a30bb7f2eef2b51b2e2d71755866",
+      "exportSha256": "041610ca0a7739cad7a892a9b86a904bcff1a30bb7f2eef2b51b2e2d71755866",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_source_guard_backend.py",
+      "sourceSha256": "187f35525c4fd39a0208b138530f224ffcc06de854a28245157966b7d2f6211f",
+      "exportSha256": "187f35525c4fd39a0208b138530f224ffcc06de854a28245157966b7d2f6211f",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_source_owned_execute.py",
+      "sourceSha256": "98caa938a7feb12f46b554116a85024b7e2acddd0880c1f1996d20fabe6c3276",
+      "exportSha256": "98caa938a7feb12f46b554116a85024b7e2acddd0880c1f1996d20fabe6c3276",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_source_tree.py",
+      "sourceSha256": "a95e4cccf2ad7ee0907f6e27696b6d0531c24a9a31298c606c1ffdfeb0019592",
+      "exportSha256": "a95e4cccf2ad7ee0907f6e27696b6d0531c24a9a31298c606c1ffdfeb0019592",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_stage_scope.py",
+      "sourceSha256": "8f72e63f0d2c0cad427a56b032e38ecb4589f550ec333e46d255fdb3832f1a8a",
+      "exportSha256": "8f72e63f0d2c0cad427a56b032e38ecb4589f550ec333e46d255fdb3832f1a8a",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_startup_join.py",
+      "sourceSha256": "056cf2d81122f1c678e8e59bc5a6d4607ad5ea046e4c82ac911e91ccd932841d",
+      "exportSha256": "056cf2d81122f1c678e8e59bc5a6d4607ad5ea046e4c82ac911e91ccd932841d",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_stored_platform_source.py",
+      "sourceSha256": "fd9f346f69ffb693d4010b470a4fda560d2cd0cade5f79b637c18bf47aa42e1a",
+      "exportSha256": "fd9f346f69ffb693d4010b470a4fda560d2cd0cade5f79b637c18bf47aa42e1a",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_stored_startup.py",
+      "sourceSha256": "af2ffb8d7afcc784ccf3753736958810f5474525d0c72b0c825e0946bb98f8cc",
+      "exportSha256": "af2ffb8d7afcc784ccf3753736958810f5474525d0c72b0c825e0946bb98f8cc",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_install_session_stage_binding.py",
+      "sourceSha256": "4f1f65124f65965ace62a9f525931c8e562bd398a6150c7478f03929a122d7d9",
+      "exportSha256": "4f1f65124f65965ace62a9f525931c8e562bd398a6150c7478f03929a122d7d9",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_installer_materialize.py",
+      "sourceSha256": "34a357ad9f9efe55cbbb91e724feb8693b81b645f468aa0846121a6e697f2821",
+      "exportSha256": "34a357ad9f9efe55cbbb91e724feb8693b81b645f468aa0846121a6e697f2821",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_model_budget_handover.py",
+      "sourceSha256": "c8521d586b5a6524b9f17d31f7b03d60d149fdf825215c3b98f3b3e780cec796",
+      "exportSha256": "c8521d586b5a6524b9f17d31f7b03d60d149fdf825215c3b98f3b3e780cec796",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_model_test_budget.py",
+      "sourceSha256": "96a09dbd605c816ca05f260200fcb7912ae6129ab2daff6577c4e15217d16577",
+      "exportSha256": "96a09dbd605c816ca05f260200fcb7912ae6129ab2daff6577c4e15217d16577",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_platform_foundation_materialize.py",
+      "sourceSha256": "d4954ad5a7a5d00790d3b70aadfe96585105a9ac27ee15c9a02acc4ae7b99bfc",
+      "exportSha256": "d4954ad5a7a5d00790d3b70aadfe96585105a9ac27ee15c9a02acc4ae7b99bfc",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_platform_git_runner.py",
+      "sourceSha256": "5910add057568320401c30b8c61e72b56f76fbbe9cbd4dc6cbb20c6465548418",
+      "exportSha256": "5910add057568320401c30b8c61e72b56f76fbbe9cbd4dc6cbb20c6465548418",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_platform_recheck_efficiency.py",
+      "sourceSha256": "e2b1afbe12c70a6f451ad96148b975e9dc3c94f34bb0cbdd4c44894841d8aa16",
+      "exportSha256": "e2b1afbe12c70a6f451ad96148b975e9dc3c94f34bb0cbdd4c44894841d8aa16",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_platform_source.py",
+      "sourceSha256": "f17d2bcd9a78f83f02e0e69da8b3ab4054671946debd34a602a00ca9864145fc",
+      "exportSha256": "f17d2bcd9a78f83f02e0e69da8b3ab4054671946debd34a602a00ca9864145fc",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_provider_preflight.py",
+      "sourceSha256": "21082e2c57c549d5b52d520b8c9bff5998028c586c5c0fb8329af38a67b0a3de",
+      "exportSha256": "21082e2c57c549d5b52d520b8c9bff5998028c586c5c0fb8329af38a67b0a3de",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_public_npm_advisories.py",
+      "sourceSha256": "d532c6582105291b83f0101136642060178b32a6512446dad6a8bf1233669bc9",
+      "exportSha256": "d532c6582105291b83f0101136642060178b32a6512446dad6a8bf1233669bc9",
+      "transformations": []
+    },
+    {
+      "path": "tools/dms-reference.test.ts",
+      "sourceSha256": "fe96ee4333c5cd65009381a9809a37266a78aa8a42ef117f1a6566994bd0fb7c",
+      "exportSha256": "fe96ee4333c5cd65009381a9809a37266a78aa8a42ef117f1a6566994bd0fb7c",
+      "transformations": []
+    },
+    {
+      "path": "tools/qualification-budget.ts",
+      "sourceSha256": "fe2490f87326397dc7e22e00bd3f2ca52869a455bf0ff2e6e0bd1db2c411dd11",
+      "exportSha256": "fe2490f87326397dc7e22e00bd3f2ca52869a455bf0ff2e6e0bd1db2c411dd11",
+      "transformations": []
+    },
+    {
+      "path": "tools/qualify-models.test.ts",
+      "sourceSha256": "2b5257189822ca6a60ad1a96159f2b96215b11534c68d8903760026f24d119ee",
+      "exportSha256": "2b5257189822ca6a60ad1a96159f2b96215b11534c68d8903760026f24d119ee",
+      "transformations": []
+    },
+    {
+      "path": "tools/qualify-models.ts",
+      "sourceSha256": "0322a564b7bd904590e3ab0a83bbe489446a49fb79413d6fa10e198e0f97ffb7",
+      "exportSha256": "0322a564b7bd904590e3ab0a83bbe489446a49fb79413d6fa10e198e0f97ffb7",
+      "transformations": []
+    },
+    {
+      "path": "tools/rehearse-dms-update.test.ts",
+      "sourceSha256": "1ec58aa13afcbfbb2f37a12dbbee32d4f8d4cf85e909e8b86d15e5dd44d163f3",
+      "exportSha256": "1ec58aa13afcbfbb2f37a12dbbee32d4f8d4cf85e909e8b86d15e5dd44d163f3",
+      "transformations": []
+    },
+    {
+      "path": "tools/rehearse-dms-update.ts",
+      "sourceSha256": "7807e2f19284007a1361e16f960e2f30c36c88ae66b7b39d4e6cbe6418b6846c",
+      "exportSha256": "7807e2f19284007a1361e16f960e2f30c36c88ae66b7b39d4e6cbe6418b6846c",
+      "transformations": []
+    },
+    {
+      "path": "tsconfig.json",
+      "sourceSha256": "c48a4bf6ecc0c62a9b7750486481ff18d921f1789ac62d016c47e662ad5d3c6f",
+      "exportSha256": "c48a4bf6ecc0c62a9b7750486481ff18d921f1789ac62d016c47e662ad5d3c6f",
+      "transformations": []
+    }
+  ]
+}

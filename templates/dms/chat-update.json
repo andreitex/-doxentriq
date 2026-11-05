@@ -1,0 +1,5 @@
+{
+  "request": "Add an optional Project code field next to Department when uploading a document. Store it as projectCode metadata and include it in the existing metadata search. Keep every document and version, all role boundaries, PKCE authentication, the database schema, and the current dependency lock unchanged.",
+  "answeredBusinessContext": "This optional metadata field uses the existing string metadata schema. Readers have dms.read and dms.search, editors additionally have dms.write, and document administrators have app dms.admin. No roles or connections should change. No data migration, deletion, or new dependency is needed.",
+  "acceptance": ["Upload form includes a Project code field", "Project code searches return matching documents", "Previous document bytes remain readable", "Authorization and storage code remain identical", "Immutable migration IDs and lockfile remain unchanged"]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "autosoft-dms-reference",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24.0.0" },
+  "scripts": { "build": "vite build --configLoader native", "test": "node --test test/*.test.mjs", "start": "node server.mjs" },
+  "dependencies": { "jose": "6.2.12", "mysql2": "3.24.5", "react": "19.3.0", "react-dom": "19.3.0" },
+  "devDependencies": { "vite": "8.3.4" }
+}

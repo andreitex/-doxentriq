@@ -1,0 +1,6 @@
+import { hashArtifact } from '../src/security.ts';
+import { migrationSetHash,type MigrationSnapshotRequest } from '../src/migration-snapshot.ts';
+export function snapshotFixture(baseReleaseId:string|null=null) {
+  const binding:MigrationSnapshotRequest={schemaVersion:1,appId:'app1',jobId:'job1',attemptId:'attempt1',fence:2,baseReleaseId,baseArtifactHash:baseReleaseId?'a'.repeat(64):'',baseImage:baseReleaseId?`registry.test/base@sha256:${'b'.repeat(64)}`:'',sourceHash:'c'.repeat(64),migrationSetHash:migrationSetHash([])};
+  return {schemaVersion:1 as const,binding,requestHash:hashArtifact(binding),status:baseReleaseId?'captured' as const:'no_previous_release' as const,checkedAt:new Date().toISOString(),schemaEpoch:1,schemaFingerprintHash:(baseReleaseId?'d':'0').repeat(64),migrationLedgerHash:(baseReleaseId?'e':'0').repeat(64),streamHash:(baseReleaseId?'f':'0').repeat(64),rowDigest:(baseReleaseId?'a':'0').repeat(64),tableCount:baseReleaseId?1:0,rowCount:baseReleaseId?2:0,byteCount:baseReleaseId?300:0,unappliedMigrationIds:[],dataPreservation:baseReleaseId?'captured_only' as const:'no_previous_release' as const,previousReleaseCompatibility:baseReleaseId?'not_run' as const:'no_previous_release' as const,publicationEligible:false as const,reason:'none' as const};
+}
