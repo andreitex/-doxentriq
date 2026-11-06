@@ -37,6 +37,9 @@ rendered files are preserved and refused; this command does not resume them.
   identity can be removed. Unknown outcomes are retained without blind retry.
   Its Caddyfile has an explicit verified SELinux label transition when needed;
   Docker does not implicitly relabel it. SELinux remains enabled.
+  Inspection accepts the single bind-service capability as `NET_BIND_SERVICE`
+  or Docker's normalized `CAP_NET_BIND_SERVICE`. Duplicate or additional
+  capabilities are refused; dropping `ALL` and `no-new-privileges` remain required.
 - A separate read-only child verifies the exact output inventory, hashes and
   permissions, credential relationships, realm policy, image bindings and TLS
   chains, key pairs and hostnames. Bash acknowledges only after successful

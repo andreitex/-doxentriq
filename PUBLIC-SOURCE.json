@@ -3,7 +3,7 @@
   "status": "source_candidate_not_published",
   "licenseSelected": true,
   "fileCount": 702,
-  "excludedFileCount": 709,
+  "excludedFileCount": 0,
   "transformedFileCount": 29,
   "publicSourceCheck": {
     "schemaVersion": 1,
@@ -1291,8 +1291,8 @@
     },
     {
       "path": "deploy/installer/company_render_commands.py",
-      "sourceSha256": "687c491f71b6b87d8fb029d8d02a27fcfa938bba88757f9af17fda73dd6a0aeb",
-      "exportSha256": "687c491f71b6b87d8fb029d8d02a27fcfa938bba88757f9af17fda73dd6a0aeb",
+      "sourceSha256": "9749310dd5b32d26313431bdb7c10449ac2efa055fe29313216575bd969bc749",
+      "exportSha256": "9749310dd5b32d26313431bdb7c10449ac2efa055fe29313216575bd969bc749",
       "transformations": []
     },
     {
@@ -1709,8 +1709,8 @@
     },
     {
       "path": "docs/native-rendering.md",
-      "sourceSha256": "ffd6516cbcac6f6c4ba5484c80b9ac8113fc3071757a225893b171ad1764bc9d",
-      "exportSha256": "ffd6516cbcac6f6c4ba5484c80b9ac8113fc3071757a225893b171ad1764bc9d",
+      "sourceSha256": "c089b53b9ca4d0c94b710166dc4afba256e14c91deaccd8bcca5b5155f673fd6",
+      "exportSha256": "c089b53b9ca4d0c94b710166dc4afba256e14c91deaccd8bcca5b5155f673fd6",
       "transformations": []
     },
     {
@@ -3977,8 +3977,8 @@
     },
     {
       "path": "tests/test_company_render_commands.py",
-      "sourceSha256": "a95f08fb4d59ae8cdbe4befc7fefb41856c84e20798df5213b57d38e098ee019",
-      "exportSha256": "a95f08fb4d59ae8cdbe4befc7fefb41856c84e20798df5213b57d38e098ee019",
+      "sourceSha256": "768f74007de0573764d6e6f8ae99c31f221384e153a2f0aa62e6a6d344f4431e",
+      "exportSha256": "768f74007de0573764d6e6f8ae99c31f221384e153a2f0aa62e6a6d344f4431e",
       "transformations": []
     },
     {

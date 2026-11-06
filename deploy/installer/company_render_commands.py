@@ -239,7 +239,10 @@ class NativeCommands:
         require(c.get('Entrypoint') in (None,[]))
         require(c['Labels'].get('com.doxentriq.render')==self.name and not h['Privileged'] and h['ReadonlyRootfs'])
         require(h['NetworkMode']=='none' and h['Memory']==134217728 and h['PidsLimit']==64)
-        require(set(h['CapDrop'])=={'ALL'} and set(h['CapAdd'])=={'NET_BIND_SERVICE'} and h['SecurityOpt']==['no-new-privileges'])
+        require(type(h['CapDrop']) is list and h['CapDrop']==['ALL']
+            and type(h['CapAdd']) is list and len(h['CapAdd'])==1 and type(h['CapAdd'][0]) is str
+            and h['CapAdd'][0] in ('NET_BIND_SERVICE','CAP_NET_BIND_SERVICE')
+            and h['SecurityOpt']==['no-new-privileges'])
         require(h['Binds']==[self.io.root+'/config/Caddyfile:/etc/caddy/Caddyfile:ro'] and not h.get('PortBindings'))
         require((h.get('Tmpfs') or {})==self.tmpfs)
         require(h['LogConfig']['Type']=='none' and h['RestartPolicy']['Name']=='no')

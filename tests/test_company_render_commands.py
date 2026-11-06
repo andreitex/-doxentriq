@@ -13,10 +13,11 @@ C=importlib.util.module_from_spec(spec);spec.loader.exec_module(C)
 
 
 class Simulated(C.NativeCommands):
-    def __init__(self,*,volumes=False,fail_start=False,foreign_mount=False):
+    def __init__(self,*,volumes=False,fail_start=False,foreign_mount=False,host_config=None):
         self.name='doxentriq-render-'+'a'*32;self.image='caddy@sha256:'+'b'*64;self.image_id='sha256:'+'c'*64
         self.identifier='d'*64;self.container=None;self.failed=False;self.tools={};self.selinux=False
         self.calls=[];self.labels=[];self.started=False;self.fail_start=fail_start;self.foreign_mount=foreign_mount
+        self.host_config={} if host_config is None else host_config
         self.io=SimpleNamespace(root='/protected/data',readonly=False,caddy_label=lambda *args,**kwargs:self.labels.append((args,kwargs)))
         self.tmpfs={n:'rw,noexec,nosuid,nodev,size=16m,uid=10001,gid=10001,mode=0700' for n in ('/data','/config')} if volumes else {}
     def _docker(self,args):
@@ -30,6 +31,7 @@ class Simulated(C.NativeCommands):
                     Binds=['/protected/data/config/Caddyfile:/etc/caddy/Caddyfile:ro'],PortBindings={},LogConfig={'Type':'none'},RestartPolicy={'Name':'no'}),
                 State=dict(Status='exited' if self.started else 'created',ExitCode=0,Pid=0,OOMKilled=False,Error=''),
                 Mounts=[dict(Type='bind',Source='/protected/data/config/Caddyfile',Destination='/etc/caddy/Caddyfile',RW=False)])
+            row['HostConfig'].update(self.host_config)
             if self.foreign_mount:row['Mounts'].append(dict(Type='volume',Source='/foreign',Destination='/data',RW=True))
             return json.dumps([row]).encode()
         if args[:2]==['container','start']:
@@ -45,6 +47,52 @@ class Simulated(C.NativeCommands):
 
 
 class Commands(unittest.TestCase):
+    def test_single_bind_capability_accepts_exact_docker_inspect_spellings(self):
+        for capability in ('NET_BIND_SERVICE','CAP_NET_BIND_SERVICE'):
+            with self.subTest(capability=capability):
+                c=Simulated(host_config={'CapAdd':[capability]})
+                c.check_output(c.original(),text=True)
+                self.assertTrue(c.started)
+                self.assertEqual(sum(call[:2]==['container','inspect'] for call in c.calls),2)
+                self.assertEqual(sum(call[:2]==['container','rm'] for call in c.calls),1)
+                self.assertIsNone(c.container)
+
+    def refused_profile(self,field,value):
+        c=Simulated(host_config={field:value})
+        with self.assertRaises(ValueError):c.check_output(c.original(),text=True)
+        self.assertFalse(any(call[:2] in (['container','start'],['container','rm']) for call in c.calls))
+        self.assertEqual(c.container,c.identifier)
+        with self.assertRaises(ValueError):c.close()
+
+    def test_added_capability_rejects_duplicates_extra_caps_and_malformed_types(self):
+        for value in (None,True,1,'NET_BIND_SERVICE',{},[],[None],[True],[1],[{}],
+                ['NET_BIND_SERVICE','NET_BIND_SERVICE'],['CAP_NET_BIND_SERVICE','CAP_NET_BIND_SERVICE'],
+                ['NET_BIND_SERVICE','CAP_NET_BIND_SERVICE'],['CAP_NET_BIND_SERVICE','CAP_SYS_ADMIN'],
+                ['ALL'],['CAP_CAP_NET_BIND_SERVICE'],['cap_net_bind_service'],['CAP_NET_BIND_SERVICE ']):
+            with self.subTest(value=value):self.refused_profile('CapAdd',value)
+
+    def test_all_dropped_and_no_new_privileges_stay_exact(self):
+        for value in (None,True,1,'ALL',{},[],['ALL','ALL'],['CAP_ALL'],['ALL','NET_BIND_SERVICE']):
+            with self.subTest(field='CapDrop',value=value):self.refused_profile('CapDrop',value)
+        for value in (None,True,'no-new-privileges',{},[],['no-new-privileges','no-new-privileges'],
+                ['no-new-privileges','seccomp=unconfined'],['seccomp=unconfined']):
+            with self.subTest(field='SecurityOpt',value=value):self.refused_profile('SecurityOpt',value)
+
+    def test_post_start_capability_drift_preserves_exact_container(self):
+        class Drift(Simulated):
+            def _docker(self,args):
+                raw=super()._docker(args)
+                if args[:2]==['container','inspect'] and self.started:
+                    rows=json.loads(raw);rows[0]['HostConfig']['CapAdd']=['CAP_NET_BIND_SERVICE','CAP_SYS_ADMIN']
+                    return json.dumps(rows).encode()
+                return raw
+        c=Drift(host_config={'CapAdd':['CAP_NET_BIND_SERVICE']})
+        with self.assertRaises(ValueError):c.check_output(c.original(),text=True)
+        self.assertEqual(sum(call[:2]==['container','start'] for call in c.calls),1)
+        self.assertFalse(any(call[:2]==['container','rm'] for call in c.calls))
+        self.assertEqual(c.container,c.identifier)
+        with self.assertRaises(ValueError):c.close()
+
     def test_docker_hub_normalization_preserves_exact_registry_repository_and_digest(self):
         suffix='@sha256:'+'a'*64
         for name in ('caddy','library/caddy','docker.io/caddy','docker.io/library/caddy'):
