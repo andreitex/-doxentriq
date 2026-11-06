@@ -31,8 +31,8 @@
     },
     {
       "path": ".github/workflows/public-source-readiness.yml",
-      "sourceSha256": "f0137fc2c2674d028222aff75302cc3414db16ea0325c7e5e393a7da16258d92",
-      "exportSha256": "f0137fc2c2674d028222aff75302cc3414db16ea0325c7e5e393a7da16258d92",
+      "sourceSha256": "385151826fa49a11fda4f39ef8f0ec60d8eaab2ff3ed4852b8e87c42b2b5c253",
+      "exportSha256": "385151826fa49a11fda4f39ef8f0ec60d8eaab2ff3ed4852b8e87c42b2b5c253",
       "transformations": []
     },
     {

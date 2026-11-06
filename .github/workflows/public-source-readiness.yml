@@ -70,6 +70,8 @@ jobs:
           python3 -I -B scripts/test-quota-helper.py
       - name: Check installer records and read-only root compatibility
         run: |
+          AUTOSOFT_TEST_ARTIFACT_ROOT="$(mktemp -d "${RUNNER_TEMP}/doxentriq-records.XXXXXX")"
+          export AUTOSOFT_TEST_ARTIFACT_ROOT
           python3 -I -B tests/test_company_cli_executed_record_store.py
           python3 -I -B tests/test_company_retention_records.py
 
