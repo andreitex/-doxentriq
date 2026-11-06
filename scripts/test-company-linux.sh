@@ -48,12 +48,14 @@ names.append('scripts/test-quota-admission.py')
 names.extend(('scripts/test-quota-command.py','scripts/test-runtime-layout.py','scripts/test-installation-identity.py'))
 names.extend(('scripts/test-installation-wiring.py','scripts/test-installation-budgets.py','scripts/test-install-lock.py'))
 names.append('scripts/test-installation-status.py')
+names.append('scripts/test-host-network.py')
 names.extend(('scripts/test-startup-binding.py','scripts/test-runtime-pair-init.py','scripts/test-install-lock-verification.py'))
 names.extend(('scripts/test-installer-parent.py','scripts/test-recovery-catalog.py'))
 names.append('scripts/test-company-source.py')
 names.extend(('scripts/test-company-release.py','scripts/test-qualify-trivy-feed.py'))
 names.append('tests/test_installer_materialize.py')
 names.append('tests/test_company_foundation.py')
+names.append('tests/test_company_runtime_identity.py')
 names.extend(('tests/test_platform_source.py','tests/test_company_release_schema4.py','tests/test_company_platform_issuance.py','tests/test_authenticated_seed.py','tests/test_company_platform_store.py','tests/test_platform_git_runner.py','tests/test_install_session_stage_binding.py','tests/test_company_stored_platform_source.py','tests/test_company_source_tree.py'))
 names.extend(('tests/test_company_source_guard.py', 'tests/test_company_source_guard_backend.py', 'tests/test_company_captured_loader.py', 'tests/test_company_full_entry.py'))
 names.append('tests/test_company_stored_startup.py')
@@ -74,11 +76,15 @@ names.append('tests/test_model_budget_handover.py')
 names.append('tests/test_public_npm_advisories.py')
 names.append('tests/test_platform_recheck_efficiency.py')
 names.append('tests/test_company_source_owned_execute.py')
+names.extend(('tests/test_company_configuration.py', 'tests/test_company_configuration_native.py',
+              'tests/test_company_release_producer.py'))
 for name in names:
     if name in cli_helper_tests or name in ('test/test_checkpoint_admission.py','scripts/test-quota-admission.py','scripts/test-quota-command.py','scripts/test-runtime-layout.py','scripts/test-installation-identity.py','scripts/test-installation-wiring.py','scripts/test-installation-budgets.py','scripts/test-install-lock.py','scripts/test-startup-binding.py','scripts/test-runtime-pair-init.py','scripts/test-install-lock-verification.py','scripts/test-installer-parent.py','scripts/test-recovery-catalog.py','scripts/test-company-source.py','scripts/test-company-release.py','scripts/test-qualify-trivy-feed.py','tests/test_installer_materialize.py','tests/test_company_foundation.py','tests/test_platform_source.py','tests/test_company_release_schema4.py','tests/test_company_platform_issuance.py','tests/test_authenticated_seed.py','tests/test_company_platform_store.py','tests/test_platform_git_runner.py','tests/test_install_session_stage_binding.py','tests/test_company_stored_platform_source.py','tests/test_company_source_tree.py','tests/test_company_source_guard.py','tests/test_company_source_guard_backend.py','tests/test_company_captured_loader.py','tests/test_company_full_entry.py','tests/test_company_stored_startup.py','tests/test_company_fresh_assembly.py','tests/test_platform_foundation_materialize.py','tests/test_company_full_plan.py','tests/test_company_full_package.py','tests/test_company_full_package_loader.py','tests/test_company_runtime_pair_parent.py','tests/test_company_full_package_emit.py','tests/test_company_stage_scope.py','tests/test_company_full_retention_worker.py','tests/test_company_parent_system.py','tests/test_company_seed_backend.py','tests/test_company_seed_runner.py','tests/test_company_retention_effects.py','tests/test_company_full_cli_package.py','tests/test_company_full_cli.py','tests/test_company_release_crypto.py'):
         os.environ['AUTOSOFT_TEST_ARTIFACT_ROOT']=str(folder)
     if name=='tests/test_company_foundation.py':
         os.environ.pop('AUTOSOFT_FOUNDATION_TEST_PROPOSAL',None)
+    if name in ('tests/test_company_release_producer.py','tests/test_company_runtime_identity.py'):
+        os.environ['DOXENTRIQ_NATIVE_TEST_ROOT']=str(folder)
     path=source/name
     module_name='company_'+name.replace('-','_').replace('.','_')
     spec=importlib.util.spec_from_file_location(module_name,path)

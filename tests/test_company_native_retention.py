@@ -65,6 +65,17 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(first['storeOperationId'], second['storeOperationId'])
         self.assertIsNone(first['parent'])
 
+    def test_repository_companion_pins_exact_package_and_shared_parent(self):
+        raw = B.assemble_entry(ROOT, self.worker, reader=lambda p, n: p.read_bytes(), repository=True)
+        self.assertIn(B.pin(self.worker)['sha256'].encode(), raw)
+        self.assertIn((ROOT/'scripts/install-lock.sh').read_bytes(), raw)
+        self.assertNotIn(b'@WORKER_SHA256@', raw)
+        self.assertIn(b'--seed-repository', raw)
+        self.assertEqual(base64.b64decode(self.package['programs']['repository_io']['base64']),
+                         (ROOT/'deploy/installer/company_repository_io.py').read_bytes())
+        with self.assertRaises(ValueError):
+            B.assemble_entry(ROOT, self.worker, reader=lambda p, n: p.read_bytes(), repository=True, configuration=True)
+
 
 NATIVE = sys.platform == 'linux' and getattr(os, 'geteuid', lambda: -1)() == 0 and bool(os.environ.get('DOXENTRIQ_NATIVE_TEST_ROOT'))
 

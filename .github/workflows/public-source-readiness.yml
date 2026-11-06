@@ -68,12 +68,24 @@ jobs:
         run: |
           sudo python3 -I -B scripts/test-quota-startup.py
           python3 -I -B scripts/test-quota-helper.py
+          python3 -I -B scripts/test-host-network.py
       - name: Check installer records and read-only root compatibility
         run: |
           AUTOSOFT_TEST_ARTIFACT_ROOT="$(mktemp -d "${RUNNER_TEMP}/doxentriq-records.XXXXXX")"
           export AUTOSOFT_TEST_ARTIFACT_ROOT
           python3 -I -B tests/test_company_cli_executed_record_store.py
           python3 -I -B tests/test_company_retention_records.py
+          python3 -I -B tests/test_company_configuration.py
+          python3 -I -B tests/test_company_release_producer.py
+          sudo python3 -I -B tests/test_company_configuration_native.py
+      - name: Check foundation entry before host mutation
+        shell: bash
+        run: |
+          DOXENTRIQ_NATIVE_TEST_ROOT=$(sudo mktemp -d /srv/doxentriq-entry.XXXXXX)
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_foundation_entry_native.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_runtime_identity.py
 
   source-build:
     runs-on: ubuntu-latest

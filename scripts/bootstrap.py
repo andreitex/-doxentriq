@@ -231,7 +231,50 @@ def initialize_storage(_data, _root, *, host_directory=Path('/etc/autosoft'), fi
     finish_storage_receipt(value, host_directory=host_directory, files=files)
 
 
-def configure(data, root, *, host_directory=Path('/etc/autosoft'), files=None):
+def configure(data, root, *, host_directory=Path('/etc/autosoft'), files=None,
+              captured_release=None, answers=None):
+    remaining_answers = None
+    if answers is None:
+        ask = globals()['ask']
+    else:
+        if (type(answers) is not dict or not 1 <= len(answers) <= 64
+                or any(type(key) is not str or type(value) is not str
+                    or not 0 < len(key) <= 256 or len(value) > 16384 or '\0' in value
+                    for key, value in answers.items())):
+            raise ValueError('A bounded protected configuration answer set is required')
+        remaining_answers = dict(answers)
+        def ask(label, default='', sensitive=False):
+            if label not in remaining_answers:
+                raise ValueError('Configuration input is missing; interactive fallback is disabled')
+            return remaining_answers.pop(label)
+    # The company configuration stage passes bytes from its live, original
+    # verifier-issued source. This argument is data, not an authentication API.
+    # In this mode no environment variable or candidate path supplies a catalog.
+    released = None
+    if captured_release is not None:
+        if (type(captured_release) is not dict
+                or set(captured_release) != {'fingerprint', 'configs'}
+                or type(captured_release['fingerprint']) is not str
+                or re.fullmatch('[a-f0-9]{64}', captured_release['fingerprint']) is None
+                or type(captured_release['configs']) is not dict
+                or set(captured_release['configs']) != {'images.lock.json', 'runtime-manifest.json', 'approved-mirrors.json'}):
+            raise ValueError('Exact captured company configuration is required')
+        released = {}
+        for name, raw in captured_release['configs'].items():
+            if type(raw) is not bytes or not 0 < len(raw) <= 1024 ** 2:
+                raise ValueError('Bounded captured company configuration bytes are required')
+            def unique_pairs(pairs):
+                result = {}
+                for key, value in pairs:
+                    if key in result:
+                        raise ValueError('Duplicate captured company configuration key')
+                    result[key] = value
+                return result
+            value = json.loads(raw, object_pairs_hook=unique_pairs,
+                               parse_constant=lambda unused: (_ for _ in ()).throw(ValueError('Finite JSON required')))
+            if type(value) is not (list if name == 'approved-mirrors.json' else dict):
+                raise ValueError('Unexpected captured company configuration type')
+            released[name] = value
     files = files or _identity.C.NativeFiles()
     host = _identity.verify_host_record(host_directory, files=files)
     _identity.C.require(not os.path.lexists(Path(host_directory) / 'installation.pending.json'),
@@ -250,7 +293,7 @@ def configure(data, root, *, host_directory=Path('/etc/autosoft'), files=None):
         files.protected(secrets_root, directory=True, private=True)
         _identity.C.require(files.inventory(secrets_root, 0) == [],
                             'Partial configuration secrets require company continuation')
-    for name in ('models.json', 'runtime-manifest.json', 'approved-mirrors.json'):
+    for name in ('models.json', 'runtime-manifest.json', 'approved-mirrors.json', 'images.lock.json'):
         _identity.C.require(not os.path.lexists(target.parent / name),
                             'Partial configuration evidence requires company continuation')
     admin = origin(ask("Administrative HTTPS URL"))
@@ -277,6 +320,9 @@ def configure(data, root, *, host_directory=Path('/etc/autosoft'), files=None):
             raise ValueError("Spending limits must be finite positive numbers") from None
         if not math.isfinite(amount) or amount <= 0:
             raise ValueError("Spending limits must be finite positive numbers")
+    cfg['app_network_pool'] = _layout.Q.validate_fresh_network_pool(
+        ask('Unused private IPv4 pool for application networks (CIDR /16 through /24; confirm with your network administrator)'),
+        _layout.Q.host_network_snapshot())
     cfg['timezone'] = ask('Schedule timezone (IANA name)', 'UTC')
     from zoneinfo import ZoneInfo
     ZoneInfo(cfg['timezone'])
@@ -307,14 +353,28 @@ def configure(data, root, *, host_directory=Path('/etc/autosoft'), files=None):
     catalog_path = Path(ask("Company-approved model catalog JSON path"))
     catalog = json.loads(catalog_path.read_text())
     write(data / "config/models.json", catalog, 0o644)
-    bundle = Path(os.environ["COMPANY_RELEASE_DIR"]) if os.environ.get("COMPANY_RELEASE_DIR") else None
-    manifest_path = bundle / "runtime-manifest.json" if bundle else Path(ask("Company-approved runtime manifest JSON path"))
-    manifest = json.loads(manifest_path.read_text())
-    write(data / "config/runtime-manifest.json", manifest, 0o644)
-    if bundle:
-        write(data / "config/approved-mirrors.json", json.loads((bundle / "approved-mirrors.json").read_text()))
-        cfg['company_public_fingerprint'] = os.environ['COMPANY_RELEASE_FINGERPRINT']
+    bundle = Path(os.environ["COMPANY_RELEASE_DIR"]) if released is None and os.environ.get("COMPANY_RELEASE_DIR") else None
+    if released is not None:
+        manifest = released['runtime-manifest.json']
+    else:
+        manifest_path = bundle / "runtime-manifest.json" if bundle else Path(ask("Company-approved runtime manifest JSON path"))
+        manifest = json.loads(manifest_path.read_text())
+    if released is not None:
+        # Preserve the exact signed bytes: later release comparisons bind bytes,
+        # including whitespace, rather than a JSON reserialization.
+        for name, raw in captured_release['configs'].items():
+            target_config = data / 'config' / name
+            with target_config.open('xb') as output:
+                os.chmod(target_config, 0o644 if name in ('images.lock.json', 'runtime-manifest.json') else 0o600)
+                output.write(raw); output.flush(); os.fsync(output.fileno())
+        cfg['company_public_fingerprint'] = captured_release['fingerprint']
+    else:
+        write(data / "config/runtime-manifest.json", manifest, 0o644)
+        if bundle:
+            write(data / "config/approved-mirrors.json", json.loads((bundle / "approved-mirrors.json").read_text()))
+            cfg['company_public_fingerprint'] = os.environ['COMPANY_RELEASE_FINGERPRINT']
     docker_registry = ask("Company image registry hostname requiring login (optional)")
+    cfg['company_registry'] = docker_registry
     if docker_registry:
         if not re.fullmatch(r'[A-Za-z0-9.-]+(?::[0-9]+)?', docker_registry):
             raise ValueError('Use a registry hostname with optional port')
@@ -344,6 +404,8 @@ def configure(data, root, *, host_directory=Path('/etc/autosoft'), files=None):
     for value in dns_vars.values():
         if "\n" in value or "\r" in value or "'" in value:
             raise ValueError("DNS credential contains unsupported newline/quote")
+    if remaining_answers:
+        raise ValueError('Unexpected configuration input; preserve partial configuration')
     write(data / "secrets/dns.env", "\n".join(f"{key}='{value}'" for key, value in dns_vars.items()) + "\n")
     _identity.C.require(_identity.verify_host_record(host_directory, files=files) == host)
     _identity.verify_reference(_identity.read_intent(host_directory, files=files), cfg)
@@ -356,7 +418,7 @@ def certificates(data, cfg):
     tls = data / "tls"
     ca_key, ca_crt = tls / "ca.key", tls / "ca.crt"
     if not ca_key.exists():
-        subprocess.run(["openssl", "req", "-x509", "-newkey", "rsa:4096", "-nodes", "-days", "3650", "-subj", "/CN=Autosoft Installation CA", "-addext", "basicConstraints=critical,CA:TRUE", "-addext", "keyUsage=critical,keyCertSign,cRLSign", "-keyout", str(ca_key), "-out", str(ca_crt)], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["openssl", "req", "-x509", "-newkey", "rsa:4096", "-nodes", "-days", "3650", "-subj", "/CN=Doxentriq Installation CA", "-addext", "basicConstraints=critical,CA:TRUE", "-addext", "keyUsage=critical,keyCertSign,cRLSign", "-keyout", str(ca_key), "-out", str(ca_crt)], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         os.chmod(ca_key, 0o600)
     os.chmod(ca_crt, 0o644)
     verification = subprocess.run(['openssl','verify','-x509_strict','-CAfile',str(ca_crt),str(ca_crt)],capture_output=True,text=True)
@@ -661,6 +723,7 @@ def render(data, root):
     adapted["apps"]["http"]["servers"] = {"apps": server}
     write(data / "config/caddy.json", adapted, 0o644)
     env = dict(DATA_DIR=str(data), DOCKER_GID=str(os.stat('/var/run/docker.sock').st_gid), ADMIN_ORIGIN=cfg["admin_origin"], APPS_BASE_URL=cfg["apps_base_url"], AUTH_ORIGIN=cfg["auth_origin"], OIDC_ISSUER=cfg["auth_origin"] + "/realms/platform", OWNER_SUBJECT=cfg["owner_subject"], JOB_BUDGET_USD=cfg["job_budget_usd"], MONTHLY_BUDGET_USD=cfg["monthly_budget_usd"], APP_DIRECTORY_AUTHORIZATION_ENABLED='1' if cfg.get('directory_authorization_enabled') is True else '0')
+    env['APP_NETWORK_POOL'] = str(_layout.Q.app_network_pool(cfg['app_network_pool'])) if cfg.get('app_network_pool') else ''
     env.update({name.upper() + "_IMAGE": value for name, value in images.items()})
     write(data / "config/compose.env", "\n".join(f"{key}={value}" for key, value in env.items()) + "\n")
     for directory, uid in (("platform", 10001), ("workspaces", 10001), ("caddy", 10001), ("caddy-config", 10001), ("caddy-admin", 10001), ("public-tls", 10001), ("mysql", 999), ("mysql-keyring", 999), ("redis", 999), ("rabbitmq", 999), ("prometheus", 65534), ("loki", 10001), ("grafana", 472)):
@@ -837,7 +900,8 @@ NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
 PrivateTmp=true
-RestrictAddressFamilies=AF_UNIX
+PrivateNetwork=false
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
 ReadWritePaths={data}/runtime/storage {data}/quota /run/autosoft
 CapabilityBoundingSet=CAP_SYS_ADMIN CAP_CHOWN CAP_FOWNER CAP_DAC_OVERRIDE
 [Install]
@@ -1126,6 +1190,7 @@ class SeedStorage:
         self.files,self.commands,self.startup,self.fresh=files,commands,startup_module,fresh
         self.data=_seed_path(str(data),True); self.root=_seed_path(str(install_root),True)
         self.host=_seed_path(str(host_directory),True); self.active=True
+        self.last_host_probe=None; self.host_probes=0
         _seed_require(self.host=='/etc/autosoft')
         _seed_require(callable(getattr(startup_module,'encrypted_proof',None)))
         try:
@@ -1207,31 +1272,50 @@ class SeedStorage:
             result[name]=row[:7] # Explicit writable device policy, never a hidden nine-field refresh.
         return result
 
-    def check(self):
+    def check(self,*,force_host=True):
+        """Check held paths each call; sample host state at logical boundaries.
+
+        A probe starts before the next write once its predecessor is 5s old.
+        This is not a realtime limit inside a logical write/fsync operation.
+        Forced phase-boundary probes do not depend on that interval. Slow,
+        failed or exhausted probes stop the stage and preserve its evidence.
+        These subprocess observations are not an atomic host-writer fence.
+        """
         try:
-            _seed_require(self.active); self.files.check(); _seed_require(self._mount()==self.mount,'seed_mount_changed')
+            _seed_require(self.active and type(force_host) is bool); self.files.check()
             for path in self.control_paths:self.files.check_one(path,readback=True)
             host_names=self.files.names(self.host,64)
             _seed_require('installation.pending.json' not in host_names and (not self.fresh or 'installation.complete' not in host_names))
+            now=self.files.clock()
+            _seed_require(self.last_host_probe is None or now>=self.last_host_probe,'seed_clock_regressed')
+            probe=force_host or self.last_host_probe is None or now-self.last_host_probe>=5
+            if probe:
+                _seed_require(self.host_probes<136,'seed_host_probe_budget')
+                self.host_probes+=1; self.last_host_probe=now
+                _seed_require(self._mount()==self.mount,'seed_mount_changed')
             if self.fresh:
                 for name in self.startup.L.BROKER_DIRECTORIES:
                     if name not in ('repository','builds'): _seed_require(self.files.names(self.data+'/runtime/'+name,0)==[],'seed_prior_runtime_effects')
+            if self.fresh and probe:
                 for unit in ('autosoft.service','autosoft-quota.service','autosoft-security.service','autosoft-log-retention.service',
                              'autosoft-certificates.service','autosoft-logs.service','autosoft-backup.service',
                              'autosoft-incremental.service','autosoft-restore-verify.service',
                              'autosoft-security.timer','autosoft-certificates.timer','autosoft-log-retention.timer',
                              'autosoft-logs.timer','autosoft-backup.timer','autosoft-incremental.timer','autosoft-restore-verify.timer'):
-                    fields=('ActiveState','SubState','MainPID','ControlPID','ControlGroup','LoadState')
+                    fields=(('ActiveState','SubState','LoadState') if unit.endswith('.timer') else
+                            ('ActiveState','SubState','MainPID','ControlPID','ControlGroup','LoadState'))
                     raw=self.commands.text(['/usr/bin/systemctl','show',*["--property="+name for name in fields],'--',unit])
                     pairs=[line.split('=',1) for line in raw.splitlines()]
                     _seed_require(len(pairs)==len(fields) and all(len(row)==2 for row in pairs)
                         and len({row[0] for row in pairs})==len(fields) and {row[0] for row in pairs}==set(fields))
                     value=dict(pairs)
                     _seed_require(value['ActiveState'] in ('inactive','failed') and value['SubState'] in ('dead','failed')
-                        and value['MainPID']==value['ControlPID']=='0' and value['ControlGroup']==''
                         and value['LoadState'] in ('loaded','not-found'),'seed_writer_active')
+                    if unit.endswith('.service'):
+                        _seed_require(value['MainPID']==value['ControlPID']=='0' and value['ControlGroup']=='','seed_writer_active')
                 _seed_require(self.commands.text(['/usr/bin/docker','ps','-aq','--no-trunc'])=='','seed_writer_present')
             self.files.check()
+            _seed_require(not probe or self.files.clock()-now<5,'seed_host_probe_too_slow')
         except BaseException: self.active=False; raise
 
 
@@ -1256,7 +1340,7 @@ def authenticated_seed_request(data,install_root,held,*,verifier_module,storage,
     return request,request_sha,action
 
 
-def _seed_bound(held,V,P,parent,storage,request_sha,action,installation_request_sha256=None):
+def _seed_bound(held,V,P,parent,storage,request_sha,action,installation_request_sha256=None,force_host=False):
     _seed_require(installation_request_sha256 is None or type(installation_request_sha256) is str
                   and re.fullmatch('[a-f0-9]{64}',installation_request_sha256),'seed_installation_request')
     validator=getattr(V,'require_platform_source',None)
@@ -1264,7 +1348,7 @@ def _seed_bound(held,V,P,parent,storage,request_sha,action,installation_request_
     _seed_require(type(parent) is getattr(P,'HeldParent',None) and parent.arguments.stage=='repository-seed'
                   and parent.arguments.request==(installation_request_sha256 if installation_request_sha256 is not None else request_sha)
                   and parent.arguments.action==action,'seed_parent_binding')
-    parent.check(); storage.check(); _seed_require(validator(held) is held)
+    parent.check(); storage.check(force_host=force_host); _seed_require(validator(held) is held)
 
 
 def _seed_plan(held):
@@ -1424,13 +1508,13 @@ def seed_authenticated_repository(data,install_root,held,*,verifier_module,paren
     _seed_require(type(files) is SeedFiles and storage.files is files and git.files is files and storage.fresh)
     try:
         request,request_sha,action=authenticated_seed_request(data,install_root,held,verifier_module=verifier_module,storage=storage,git=git,operation_id=operation_id,installation_request_sha256=installation_request_sha256)
-        def bound(): _seed_bound(held,verifier_module,parent_module,parent,storage,request_sha,action,installation_request_sha256=installation_request_sha256)
-        bound();plan=_seed_plan(held);bound()
+        def bound(force_host=False): _seed_bound(held,verifier_module,parent_module,parent,storage,request_sha,action,installation_request_sha256=installation_request_sha256,force_host=force_host)
+        bound(True);plan=_seed_plan(held);bound(True)
         _seed_require(files.names(storage.repository,0)==[] and files.names(storage.journal,0)==[],'seed_not_fresh')
         operation=files.create(storage.journal,operation_id,uid=0,gid=0)
         intent=dict(scope='AUTHENTICATED_REPOSITORY_SEED_ONLY',request=request,requestSha256=request_sha,actionSha256=action,
                     commit=plan['commit'],tree=plan['root'],leafCount=len(plan['leaves']))
-        files.create(operation,'intent.json',_seed_json(intent),uid=0,gid=0,mode=0o600);bound()
+        files.create(operation,'intent.json',_seed_json(intent),uid=0,gid=0,mode=0o600);bound(True)
         for name in sorted(plan['directories'],key=lambda x:(x.count('/'),x)):
             bound();path=storage.repository+'/'+name; parent_path,leaf=path.rsplit('/',1)
             files.create(parent_path,leaf);bound()
@@ -1438,13 +1522,13 @@ def seed_authenticated_repository(data,install_root,held,*,verifier_module,paren
             bound();path=storage.repository+'/'+name; parent_path,leaf=path.rsplit('/',1)
             mode=0o755 if plan['modes'].get(name)=='100755' else 0o644 if name in plan['leaves'] else 0o600
             files.create(parent_path,leaf,raw,mode=mode);bound()
-        _seed_hold_output(files,storage.repository,plan,fresh=True);bound()
-        head=git.verify(storage.repository,plan);bound();files.check(readback=True)
+        _seed_hold_output(files,storage.repository,plan,fresh=True);bound(True)
+        head=git.verify(storage.repository,plan);bound(True);files.check(readback=True)
         outcome=dict(scope='AUTHENTICATED_REPOSITORY_SEED_ONLY',requestSha256=request_sha,actionSha256=action,
             commit=plan['commit'],tree=plan['root'],head=head,leafCount=len(plan['leaves']),objectCount=len(plan['objects']),
             objectBytesVerified=True,installationActivated=False,nativeQualified=False,
             companyStoreImplemented=False,fullInstallDenied=True,nativeFdCapacityQualified=False)
-        files.create(operation,'objects-verified.json',_seed_json(outcome),uid=0,gid=0,mode=0o600);bound();files.check()
+        files.create(operation,'objects-verified.json',_seed_json(outcome),uid=0,gid=0,mode=0o600);bound(True);files.check()
         _seed_require(files.names(operation,2)==['intent.json','objects-verified.json'])
     finally:
         files.close(); storage.active=False
@@ -1457,7 +1541,7 @@ def confirm_authenticated_seed(data,install_root,held,*,verifier_module,parent_m
     try:
         # Admission action remains bound to the original fresh seed request.
         request,request_sha,action=authenticated_seed_request(data,install_root,held,verifier_module=verifier_module,storage=storage,git=git,operation_id=operation_id,installation_request_sha256=installation_request_sha256)
-        def bound(): _seed_bound(held,verifier_module,parent_module,parent,storage,request_sha,action,installation_request_sha256=installation_request_sha256)
+        def bound(): _seed_bound(held,verifier_module,parent_module,parent,storage,request_sha,action,installation_request_sha256=installation_request_sha256,force_host=True)
         bound();plan=_seed_plan(held);operation=storage.journal+'/'+operation_id
         _seed_require(files.names(storage.journal,1)==[operation_id]);files.hold(operation,kind='directory',mode=0o700)
         _seed_require(files.names(operation,2)==['intent.json','objects-verified.json'])

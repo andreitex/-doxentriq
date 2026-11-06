@@ -85,6 +85,7 @@ COPY tests/test_company_source_owned_execute.py ./tests/test_company_source_owne
 COPY tests/fixtures/company_signed_execute_helpers_v1.json ./tests/fixtures/company_signed_execute_helpers_v1.json
 COPY tests/fixtures/company_signed_execute_helpers_v2.json ./tests/fixtures/company_signed_execute_helpers_v2.json
 COPY tests/fixtures/company_signed_execute_helpers_v3.json ./tests/fixtures/company_signed_execute_helpers_v3.json
+COPY tests/fixtures/company_signed_execute_helpers_v4.json ./tests/fixtures/company_signed_execute_helpers_v4.json
 COPY tests/fixtures/company_cli_execute_bootstrap_before_public_path.source.txt ./tests/fixtures/company_cli_execute_bootstrap_before_public_path.source.txt
 COPY tests/test_company_binary_capture.py ./tests/test_company_binary_capture.py
 COPY tests/test_company_cli_record_io.py ./tests/test_company_cli_record_io.py

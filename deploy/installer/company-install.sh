@@ -11,6 +11,9 @@ company_entry() {
   [[ $# = 2 && $1 = --foundation-only ]] || _il_fail 'full_install_pending_signed_source_and_native_pair'
   _il_root
   local request=$2 package worker expected actual request_sha action operation outcome entry status
+  # Protected pre-admission reads use this process's descriptor namespace.
+  # install_lock_acquire later binds the same identity to the actual lock.
+  IL_OWNER=$BASHPID
   package=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
   worker="$package/company_install.py"
   expected='@WORKER_SHA256@'

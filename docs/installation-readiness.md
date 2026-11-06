@@ -1,6 +1,6 @@
 # Installation readiness
 
-Reviewed November 5, 2026. The repository is a development preview. It does
+Reviewed November 6, 2026. The repository is a development preview. It does
 **not yet provide a complete installer that an independent IT operator can run
 on a clean VM**. The existing trial must not be described as clean-install
 acceptance for a public release.
@@ -39,7 +39,7 @@ Everyday application management belongs in the administration website.
 | Requirement | Current evidence and missing work |
 |---|---|
 | Install from a public release | `scripts/install.sh` delegates to `/opt/autosoft-company/bootstrap/company-install.sh`. A checkout does not supply that trusted installed entry. Publish a verified bootstrap and signed source/image bundle with a documented trust fingerprint. |
-| Complete platform setup | `deploy/installer/company-install.sh` accepts only `--foundation-only`. `scripts/install.sh` explicitly stops the retained full-install function before service deployment. The [native retention worker](native-retention-worker.md) supplies actual Linux collaborators for two source-retention stages; complete native stage execution and trusted parent integration still need qualification. Configuration, identity, service activation and recovery must be connected before advertising a complete installer. |
+| Complete platform setup | `deploy/installer/company-install.sh` accepts only `--foundation-only`. `scripts/install.sh` explicitly stops the retained full-install function before service deployment. A separately packaged [configuration and placement stage](native-configuration-stage.md) now connects the protected wizard to the prerequisites of the [native retention worker](native-retention-worker.md). It requires real foundation/source bindings and independent output verification. Actual signed execution of these stages on a fresh VM remains unqualified; repository seed, runtime pair, identity, service activation and recovery still need integration. |
 | Safe rerun and interruption recovery | Read-only `--status` now reports retained stages and missing confirmation through the normal installer/maintenance entry points. Partial records remain preserved. The foundation command is not a general resume command: native stage reconciliation and continuation still need implementation and disposable-VM acceptance. Do not delete records to make a rerun succeed. |
 | Clean-install OS matrix | Debian 12/13 and Rocky Linux 9/10 are source targets. Retained Rocky 10.2 foundation and reboot reports cover a limited earlier configuration. They do not establish complete clean-install, rerun, or failed-unlock recovery on any of the four targets. |
 | Usable first sign-in | A new installation must reach the admin URL, force owner password change and TOTP enrollment, and explain how to recover access. Test real DNS/certificate configuration, including the identity hostname and application subdomains, without trial-only browser mappings. |
@@ -75,6 +75,15 @@ After this passes, repeat the same artifact on the other three OS targets. Do
 not replace a failing safety check with a bypass to complete this milestone.
 
 ## Checks run during this review
+
+A fresh Rocky Linux 10.2 VM passed 42 network-control tests (162 including
+subtests), 11 native installer-source cases and five shell syntax checks. Three
+Git-dependent source cases were skipped because Git was not installed on the
+base VM. The [runtime archive verifier](runtime-archive-verification.md) passed
+17 additional native cases on that VM. These runs used private test directories
+and synthetic configuration. They did not install the platform, create its
+encrypted volume or qualify reboot recovery. The remaining release and
+activation blockers above still apply.
 
 The five existing installation-budget controls passed locally. They verify
 finite positive limits and reject malformed/zero/infinite inputs before secrets

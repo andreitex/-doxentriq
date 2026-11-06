@@ -189,8 +189,169 @@ def digest(reference):
     return evidence['reference']
 
 
+def bounded_git(argv, *, env, limit, timeout):
+    """Trusted producer's bounded Git transport; no shell or ambient Git config.
+
+    NativeGit supplies the fixed read-only query grammar. Both pipes share one
+    finite memory budget; timeout/overflow kills and reaps the owned process
+    group. Raw diagnostics stay out of release metadata and terminal output.
+    """
+    import selectors
+    import signal
+    import time
+    if (os.name != 'posix' or type(limit) is not int or not 0 < limit <= 16 * 1024 ** 2
+            or type(timeout) is not int or not 0 < timeout <= 30
+            or type(argv) is not tuple or not argv or argv[0] != '/usr/bin/git'):
+        raise ValueError('Bounded native company Git query required')
+    process = subprocess.Popen(argv, env=env, stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True,
+        start_new_session=True, cwd='/', bufsize=0)
+    output, errors = bytearray(), bytearray()
+    deadline = time.monotonic() + timeout
+    reaped = False
+    try:
+        with selectors.DefaultSelector() as poll:
+            for pipe, target in ((process.stdout, output), (process.stderr, errors)):
+                os.set_blocking(pipe.fileno(), False)
+                poll.register(pipe, selectors.EVENT_READ, target)
+            while poll.get_map():
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise ValueError('Company Git query exceeded its deadline')
+                for key, unused in poll.select(min(remaining, .2)):
+                    raw = os.read(key.fd, min(65536, limit + 1 - len(output) - len(errors)))
+                    if not raw:
+                        poll.unregister(key.fileobj)
+                    else:
+                        key.data.extend(raw)
+                        if len(output) + len(errors) > limit:
+                            raise ValueError('Company Git query exceeded its output limit')
+            code = process.wait(timeout=max(.001, deadline - time.monotonic()))
+            reaped = True
+            if code != 0 or errors:
+                raise ValueError('Company Git query failed; no source artifact emitted')
+            return bytes(output)
+    finally:
+        # Fixed queries use no child helpers. Also remove descendants on an
+        # abnormal exit so a failed producer cannot leave an inherited writer.
+        if not reaped:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            process.wait(timeout=5)
+        process.stdout.close(); process.stderr.close()
+
+
+def protected_producer_directories(directory, source_root):
+    """Shared native producer boundary, not permission to trust candidate input."""
+    if os.name != 'posix' or os.getuid() != os.getgid() or os.getuid() != 0:
+        raise ValueError('Trusted root-owned Linux company producer required')
+    for path in (directory, source_root):
+        if not path.is_absolute() or path.resolve(strict=True) != path:
+            raise ValueError('Exact absolute protected company directories required')
+        for parent in (path, *path.parents):
+            info = parent.lstat()
+            if not stat.S_ISDIR(info.st_mode) or info.st_uid != info.st_gid or info.st_uid != 0 or info.st_mode & 0o022:
+                raise ValueError('Protected company directory ancestry required')
+
+
+class ProducerPrerequisiteUnavailable(ValueError):
+    """An actionable fixed diagnostic before repository reads or output writes."""
+
+
+def producer_git_prerequisite():
+    """Check the actual fixed tool; never retry a repository read unprotected."""
+    instruction = ('Use a company-approved, security-maintained Git package for this OS '
+        'or an approved Linux builder. Do not remove --no-lazy-fetch or substitute '
+        'an environment-only fallback.')
+    if os.name != 'posix':
+        raise ProducerPrerequisiteUnavailable('Company source production requires Linux. ' + instruction)
+    environment = dict(PATH='/usr/bin:/bin', HOME='/nonexistent', LANG='C', LC_ALL='C', TZ='UTC',
+        GIT_CONFIG_NOSYSTEM='1', GIT_CONFIG_GLOBAL='/dev/null',
+        GIT_NO_REPLACE_OBJECTS='1', GIT_NO_LAZY_FETCH='1')
+    try:
+        raw = bounded_git(('/usr/bin/git', '--version'), env=environment, limit=4096, timeout=10)
+    except (OSError, ValueError):
+        raise ProducerPrerequisiteUnavailable('Required /usr/bin/git is missing or cannot be checked. ' + instruction) from None
+    parsed = re.fullmatch(rb'git version ([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,4})(?:[ .-][A-Za-z0-9._+-]{1,64})?\n', raw)
+    if parsed is None:
+        raise ProducerPrerequisiteUnavailable('Cannot identify the required /usr/bin/git version. ' + instruction)
+    version = tuple(int(value) for value in parsed.groups())
+    display = '.'.join(str(value) for value in version)
+    if version < (2, 45, 1):
+        raise ProducerPrerequisiteUnavailable('Company source capture requires Git 2.45.1 or newer; '
+            'this host reports Git ' + display + '. ' + instruction)
+    try:
+        protected = bounded_git(('/usr/bin/git', '--no-lazy-fetch', '--version'),
+            env=environment, limit=4096, timeout=10)
+    except (OSError, ValueError):
+        raise ProducerPrerequisiteUnavailable('Required /usr/bin/git cannot enforce --no-lazy-fetch. ' + instruction) from None
+    if protected != raw:
+        raise ProducerPrerequisiteUnavailable('Git prerequisite results disagree; keep the existing source unchanged. ' + instruction)
+    return dict(scope='GIT_FUNCTIONAL_PREREQUISITE_ONLY', gitVersion=display,
+        noLazyFetchOption=True, securityQualification=False, sourceCaptured=False)
+
+
+def prepare_deployment_cli(argv):
+    """Expose the original schema3 capture for a matching fresh foundation."""
+    import argparse
+    parser = argparse.ArgumentParser(description='Capture reviewed deployment source into a fresh schema3 release. Does not build/scan images, sign, install or activate.')
+    parser.add_argument('directory', type=Path)
+    parser.add_argument('source_root', type=Path)
+    parser.add_argument('version')
+    args = parser.parse_args(argv)
+    protected_producer_directories(args.directory, args.source_root)
+    result = prepare_deployment_payload(args.directory, args.source_root, args.version,
+        'x86_64', owner_uid=0, owner_gid=0)
+    raw = (args.directory / 'release.json').read_bytes()
+    print(json.dumps(dict(scope='UNSIGNED_DEPLOYMENT_SOURCE_ONLY',
+        schemaVersion=result['schemaVersion'], releaseSha256=hashlib.sha256(raw).hexdigest(),
+        signed=False, imageSecurityQualified=False, installationActivated=False), sort_keys=True))
+
+
+def prepare_platform_cli(argv):
+    """Expose the existing schema4 producer without inventing image qualification."""
+    import argparse
+    parser = argparse.ArgumentParser(description='Capture reviewed clean Git source into a fresh schema4 release. Does not build/scan images, sign, install or activate.')
+    parser.add_argument('directory', type=Path)
+    parser.add_argument('source_root', type=Path)
+    parser.add_argument('revision')
+    parser.add_argument('version')
+    args = parser.parse_args(argv)
+    protected_producer_directories(args.directory, args.source_root)
+    producer_git_prerequisite()
+    # The three configuration files must already come from the reviewed image
+    # pipeline. Their existence/hash is never labelled an image scan result.
+    platform = _trusted_sibling('platform_source.py')
+    result = prepare_platform_payload(args.directory, args.source_root, args.version,
+        'x86_64', revision=args.revision, git=platform.NativeGit('/usr/bin/git', bounded_git),
+        platform_module=platform, owner_uid=0, owner_gid=0)
+    raw = (args.directory / 'release.json').read_bytes()
+    print(json.dumps(dict(scope='UNSIGNED_COMPLETE_PLATFORM_SOURCE_ONLY',
+        schemaVersion=result['schemaVersion'], sourceRevision=args.revision,
+        releaseSha256=hashlib.sha256(raw).hexdigest(), signed=False,
+        imageSecurityQualified=False, installationActivated=False), sort_keys=True))
+
+
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == '--producer-preflight':
+        if len(sys.argv) != 2: raise SystemExit('Usage: release-manifest.py --producer-preflight')
+        try: print(json.dumps(producer_git_prerequisite(), sort_keys=True))
+        except ProducerPrerequisiteUnavailable as error: raise SystemExit(str(error)) from None
+        sys.exit(0)
+    if len(sys.argv) > 1 and sys.argv[1] == '--complete-deployment-source':
+        prepare_deployment_cli(sys.argv[2:])
+        sys.exit(0)
+    if len(sys.argv) > 1 and sys.argv[1] == '--complete-platform-source':
+        try: prepare_platform_cli(sys.argv[2:])
+        except ProducerPrerequisiteUnavailable as error: raise SystemExit(str(error)) from None
+        sys.exit(0)
     directory, registry, version = Path(sys.argv[1]), sys.argv[2].rstrip("/"), sys.argv[3]
+    complete_revision = os.environ.get('COMPLETE_PLATFORM_REVISION')
+    if complete_revision:
+        try: producer_git_prerequisite()
+        except ProducerPrerequisiteUnavailable as error: raise SystemExit(str(error)) from None
     if any(os.path.lexists(directory / name) for name in ('company-sources.json', 'company-deployment.json', 'release.json')):
         raise SystemExit('Existing company release metadata must be preserved')
     images = json.loads((directory / "upstream.lock.json").read_text())
@@ -240,8 +401,14 @@ if __name__ == "__main__":
         mirrors.append(dict(sourceImage=filesystem_source,targetImage=filesystem_private))
     for name, payload in (("images.lock.json", images), ("runtime-manifest.json", manifest), ("approved-mirrors.json", mirrors)):
         (directory / name).write_text(json.dumps(payload, indent=2) + "\n")
-    prepare_deployment_payload(directory, Path(__file__).resolve().parents[1], version,
-                    subprocess.check_output(["uname", "-m"], text=True).strip(),
-                    owner_uid=os.getuid(), owner_gid=os.getgid())
+    if complete_revision:
+        platform = _trusted_sibling('platform_source.py')
+        prepare_platform_payload(directory, Path(__file__).resolve().parents[1], version,
+            'x86_64', revision=complete_revision, git=platform.NativeGit('/usr/bin/git', bounded_git),
+            platform_module=platform, owner_uid=os.getuid(), owner_gid=os.getgid())
+    else:
+        prepare_deployment_payload(directory, Path(__file__).resolve().parents[1], version,
+                        subprocess.check_output(["uname", "-m"], text=True).strip(),
+                        owner_uid=os.getuid(), owner_gid=os.getgid())
     reports=directory/'reports';reports.mkdir(exist_ok=True)
     (reports/'registry-content.json').write_text(json.dumps(dict(schemaVersion=1,scope='Target registry manifest/config/available layer comparison against independently inspected Linux amd64 source images',images=digest.evidence),indent=2)+'\n')
