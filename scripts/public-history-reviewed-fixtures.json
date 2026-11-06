@@ -53,6 +53,13 @@
     "blobSha256": "17fe0f11df60edef119aead2896e601fce719ddec0e9471665b09ce0df362409",
     "rule": "generic-api-key",
     "line": 24,
-    "reason": "Refreshed SHA-256 source-integrity pin in FIXTURE_PINS after the root-owned 0555 ancestor compatibility fix. The value exactly matches tests/test_company_signed_execute_preparation.py; it is not an authentication credential. The historical blob review remains separate."
+    "reason": "SHA-256 source-integrity pin at line24 in FIXTURE_PINS for tests/test_authenticated_seed.py, after the root-owned 0555 ancestor compatibility update changed this test file. It authenticates test-helper source bytes, not an account or service. The historical blob review remains separate."
+  },
+  {
+    "path": "tests/test_company_fixed_execute_child.py",
+    "blobSha256": "e5c5990f8312a3109aa957e8b35892805d44f5c90017ae462603a2b69c1362ce",
+    "rule": "generic-api-key",
+    "line": 24,
+    "reason": "SHA-256 source-integrity pin at line24 in FIXTURE_PINS for tests/test_authenticated_seed.py after the captured owner-identity catalog/profile-v5 update changed this test file. This exact checksum authenticates test-helper source bytes, not an account or service. Earlier public blob reviews remain separate."
   }
 ]

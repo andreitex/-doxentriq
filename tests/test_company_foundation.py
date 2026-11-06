@@ -220,7 +220,7 @@ class MeasurementFixture:
             ('/usr/bin/findmnt','-n','-o','SIZE','--bytes','--target','/srv/test-foundation/runtime/builds'):b'2147483648\n',
             ('/usr/bin/findmnt','-n','-o','TARGET,SOURCE,FSTYPE','--target','/var/log/journal'):b'/var/log/journal /dev/mapper/autosoft-data[/journal] xfs\n',
             ('/usr/local/bin/runsc','--version'):b'runsc version 20261001.0\n',
-            ('/usr/bin/python3','-I','-B','-c',W.RUNTIME_IDENTITY,'/srv/test-foundation/company/work/gvisor.tar.zstd'):b'{"runsc":"'+b'd'*64+b'","containerd-shim-runsc-v1":"'+b'e'*64+b'"}\n',
+            ('/usr/bin/python3','-I','-B','-c',W.RUNTIME_IDENTITY,'/srv/test-foundation/company/work/gvisor.tar.zstd',self.request['runscSha512']):b'{"runsc":"'+b'd'*64+b'","containerd-shim-runsc-v1":"'+b'e'*64+b'"}\n',
             ('/usr/sbin/swapon','--noheadings','--show'):b''}
         for unit in ('docker.service','containerd.service'):self.responses[('/usr/bin/systemctl','is-active',unit)]=b'active\n'
         self.calls=[];self.runner=SimpleNamespace(run=self.run)
@@ -448,6 +448,7 @@ class FoundationTests(unittest.TestCase):
             else:
                 key=next(key for key in f.responses if W.RUNTIME_IDENTITY in key);f.responses[key]=b'{"runsc":"unverified"}'
             with self.assertRaises(W.FoundationUnavailable):f.measure()
+            self.assertNotIn(('/usr/local/bin/runsc','--version'),f.calls)
     def test_real_effect_parser_tmpfs_oversize_and_swap_denied(self):
         for defect in ('size','swap'):
             f=MeasurementFixture();key=next(key for key in f.responses if ('SIZE' if defect=='size' else '/usr/sbin/swapon') in key)

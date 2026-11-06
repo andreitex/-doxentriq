@@ -58,7 +58,7 @@ jobs:
 
   linux-startup-controls:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - name: Check out the exact source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -68,12 +68,71 @@ jobs:
         run: |
           sudo python3 -I -B scripts/test-quota-startup.py
           python3 -I -B scripts/test-quota-helper.py
+          python3 -I -B scripts/test-host-network.py
       - name: Check installer records and read-only root compatibility
         run: |
           AUTOSOFT_TEST_ARTIFACT_ROOT="$(mktemp -d "${RUNNER_TEMP}/doxentriq-records.XXXXXX")"
           export AUTOSOFT_TEST_ARTIFACT_ROOT
           python3 -I -B tests/test_company_cli_executed_record_store.py
           python3 -I -B tests/test_company_retention_records.py
+          python3 -I -B tests/test_company_configuration.py
+          python3 -I -B tests/test_company_release_producer.py
+          sudo python3 -I -B tests/test_company_configuration_native.py
+      - name: Check captured identity and source execution dependencies
+        run: |
+          AUTOSOFT_TEST_ARTIFACT_ROOT="$(mktemp -d "${RUNNER_TEMP}/doxentriq-source-controls.XXXXXX")"
+          export AUTOSOFT_TEST_ARTIFACT_ROOT
+          python3 -I -B scripts/test-identity.py
+          python3 -I -B tests/test_bootstrap_render_hooks.py
+          python3 -I -B tests/test_company_render_commands.py
+          python3 -I -B tests/test_company_render_package.py
+          python3 -I -B tests/test_identity_provisioning.py
+          python3 -I -B tests/test_company_captured_loader.py
+          python3 -I -B tests/test_company_full_package.py
+          python3 -I -B tests/test_company_full_cli_package.py
+          python3 -I -B tests/test_company_authenticated_cli_inputs.py
+          python3 -I -B tests/test_company_authenticated_cli_compose.py
+          python3 -I -B tests/test_company_signed_execute_preparation.py
+          python3 -I -B tests/test_company_fixed_execute_child.py
+          python3 -I -B tests/test_company_source_owned_execute.py
+          python3 -I -B tests/test_company_startup_worker.py
+      - name: Check foundation entry before host mutation
+        shell: bash
+        run: |
+          DOXENTRIQ_NATIVE_TEST_ROOT=$(sudo mktemp -d /srv/doxentriq-entry.XXXXXX)
+          # This fixture measures actual UID/GID against root installation state.
+          sudo python3 -I -B tests/test_company_runtime_pair_worker.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_foundation_entry_native.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_runtime_identity.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_source_terminal_native.py
+          sudo env DOXENTRIQ_PAIR_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_runtime_pair_native.py
+          sudo env DOXENTRIQ_PAIR_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_runtime_pair_entry_native.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_continuation_entry_native.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            bash --noprofile --norc -c '
+              set -euo pipefail
+              # Raise only this test child to the original worker prerequisite.
+              native_nofile=$(ulimit -Sn)
+              if [[ "$native_nofile" != unlimited ]]; then
+                [[ "$native_nofile" =~ ^[0-9]+$ ]] || exit 74
+                if (( native_nofile < 4096 )); then ulimit -Sn 4096; fi
+              fi
+              exec python3 -I -B tests/test_company_native_retention.py
+            '
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_render_io_native.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_render_openssl_native.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_render_entry_native.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_storage_fault_harness.py
 
   source-build:
     runs-on: ubuntu-latest

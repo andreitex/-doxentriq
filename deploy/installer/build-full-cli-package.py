@@ -34,6 +34,7 @@ PACKAGE_PATHS = (
 OPERATIONAL_PATHS = (
     'scripts/bootstrap.py', 'scripts/checkpoint_admission.py',
     'scripts/company_platform_store.py', 'scripts/company_source_tree.py',
+    'scripts/identity.py',
     'scripts/installation_identity.py', 'scripts/installer_parent.py',
     'scripts/platform_source.py', 'scripts/quota_allocation.py',
     'scripts/quota_runtime.py', 'scripts/registry_manifest.py',

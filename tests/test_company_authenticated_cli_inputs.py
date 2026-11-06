@@ -117,7 +117,7 @@ class Controls(unittest.TestCase):
         self.assertIs(f.V.require_platform_source(f.source),f.source)
         self.assertIs(type(result),MappingProxyType)
         self.assertEqual(set(result['sourceFiles']),f.required)
-        self.assertEqual((len(result['launchPins']),len(result['packagePins']),len(result['operationalCatalog'])),(11,9,15))
+        self.assertEqual((len(result['launchPins']),len(result['packagePins']),len(result['operationalCatalog'])),(11,9,16))
         for path in f.required:
             self.assertEqual(result['sourceFiles'][path],f.values[path])
             self.assertEqual(result['sourceModes'][path],f.modes[path])

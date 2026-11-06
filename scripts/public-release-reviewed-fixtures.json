@@ -55,7 +55,7 @@
   },
   {
     "path": "scripts/bootstrap.py",
-    "sha256": "32cea039d7da0b7f7cc872cdb347787da602a94131527b3337e7668c7c642230",
+    "sha256": "682136e6088a180ad15c12dedc2e86b9d1cb02f59b385c6e473640f6218192e2",
     "code": "credential_url",
     "reason": "URL is assembled from protected runtime credential variables; this reviewed source contains no literal credential in the URL."
   },
@@ -70,5 +70,23 @@
     "sha256": "d5adb3dd23782958a2be0fd7494158a1f6b8015323f0be1f1e2db511453ec4c0",
     "code": "trial_endpoint",
     "reason": "Synthetic isolated filesystem-qualification DNS alias and generated test CA, not a customer address."
+  },
+  {
+    "path": "scripts/bootstrap.py",
+    "sha256": "91bd411f1c6ba6649a1ab479f50c66f8a9dcaf54d623346a6a0f552b1ba9ca7b",
+    "code": "credential_url",
+    "reason": "Redis and RabbitMQ URLs interpolate protected runtime credential variables; AST review after captured identity/render-hook changes confirms no literal credential. This exact source blob also passed independent secret scanning."
+  },
+  {
+    "path": "scripts/bootstrap.py",
+    "sha256": "9835d13c73a658f7e681a35883a0a35c639e57bde0fa089791e31f225f98753c",
+    "code": "credential_url",
+    "reason": "The only URL credential fragments are protected runtime variable interpolations. AST comparison confirms this blob changes only the independently reviewed identity caller, preserving the Redis/RabbitMQ templates and containing no literal credential. Exact public history scanning remains mandatory."
+  },
+  {
+    "path": "scripts/bootstrap.py",
+    "sha256": "0417255ff7c8b86d645812dd45b6f2dedfef8ca92f555bc3371a65c52e9ab1f8",
+    "code": "credential_url",
+    "reason": "Exact reviewed renderer integration preserves Redis/RabbitMQ URL templates composed only from protected runtime credential variables. AST comparison limits changes to certificates, realm and render; it preserves the reviewed identity caller. No literal credential is present in either URL. Complete public history scanning remains mandatory."
   }
 ]

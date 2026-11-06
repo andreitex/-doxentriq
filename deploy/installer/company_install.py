@@ -367,10 +367,10 @@ def measure(state,runner,request,final_root,held,*,output=None):
     require(state.read('/etc/autosoft/runtime-bootstrap.ready') == b'encrypted-runtime-bootstrap-v1\n')
     installed=json.loads(state.read('/etc/autosoft/runtime-installed.json'));require(installed == {'version':request['runscVersion'],'archive_sha512':request['runscSha512']})
     archive=state.read(data/'company/work/gvisor.tar.zstd',128*1024**2);require(hashlib.sha512(archive).hexdigest() == request['runscSha512'])
-    version=runner.run(['/usr/local/bin/runsc','--version'],30);require(version and len(version) <= 4096)
-    runtime=runner.run(['/usr/bin/python3','-I','-B','-c',RUNTIME_IDENTITY,str(data/'company/work/gvisor.tar.zstd')],60)
-    binary_pins=json.loads(runtime);require(type(binary_pins) is dict and set(binary_pins) == {'runsc','containerd-shim-runsc-v1'}
+    runtime=runner.run(['/usr/bin/python3','-I','-B','-c',RUNTIME_IDENTITY,str(data/'company/work/gvisor.tar.zstd'),request['runscSha512']],60)
+    binary_pins=json.loads(runtime);require(type(binary_pins) is dict and set(binary_pins) in (set(RUNTIME_PRIMARY_FILES),set(RUNTIME_PRIMARY_FILES+RUNTIME_SIDECAR_FILES),set(RUNTIME_PRIMARY_FILES+RUNTIME_CURRENT_SIDECAR_FILES))
         and all(type(value) is str and re.fullmatch('[a-f0-9]{64}',value) is not None for value in binary_pins.values()))
+    version=runner.run(['/usr/local/bin/runsc','--version'],30);require(version and len(version) <= 4096)
     require('MaxRetentionSec=7day' in state.read('/etc/systemd/journald.conf.d/autosoft.conf').decode())
     require(not any(line.split()[2] == 'swap' for line in state.read('/etc/fstab').decode().splitlines() if line.strip() and not line.lstrip().startswith('#') and len(line.split()) >= 3))
     require(runner.run(['/usr/sbin/swapon','--noheadings','--show'],30).strip() == b'')
@@ -378,38 +378,160 @@ def measure(state,runner,request,final_root,held,*,output=None):
         'installationId':final['installation_id'],'releaseSha256':held.metadata['releaseSha256'],'treeSha256':output.recheck() if output is not None else inventory(state,final_root,held),
         'hostSha256':sha(canonical(records)),'runscVersionSha256':sha(version),'runtimeBinaryPins':binary_pins,'fullPlatformActivated':False,'backupReady':False,'runtimePairInitialized':False}
 
-RUNTIME_IDENTITY = r'''
-import hashlib,json,os,stat,subprocess,sys,tarfile
-p=subprocess.Popen(['/usr/bin/zstd','-dc','--',sys.argv[1]],stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
-rows={};total=0;count=0
-try:
- with tarfile.open(fileobj=p.stdout,mode='r|') as tar:
-  for member in tar:
-   count+=1;assert count<=32
-   name=member.name.removeprefix('./');assert name in ('runsc','containerd-shim-runsc-v1') and member.isfile() and 0<member.size<=256*1024**2 and name not in rows
-   source=tar.extractfile(member);digest=hashlib.sha256();amount=0
-   while True:
-    raw=source.read(65536)
-    if not raw:break
-    amount+=len(raw);total+=len(raw);assert amount<=member.size and total<=512*1024**2;digest.update(raw)
-   source.close();assert amount==member.size
-   path='/usr/local/bin/'+name;before=os.lstat(path);assert stat.S_ISREG(before.st_mode) and before.st_uid==before.st_gid==0 and before.st_nlink==1 and before.st_mode&0o111 and not before.st_mode&0o022
-   fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC)
-   try:
-    keys=('st_dev','st_ino','st_mode','st_uid','st_gid','st_nlink','st_size','st_mtime_ns','st_ctime_ns');old=tuple(getattr(before,k) for k in keys);assert old==tuple(getattr(os.fstat(fd),k) for k in keys)
-    installed=hashlib.sha256();size=0
+RUNTIME_PRIMARY_FILES = ('runsc', 'containerd-shim-runsc-v1')
+RUNTIME_SIDECAR_FILES = ('gvisor-bin/checkpointgofer', 'gvisor-bin/gvisor-sentry-prewarmer',
+    'gvisor-bin/gvisor_sentry', 'gvisor-bin/runsc-fd-parking', 'gvisor-bin/runsc-metric-server')
+RUNTIME_CURRENT_SIDECAR_FILES = RUNTIME_SIDECAR_FILES + ('gvisor-bin/gvisor-proc-umounter',)
+
+# The complete pinned archive determines whether this is a legacy two-file
+# release or one of the exact supported sidecar layouts. Never ignore a sidecar.
+RUNTIME_IDENTITY = 'PRIMARY='+repr(RUNTIME_PRIMARY_FILES)+'\nSIDECARS='+repr(RUNTIME_SIDECAR_FILES)+'\nCURRENT_SIDECARS='+repr(RUNTIME_CURRENT_SIDECAR_FILES)+'\n'+r'''
+import contextlib,fcntl,hashlib,json,os,re,stat,subprocess,sys,tarfile
+KEYS=('st_dev','st_ino','st_mode','st_uid','st_gid','st_nlink','st_size','st_mtime_ns','st_ctime_ns')
+def identity(info):return tuple(getattr(info,key) for key in KEYS)
+def close_all(fds):
+ failed=False
+ for fd in reversed(fds):
+  try:os.close(fd)
+  except OSError:failed=True
+ assert not failed
+@contextlib.contextmanager
+def pinned_archive(path,expected):
+ assert os.geteuid()==os.getegid()==0 and re.fullmatch('[a-f0-9]{128}',expected)
+ assert path.startswith('/') and all(part not in ('','.','..') for part in path[1:].split('/'))
+ owned=[];directories=[]
+ def check():
+  for fd,name,before in directories:assert identity(os.fstat(fd))==before==identity(os.lstat(name))
+  assert identity(os.fstat(archive))==original==identity(os.stat(leaf,dir_fd=parent,follow_symlinks=False))
+ try:
+  parent=None;current=''
+  for part in ('/',*path[1:].split('/')[:-1]):
+   current='/' if part=='/' else current.rstrip('/')+'/'+part
+   before=os.lstat(current)
+   assert stat.S_ISDIR(before.st_mode) and before.st_uid==before.st_gid==0 and not before.st_mode&0o022
+   fd=os.open(current if parent is None else part,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC,dir_fd=parent)
+   owned.append(fd);directories.append((fd,current,identity(before)));parent=fd
+   assert identity(os.fstat(fd))==identity(before)
+  leaf=path.rsplit('/',1)[1];before=os.stat(leaf,dir_fd=parent,follow_symlinks=False)
+  assert stat.S_ISREG(before.st_mode) and before.st_uid==before.st_gid==0 and before.st_nlink==1
+  assert not before.st_mode&0o022 and 0<before.st_size<=128*1024**2
+  archive=os.open(leaf,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC,dir_fd=parent);owned.append(archive)
+  original=identity(before);check()
+  captured=os.memfd_create('doxentriq-runtime-archive',os.MFD_CLOEXEC|os.MFD_ALLOW_SEALING);owned.append(captured)
+  digest=hashlib.sha512();size=0
+  while size<before.st_size:
+   raw=os.pread(archive,min(65536,before.st_size-size),size);assert raw
+   digest.update(raw);size+=len(raw);view=memoryview(raw)
+   while view:
+    written=os.write(captured,view);assert written>0;view=view[written:]
+  assert digest.hexdigest()==expected and not os.pread(archive,1,size)
+  check()
+  seals=fcntl.F_SEAL_SEAL|fcntl.F_SEAL_SHRINK|fcntl.F_SEAL_GROW|fcntl.F_SEAL_WRITE
+  fcntl.fcntl(captured,fcntl.F_ADD_SEALS,seals);assert fcntl.fcntl(captured,fcntl.F_GET_SEALS)==seals
+  os.lseek(captured,0,os.SEEK_SET)
+  yield captured
+  check()
+  final=hashlib.sha512();offset=0
+  while offset<size:
+   raw=os.pread(archive,min(65536,size-offset),offset);assert raw
+   final.update(raw);offset+=len(raw)
+  assert final.hexdigest()==expected and not os.pread(archive,1,offset)
+  check()
+ finally:close_all(owned)
+def verify_stream(stream,root='/usr/local/bin'):
+ assert os.geteuid()==os.getegid()==0 and root.startswith('/') and root!='/'
+ assert all(part not in ('','.','..') for part in root[1:].split('/'))
+ held=[];leaves=[];owned=[];rows={};seen=set();total=0;sidecars=False
+ def hold(path,parent=None,name=None):
+  before=os.lstat(path) if parent is None else os.stat(name,dir_fd=parent,follow_symlinks=False)
+  assert stat.S_ISDIR(before.st_mode) and before.st_uid==before.st_gid==0 and not before.st_mode&0o022
+  fd=os.open(path if parent is None else name,os.O_RDONLY|os.O_NOFOLLOW|os.O_DIRECTORY|os.O_CLOEXEC,dir_fd=parent)
+  owned.append(fd)
+  held.append((fd,path,identity(before)))
+  assert identity(os.fstat(fd))==identity(before)
+  return fd
+ def check():
+  for fd,path,before in held:assert identity(os.fstat(fd))==before==identity(os.lstat(path))
+  for fd,parent,name,before,size,digest in leaves:
+   assert identity(os.fstat(fd))==before==identity(os.stat(name,dir_fd=parent,follow_symlinks=False))
+ def read_digest(fd,size):
+  digest=hashlib.sha256();offset=0
+  while offset<size:
+   raw=os.pread(fd,min(65536,size-offset),offset);assert raw
+   offset+=len(raw);digest.update(raw)
+  assert not os.pread(fd,1,size)
+  return digest.hexdigest()
+ def file_digest(parent,name,expected_size):
+  before=os.stat(name,dir_fd=parent,follow_symlinks=False)
+  assert stat.S_ISREG(before.st_mode) and before.st_uid==before.st_gid==0 and before.st_nlink==1
+  assert stat.S_IMODE(before.st_mode)==0o755 and before.st_size==expected_size
+  fd=os.open(name,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC,dir_fd=parent)
+  owned.append(fd)
+  old=identity(before);assert old==identity(os.fstat(fd))
+  digest=read_digest(fd,expected_size)
+  leaves.append((fd,parent,name,old,expected_size,digest));check()
+  return digest
+ class Bounded:
+  def __init__(self,source):self.source=source;self.size=0
+  def read(self,size):
+   assert isinstance(size,int) and size>=0
+   raw=self.source.read(min(size,65536));self.size+=len(raw)
+   assert self.size<=512*1024**2+128*1024
+   return raw
+ bounded=Bounded(stream)
+ try:
+  parent=hold('/');path=''
+  for part in root[1:].split('/'):
+   path+='/'+part;parent=hold(path,parent,part)
+  root_fd=parent;sidecar_fd=None
+  with tarfile.open(fileobj=bounded,mode='r|') as tar:
+   for member in tar:
+    name=member.name.removeprefix('./')
+    assert name not in seen and len(seen)<9 and not member.linkname and member.sparse is None
+    assert member.mode==0o755
+    seen.add(name);check()
+    if name=='gvisor-bin':
+     assert member.isdir() and member.size==0
+     sidecar_fd=hold(root+'/gvisor-bin',root_fd,'gvisor-bin');sidecars=True
+     continue
+    assert name in PRIMARY+CURRENT_SIDECARS and member.isfile() and 0<member.size<=256*1024**2
+    if name in CURRENT_SIDECARS:
+     if sidecar_fd is None:sidecar_fd=hold(root+'/gvisor-bin',root_fd,'gvisor-bin')
+     sidecars=True;file_parent=sidecar_fd;basename=name.split('/')[1]
+    else:file_parent=root_fd;basename=name
+    source=tar.extractfile(member);digest=hashlib.sha256();amount=0
     while True:
-     raw=os.read(fd,65536)
+     raw=source.read(65536)
      if not raw:break
-     size+=len(raw);assert size<=member.size;installed.update(raw)
-    assert size==member.size and installed.digest()==digest.digest() and old==tuple(getattr(os.fstat(fd),k) for k in keys)==tuple(getattr(os.lstat(path),k) for k in keys)
-   finally:os.close(fd)
-   rows[name]=digest.hexdigest()
- assert set(rows)=={'runsc','containerd-shim-runsc-v1'} and p.wait(timeout=5)==0
+     amount+=len(raw);total+=len(raw);assert amount<=member.size and total<=512*1024**2;digest.update(raw)
+    source.close();assert amount==member.size
+    assert file_digest(file_parent,basename,member.size)==digest.hexdigest()
+    rows[name]=digest.hexdigest();check()
+  while bounded.read(65536):pass
+  companions=CURRENT_SIDECARS if set(rows)&(set(CURRENT_SIDECARS)-set(SIDECARS)) else SIDECARS
+  expected=set(PRIMARY+companions) if sidecars else set(PRIMARY)
+  assert set(rows)==expected and seen==(expected|{'gvisor-bin'} if sidecars else expected)
+  if sidecars:assert set(os.listdir(sidecar_fd))=={name.split('/')[1] for name in companions}
+  else:assert not os.path.lexists(root+'/gvisor-bin')
+  for fd,_,_,_,size,digest in leaves:
+   check();assert read_digest(fd,size)==digest
+  check();return rows
+ finally:close_all(owned)
+def decode_archive(archive):
+ p=subprocess.Popen(['/usr/bin/zstd','-dc'],stdin=archive,stdout=subprocess.PIPE,
+     stderr=subprocess.DEVNULL,env={'PATH':'/usr/bin:/bin','LC_ALL':'C','LANG':'C'},cwd='/',close_fds=True)
+ try:
+  rows=verify_stream(p.stdout)
+  assert p.wait(timeout=5)==0
+  return rows
+ finally:
+  if p.stdout is not None:p.stdout.close()
+  if p.returncode is None:p.kill();p.wait(timeout=5)
+def main():
+ assert len(sys.argv)==3
+ with pinned_archive(sys.argv[1],sys.argv[2]) as archive:rows=decode_archive(archive)
  print(json.dumps(rows,sort_keys=True))
-finally:
- if p.stdout is not None:p.stdout.close()
- if p.returncode is None:p.kill();p.wait(timeout=5)
+if __name__=='__main__':main()
 '''
 
 class Worker:

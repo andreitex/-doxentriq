@@ -34,7 +34,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         self.close_connection=True
-        if self.path not in {'/v1/storage','/v1/telemetry'} or len(self.headers.get_all('Authorization',[]))!=1 or not authenticated(self.headers.get('Authorization',''),TOKEN):
+        if self.path not in {'/v1/storage','/v1/telemetry','/v1/network-snapshot'} or len(self.headers.get_all('Authorization',[]))!=1 or not authenticated(self.headers.get('Authorization',''),TOKEN):
             self.send_error(403);return
         try:
             lengths=self.headers.get_all('Content-Length',[])
@@ -43,7 +43,10 @@ class Handler(BaseHTTPRequestHandler):
             raw=self.rfile.read(count);require(len(raw)==count)
             value=decode(raw,4096)
             self.read_deadline.cancel()
-            if self.path=='/v1/telemetry':
+            if self.path=='/v1/network-snapshot':
+                require(type(value) is dict and not value)
+                response=_runtime.host_network_snapshot()
+            elif self.path=='/v1/telemetry':
                 require(type(value) is dict and not value)
                 response={'host':host_telemetry()}
             else:
@@ -54,7 +57,7 @@ class Handler(BaseHTTPRequestHandler):
             data=json.dumps(response,allow_nan=False).encode()
             self.send_response(200);self.send_header('Content-Type','application/json');self.send_header('Content-Length',str(len(data)));self.end_headers();self.wfile.write(data)
         except Exception:
-            self.send_error(503,'Storage quota could not be independently verified')
+            self.send_error(503,'Host network observation unavailable; ask IT to check the platform host service' if self.path=='/v1/network-snapshot' else 'Storage quota could not be independently verified')
 
 # BaseServer permits host-independent import/validation on Windows. main()
 # rejects unsupported hosts before any service construction.

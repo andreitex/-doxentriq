@@ -128,14 +128,14 @@ class PackageControls(unittest.TestCase):
         with self.assertRaises(B.FullPackageUnavailable):
             function()
 
-    def test_closed_nine_and_fifteen_captured_before_inert_output(self):
+    def test_closed_package_and_operational_catalog_captured_before_inert_output(self):
         with patch('builtins.compile', side_effect=AssertionError('capture code execution')):
             raw = self.f.build()
         value = self.f.validate(raw)
         self.assertEqual([name for name, _ in self.f.events], list(B.PACKAGE_PATHS)+list(B.OPERATIONAL_PATHS))
         self.assertEqual(value['scope'], 'FULL_INSTALLATION_COMPOSITION_ONLY')
         self.assertEqual(len(value['records']), 9)
-        self.assertEqual(len(value['operationalCatalog']), 15)
+        self.assertEqual(len(value['operationalCatalog']), 16)
         self.assertEqual(value['records'][B.PACKAGE_PATHS[-1]]['bytes'], len(self.f.files[B.PACKAGE_PATHS[-1]]))
 
     def test_actual_current_modules_fit_and_original_six_contract_preserved(self):
@@ -208,7 +208,7 @@ class PackageControls(unittest.TestCase):
             return self.f.reader(path, maximum) + (b'x' if name == B.OPERATIONAL_PATHS[-1]
                 and len(self.f.events) > 9 else b'')
         self.reject(lambda: self.f.build(reader=read))
-        self.assertEqual(len(self.f.events), 24)
+        self.assertEqual(len(self.f.events), 25)
 
     def test_reader_cannot_return_mutable_or_text_capture(self):
         for raw in (bytearray(b'x'), 'x', None):

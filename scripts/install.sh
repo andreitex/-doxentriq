@@ -23,7 +23,7 @@ prepare_runtime_gate /etc/autosoft /etc/systemd/system
 case "$ID:$VERSION_ID" in
   debian:12|debian:13)
     apt-get update
-    apt-get install -y ca-certificates curl gnupg openssl cryptsetup cryptsetup-bin util-linux xfsprogs e2fsprogs python3 tar zstd rsync git apache2-utils
+    apt-get install -y ca-certificates curl gnupg openssl cryptsetup cryptsetup-bin util-linux iproute2 xfsprogs e2fsprogs python3 tar zstd rsync git apache2-utils
     if [[ "$VERSION_ID" = 13 ]]; then apt-get install -y systemd-cryptsetup; fi
     install -d -m 0755 /etc/apt/keyrings
     curl --fail --proto '=https' --tlsv1.2 https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
@@ -33,7 +33,7 @@ case "$ID:$VERSION_ID" in
     apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     ;;
   rocky:9*|rocky:10*)
-    dnf install -y ca-certificates curl gnupg2 openssl cryptsetup util-linux xfsprogs e2fsprogs python3 tar zstd rsync git httpd-tools policycoreutils-python-utils
+    dnf install -y ca-certificates curl gnupg2 openssl cryptsetup util-linux iproute xfsprogs e2fsprogs python3 tar zstd rsync git httpd-tools policycoreutils-python-utils
     curl --fail --proto '=https' --tlsv1.2 https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/autosoft-docker.repo
     dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     ;;
