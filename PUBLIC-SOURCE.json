@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "status": "source_candidate_not_published",
   "licenseSelected": true,
-  "fileCount": 686,
+  "fileCount": 689,
   "excludedFileCount": 709,
   "transformedFileCount": 29,
   "publicSourceCheck": {
     "schemaVersion": 1,
     "ready": true,
-    "candidateFiles": 686,
-    "scannedFiles": 686,
+    "candidateFiles": 689,
+    "scannedFiles": 689,
     "reviewedFixtureFindings": 12,
     "findingCounts": {},
     "findings": [],
@@ -31,8 +31,8 @@
     },
     {
       "path": ".github/workflows/public-source-readiness.yml",
-      "sourceSha256": "2ab9b433c32f0d2a5d25796c6672b8bb707f5bdf578d2470455ff2e985be585e",
-      "exportSha256": "2ab9b433c32f0d2a5d25796c6672b8bb707f5bdf578d2470455ff2e985be585e",
+      "sourceSha256": "c71eb70428522699656f489e4addba24097d00bfaf2a1060f240e2352381dc2b",
+      "exportSha256": "c71eb70428522699656f489e4addba24097d00bfaf2a1060f240e2352381dc2b",
       "transformations": []
     },
     {
@@ -883,8 +883,8 @@
     },
     {
       "path": "deploy/Dockerfile.platform",
-      "sourceSha256": "6c7bb63094d339716e3f17258a38632da1549e08e9bb799183404391c7f8b1ce",
-      "exportSha256": "6c7bb63094d339716e3f17258a38632da1549e08e9bb799183404391c7f8b1ce",
+      "sourceSha256": "6dd795ea67f4ab8ded2fc72a65dc7d339d7feeb45e11a4959ed9ae8740464db0",
+      "exportSha256": "6dd795ea67f4ab8ded2fc72a65dc7d339d7feeb45e11a4959ed9ae8740464db0",
       "transformations": []
     },
     {
@@ -1568,6 +1568,12 @@
       "transformations": []
     },
     {
+      "path": "docs/identity-provisioning-transport.md",
+      "sourceSha256": "76a71e0a601b1c5051b33f3c823cbd0a55d89bbeaeffdf11d1ed29ec0bc4700b",
+      "exportSha256": "76a71e0a601b1c5051b33f3c823cbd0a55d89bbeaeffdf11d1ed29ec0bc4700b",
+      "transformations": []
+    },
+    {
       "path": "docs/identity.md",
       "sourceSha256": "23b535a23c7733f057885666a2685a209786b88ca75b3567778fa51f4525106f",
       "exportSha256": "d54f65c263e6e710780ca0573099e6d252db18ba03f3b8e74a00e8e5b488e372",
@@ -1891,8 +1897,8 @@
     },
     {
       "path": "package.json",
-      "sourceSha256": "c70fbd6bf40b624d557ff64b49337ef106d156b6d2783a04af8c9c3c8960b4c5",
-      "exportSha256": "c70fbd6bf40b624d557ff64b49337ef106d156b6d2783a04af8c9c3c8960b4c5",
+      "sourceSha256": "79fe6347b9a3f9ce622534da3761c399bd940af72b9a563572f553e948bdb1af",
+      "exportSha256": "79fe6347b9a3f9ce622534da3761c399bd940af72b9a563572f553e948bdb1af",
       "transformations": []
     },
     {
@@ -2131,8 +2137,8 @@
     },
     {
       "path": "scripts/bootstrap.py",
-      "sourceSha256": "91bd411f1c6ba6649a1ab479f50c66f8a9dcaf54d623346a6a0f552b1ba9ca7b",
-      "exportSha256": "91bd411f1c6ba6649a1ab479f50c66f8a9dcaf54d623346a6a0f552b1ba9ca7b",
+      "sourceSha256": "9835d13c73a658f7e681a35883a0a35c639e57bde0fa089791e31f225f98753c",
+      "exportSha256": "9835d13c73a658f7e681a35883a0a35c639e57bde0fa089791e31f225f98753c",
       "transformations": []
     },
     {
@@ -2319,8 +2325,14 @@
     },
     {
       "path": "scripts/keycloak-provision.mjs",
-      "sourceSha256": "82046d0dd3169f84c289816ab0d28bd85ff4d864f16c0c833960ea1643140cb3",
-      "exportSha256": "82046d0dd3169f84c289816ab0d28bd85ff4d864f16c0c833960ea1643140cb3",
+      "sourceSha256": "f333229fca2727b81143917b166cce8e2e9ecc526297bb85865d2c9dda2d1194",
+      "exportSha256": "f333229fca2727b81143917b166cce8e2e9ecc526297bb85865d2c9dda2d1194",
+      "transformations": []
+    },
+    {
+      "path": "scripts/keycloak-provision.test.mjs",
+      "sourceSha256": "034bdea748e54bbfc02675c34e235793f95ff09c2e6b1cf023ab23aedffa8192",
+      "exportSha256": "034bdea748e54bbfc02675c34e235793f95ff09c2e6b1cf023ab23aedffa8192",
       "transformations": []
     },
     {
@@ -2451,8 +2463,8 @@
     },
     {
       "path": "scripts/public-release-reviewed-fixtures.json",
-      "sourceSha256": "52aa6d648ad3709cd445900a86afa7733af614cd121ab99b2b005426da7d369b",
-      "exportSha256": "52aa6d648ad3709cd445900a86afa7733af614cd121ab99b2b005426da7d369b",
+      "sourceSha256": "25f483c6dd093987b44cd1c61a0788657a32fd5cf4eb4a15683322f3bbe961e2",
+      "exportSha256": "25f483c6dd093987b44cd1c61a0788657a32fd5cf4eb4a15683322f3bbe961e2",
       "transformations": []
     },
     {
@@ -2601,8 +2613,8 @@
     },
     {
       "path": "scripts/test-company-linux.sh",
-      "sourceSha256": "6215756246ca5c706b7d3edb323cb9bde3183a2599abdeb5b5234cbf6b73861c",
-      "exportSha256": "6215756246ca5c706b7d3edb323cb9bde3183a2599abdeb5b5234cbf6b73861c",
+      "sourceSha256": "eab51113bcf81e198483442c72951bea7971ace68f4562e2a1564f09dd5e7bb5",
+      "exportSha256": "eab51113bcf81e198483442c72951bea7971ace68f4562e2a1564f09dd5e7bb5",
       "transformations": []
     },
     {
@@ -4087,6 +4099,12 @@
       "path": "tests/test_company_stored_startup.py",
       "sourceSha256": "af2ffb8d7afcc784ccf3753736958810f5474525d0c72b0c825e0946bb98f8cc",
       "exportSha256": "af2ffb8d7afcc784ccf3753736958810f5474525d0c72b0c825e0946bb98f8cc",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_identity_provisioning.py",
+      "sourceSha256": "2a8615dc76923858f2c9e67486f2a53431e79fd9c8c212e5bcc2c6749d54aa45",
+      "exportSha256": "2a8615dc76923858f2c9e67486f2a53431e79fd9c8c212e5bcc2c6749d54aa45",
       "transformations": []
     },
     {

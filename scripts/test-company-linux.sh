@@ -49,6 +49,7 @@ names.extend(('scripts/test-quota-command.py','scripts/test-runtime-layout.py','
 names.extend(('scripts/test-installation-wiring.py','scripts/test-installation-budgets.py','scripts/test-install-lock.py'))
 names.append('scripts/test-installation-status.py')
 names.append('scripts/test-host-network.py')
+names.append('tests/test_identity_provisioning.py')
 names.extend(('scripts/test-startup-binding.py','scripts/test-runtime-pair-init.py','scripts/test-install-lock-verification.py'))
 names.extend(('scripts/test-installer-parent.py','scripts/test-recovery-catalog.py'))
 names.append('scripts/test-company-source.py')

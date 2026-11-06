@@ -873,17 +873,19 @@ def verify(data, *, source_verifier=None, command=None):
 
 
 def provision_identity(data, root):
-    import time
     images = json.loads((data / "config/images.lock.json").read_text())
     payload = dict(bootstrapPassword=(data / "secrets/keycloak/bootstrap-password").read_text().strip(), provisionerSecret=(data / "secrets/runtime/keycloak-client").read_text().strip(), directoryReaderSecret=(data / "secrets/runtime/keycloak-directory-reader").read_text().strip())
-    args = ["docker", "run", "--rm", "--network=autosoft_identity", "--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--env", "NODE_EXTRA_CA_CERTS=/etc/autosoft/ca.crt", "--volume", f"{data / 'tls/ca.crt'}:/etc/autosoft/ca.crt:ro,z", "--volume", f"{root / 'scripts/keycloak-provision.mjs'}:/opt/provision.mjs:ro,z", "-i", images["platform"], "node", "/opt/provision.mjs"]
-    for attempt in range(60):
+    args = ["docker", "run", "--rm", "--pull=never", "--network=autosoft_identity", "--read-only", "--cap-drop=ALL", "--security-opt=no-new-privileges", "--env", "NODE_EXTRA_CA_CERTS=/etc/autosoft/ca.crt", "--volume", f"{data / 'tls/ca.crt'}:/etc/autosoft/ca.crt:ro,z", "--volume", f"{root / 'scripts/keycloak-provision.mjs'}:/opt/provision.mjs:ro,z", "-i", images["platform"], "node", "/opt/provision.mjs"]
+    # The service must already be healthy before this mutation. A transport
+    # failure may follow a committed client/role change: never replay the whole
+    # provisioning operation automatically or conceal that uncertain outcome.
+    try:
         result = subprocess.run(args, input=json.dumps(payload).encode(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        if result.returncode == 0:
-            print("Scoped identity provisioners validated.")
-            return
-        time.sleep(2)
-    raise ValueError("Scoped identity provisioner did not initialize; public startup is refused")
+    except OSError:
+        raise ValueError("Identity setup did not complete. Inspect the identity service and retained setup state before retrying; public startup is refused.") from None
+    if result.returncode != 0:
+        raise ValueError("Identity setup did not complete. Its state may already have changed; inspect it before retrying. Public startup is refused.")
+    print("Scoped identity provisioners validated.")
 
 
 def validate_mirrors(mirrors, manifest, images):

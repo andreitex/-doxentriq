@@ -84,6 +84,7 @@ jobs:
           export AUTOSOFT_TEST_ARTIFACT_ROOT
           python3 -I -B scripts/test-identity.py
           python3 -I -B tests/test_bootstrap_render_hooks.py
+          python3 -I -B tests/test_identity_provisioning.py
           python3 -I -B tests/test_company_captured_loader.py
           python3 -I -B tests/test_company_full_package.py
           python3 -I -B tests/test_company_full_cli_package.py
@@ -92,12 +93,13 @@ jobs:
           python3 -I -B tests/test_company_signed_execute_preparation.py
           python3 -I -B tests/test_company_fixed_execute_child.py
           python3 -I -B tests/test_company_source_owned_execute.py
-          python3 -I -B tests/test_company_runtime_pair_worker.py
           python3 -I -B tests/test_company_startup_worker.py
       - name: Check foundation entry before host mutation
         shell: bash
         run: |
           DOXENTRIQ_NATIVE_TEST_ROOT=$(sudo mktemp -d /srv/doxentriq-entry.XXXXXX)
+          # This fixture measures actual UID/GID against root installation state.
+          sudo python3 -I -B tests/test_company_runtime_pair_worker.py
           sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
             python3 -I -B tests/test_company_foundation_entry_native.py
           sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
