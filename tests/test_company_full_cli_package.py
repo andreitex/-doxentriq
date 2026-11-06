@@ -76,7 +76,7 @@ class DeliveryControls(unittest.TestCase):
         self.assertEqual(value['launchCaptures'], {path: self.f.files[path] for path in D.LAUNCH_PATHS})
         self.assertEqual(value['fullPackage'], self.f.full)
         self.assertEqual(value['fullCaptures'], {path: self.f.files[path] for path in D.PACKAGE_PATHS})
-        self.assertEqual(len(self.f.reads), 11 + 9 + 15)
+        self.assertEqual(len(self.f.reads), 11 + 9 + 16)
         self.assertEqual([path for path, maximum in self.f.reads], [*D.LAUNCH_PATHS, *D.PACKAGE_PATHS, *D.OPERATIONAL_PATHS])
         self.assertTrue(all(maximum == len(self.f.files[path]) for path, maximum in self.f.reads))
         self.assertEqual(raw, self.f.assemble())

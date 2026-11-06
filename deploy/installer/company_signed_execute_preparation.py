@@ -20,9 +20,9 @@ HELPERS=(
  ('execution-status','deploy/installer/company_bash_execution_status.py','1ca5846d66a066f503af0a45786f1362847c6ccfaf919481527e760d14fdcd80',12797),
  ('verify-invocation','deploy/installer/company_cli_verify_invocation.py','5a4d9a475a4a77f4b0e2fce46bf48ad31825b279581840cde2fe5a9ec4e9d47d',7206),
  ('execute-bootstrap','deploy/installer/company_cli_execute_bootstrap.py','19c396d40bd74bc3672effaa9ddb6be5dd35534be1e3dd3edd652137f4880277',14062),
- ('source-inputs','deploy/installer/company_authenticated_cli_inputs.py','99156be4b544dbe16fecd47b977ff790de49863588703fe1317a253dc6840928',14204),
- ('composition','deploy/installer/company_authenticated_cli_compose.py','365e8c48ad86d90063e8e7a5305bc383d80bbfc62171040c67e52efd21819aea',17289),
- ('delivery','deploy/installer/build-full-cli-package.py','05e04b4e86c35d1bcc70ae0c251088e8b9789968ef070c2ae983393e2cc70a12',10266),
+ ('source-inputs','deploy/installer/company_authenticated_cli_inputs.py','c1ffe29b2ba8f88fa7ce0156c6ef8f68007724e1cad9c857efea42d800940053',14226),
+ ('composition','deploy/installer/company_authenticated_cli_compose.py','85ae33ba03fab21ae50da3b00a1866abfcfe105ae86f513371dd62daf8b8e841',17289),
+ ('delivery','deploy/installer/build-full-cli-package.py','a3e95b485596769f70955dfd0c2734646b9ed7c7cb851270bfbe35610e87ecc6',10293),
 )
 PROGRAMS=(('cli','deploy/installer/company_full_cli.py'),('delivery','deploy/installer/build-full-cli-package.py'),('record','deploy/installer/company_cli_record.py'),('io','deploy/installer/company_cli_record_io.py'),('publisher','deploy/installer/company_cli_record_publish.py'),('captured','deploy/installer/company_cli_captured_publish.py'),('crypto','deploy/installer/company_release_crypto.py'),('stage','deploy/installer/company_cli_stage_child.py'))
 BOOTSTRAP=(('verifier','scripts/verify-release.py'),('parent','scripts/installer_parent.py'))
@@ -163,7 +163,7 @@ def _factory(public,error_kind,namespace,primitives):
     found=vars(helper).get(key);need(type(found) is tuple and len(found)==len(expected) and all(type(row) is tuple and len(row)==2 and all(type(item) is str for item in row) for row in found));need(found==expected)
    getter=gettype(bootstrap_kind,'__dict__').get('construction_modules');need(type(getter) is property and type(getter.fget) is fn and getter.fget.__globals__ is vars(helper));record['construction_getter']=getter.fget;record['functions']+=tuple(function(value) for value in (capture_bootstrap,getter.fget));record['tables']+=(tables(bootstrap_kind),)
    bootstrap=boundary(record,'original-execute-bootstrap-capture',capture_bootstrap,actual,actual_pins,sys_module=sys_module,_save='bootstrap');need(type(bootstrap) is bootstrap_kind);live(record)
-   record['summary']=proxy(dict(scope='SIGNED_EXECUTE_PREPARATION_DATA_ONLY',deliveryRaw=delivery['deliveryRaw'],authentication=frozen(auth),programCaptures=proxy(actual),programPins=frozen(actual_pins),helperPins=frozen(record['helper_pins']),signedHelperCount=15,signedHelperBytes=246382,sourceObjectTransferred=False,downstreamOriginalSourceReauthenticationRequired=True,initialOriginSelfAuthenticated=False,operationalCodeCompiled=False,childPrepared=False,stageDispatched=False,nativeExecuted=False,executionEvidenceIssued=False,stageAcknowledged=False))
+   record['summary']=proxy(dict(scope='SIGNED_EXECUTE_PREPARATION_DATA_ONLY',deliveryRaw=delivery['deliveryRaw'],authentication=frozen(auth),programCaptures=proxy(actual),programPins=frozen(actual_pins),helperPins=frozen(record['helper_pins']),signedHelperCount=15,signedHelperBytes=246431,sourceObjectTransferred=False,downstreamOriginalSourceReauthenticationRequired=True,initialOriginSelfAuthenticated=False,operationalCodeCompiled=False,childPrepared=False,stageDispatched=False,nativeExecuted=False,executionEvidenceIssued=False,stageAcknowledged=False))
    value=object.__new__(kind);record['value']=value;registry[id(value)]=record;guard(record);return value
   except BaseException as error:retain(record,'signed-execute-prepare',error);deny()
  def main(argv=None):deny()

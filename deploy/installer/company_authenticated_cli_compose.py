@@ -106,7 +106,7 @@ def _factory(public,error_kind,namespace,primitives):
  def reader(record,path,maximum):
   live(record);need(type(path) is record['path_kind'] and type(maximum) is int and 0<maximum<=8388608)
   text=record['path_str'](path);need(type(text) is str and text in record['reader_bytes']);raw=record['reader_bytes'][text];need(len(raw)==maximum)
-  record['reads']+=1;need(record['reads']<=59);record['returns'].append(('signed-source-reader',raw));live(record);return raw
+  record['reads']+=1;need(record['reads']<=61);record['returns'].append(('signed-source-reader',raw));live(record);return raw
  def close(record):
   live(record);need(record['entered'] and not record['exit_attempted']);cm_check(record,after_enter=True);record['exit_attempted']=True
   value=record['exit'](record['cm'],None,None,None);record['returns'].append(('original-cli-context-exit',value));guard(record);cm_check(record,after_enter=True);need(record['generator'].gi_frame is None)
@@ -168,12 +168,12 @@ def _factory(public,error_kind,namespace,primitives):
   used=True
   try:
    live(record);data=boundary(record,'original-source-inputs-capture',input_capture,source_inputs,_save='data');need(type(data) is proxy and all(type(key) is str for key in data) and data.get('scope')=='AUTHENTICATED_CLI_SOURCE_INPUT_DATA_ONLY')
-   files=data['sourceFiles'];need(type(files) is proxy and len(files)==33 and all(type(path) is str and type(raw) is bytes for path,raw in files.items()))
-   record['reader_bytes']={path_str(prefix/path):raw for path,raw in files.items()};need(len(record['reader_bytes'])==33)
+   files=data['sourceFiles'];need(type(files) is proxy and len(files)==34 and all(type(path) is str and type(raw) is bytes for path,raw in files.items()))
+   record['reader_bytes']={path_str(prefix/path):raw for path,raw in files.items()};need(len(record['reader_bytes'])==34)
    launch=plain_rows(data['launchPins']);package=plain_rows(data['packagePins']);catalog=plain_rows(data['operationalCatalog'],logical=True);fingerprint=data['fingerprint'];need(type(fingerprint) is str and len(fingerprint)==64)
    fixed_reader=lambda path,maximum:reader(record,path,maximum)
    full=boundary(record,'original-package-assemble',assemble_package,prefix,fingerprint,package_pins=package,operational_catalog=catalog,reader=fixed_reader,_save='full');need(type(full) is bytes and 0<len(full)<=524288);full_pin=dict(bytes=len(full),sha256=digest(full).hexdigest())
-   delivery=boundary(record,'original-delivery-assemble',assemble_delivery,prefix,launch_pins=launch,package_pins=package,operational_catalog=catalog,fingerprint=fingerprint,full_package_raw=full,full_package_pin=full_pin,reader=fixed_reader,_save='delivery');need(type(delivery) is bytes and 0<len(delivery)<=1048576 and record['reads']==59);delivery_pin=dict(bytes=len(delivery),sha256=digest(delivery).hexdigest())
+   delivery=boundary(record,'original-delivery-assemble',assemble_delivery,prefix,launch_pins=launch,package_pins=package,operational_catalog=catalog,fingerprint=fingerprint,full_package_raw=full,full_package_pin=full_pin,reader=fixed_reader,_save='delivery');need(type(delivery) is bytes and 0<len(delivery)<=1048576 and record['reads']==61);delivery_pin=dict(bytes=len(delivery),sha256=digest(delivery).hexdigest())
    bootstrap=data['bootstrapRecords'];need(type(bootstrap) is proxy and len(bootstrap)==2 and all(type(key) is str and type(raw) is bytes for key,raw in bootstrap.items()))
    auth=dict(delivery_module=delivery_module,delivery_pin=delivery_pin,launch_pins=launch,package_pins=package,operational_catalog=catalog,fingerprint=fingerprint,full_package_pin=full_pin,bootstrap_records=dict(bootstrap),bootstrap_pins=plain_rows(data['bootstrapPins']),running_cli_raw=files['deploy/installer/company_full_cli.py']);record['auth']=auth
    record['summary']=proxy(dict(scope='AUTHENTICATED_CLI_COMPOSITION_DATA_ONLY',fullPackageRaw=full,fullPackagePin=proxy(full_pin),deliveryRaw=delivery,deliveryPin=proxy(delivery_pin),sourceReleaseSha256=data['releaseSha256'],fingerprint=fingerprint,signedSourceReads=record['reads'],initialOriginSelfAuthenticated=False,originalSourceObjectTransferred=False,downstreamOriginalSourceReauthenticationRequired=True,operationalCodeCompiled=False,stageDispatched=False,executionEvidenceIssued=False,stageAcknowledged=False))

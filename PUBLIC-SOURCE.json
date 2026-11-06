@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "status": "source_candidate_not_published",
   "licenseSelected": true,
-  "fileCount": 670,
+  "fileCount": 686,
   "excludedFileCount": 709,
   "transformedFileCount": 29,
   "publicSourceCheck": {
     "schemaVersion": 1,
     "ready": true,
-    "candidateFiles": 670,
-    "scannedFiles": 670,
+    "candidateFiles": 686,
+    "scannedFiles": 686,
     "reviewedFixtureFindings": 12,
     "findingCounts": {},
     "findings": [],
@@ -31,8 +31,8 @@
     },
     {
       "path": ".github/workflows/public-source-readiness.yml",
-      "sourceSha256": "a4d5f8467352d6a92a94858923edbceb47126986af295c9d7c180d78ba3616f5",
-      "exportSha256": "a4d5f8467352d6a92a94858923edbceb47126986af295c9d7c180d78ba3616f5",
+      "sourceSha256": "2ab9b433c32f0d2a5d25796c6672b8bb707f5bdf578d2470455ff2e985be585e",
+      "exportSha256": "2ab9b433c32f0d2a5d25796c6672b8bb707f5bdf578d2470455ff2e985be585e",
       "transformations": []
     },
     {
@@ -883,8 +883,8 @@
     },
     {
       "path": "deploy/Dockerfile.platform",
-      "sourceSha256": "b535dacbfb5a5ac9b08f40056a6fb903b221b05a7b341bd75156970312a98e87",
-      "exportSha256": "b535dacbfb5a5ac9b08f40056a6fb903b221b05a7b341bd75156970312a98e87",
+      "sourceSha256": "6c7bb63094d339716e3f17258a38632da1549e08e9bb799183404391c7f8b1ce",
+      "exportSha256": "6c7bb63094d339716e3f17258a38632da1549e08e9bb799183404391c7f8b1ce",
       "transformations": []
     },
     {
@@ -1051,20 +1051,20 @@
     },
     {
       "path": "deploy/installer/build-full-cli-package.py",
-      "sourceSha256": "05e04b4e86c35d1bcc70ae0c251088e8b9789968ef070c2ae983393e2cc70a12",
-      "exportSha256": "05e04b4e86c35d1bcc70ae0c251088e8b9789968ef070c2ae983393e2cc70a12",
+      "sourceSha256": "a3e95b485596769f70955dfd0c2734646b9ed7c7cb851270bfbe35610e87ecc6",
+      "exportSha256": "a3e95b485596769f70955dfd0c2734646b9ed7c7cb851270bfbe35610e87ecc6",
       "transformations": []
     },
     {
       "path": "deploy/installer/build-full-package.py",
-      "sourceSha256": "0fbabad6923d3269e5e94eff373c2c0be5328fba927a588d1140627212964d1c",
-      "exportSha256": "0fbabad6923d3269e5e94eff373c2c0be5328fba927a588d1140627212964d1c",
+      "sourceSha256": "5c2fe3f3f918b25771c4b144e0483996578f6dc293a2db45979ab3d597af0790",
+      "exportSha256": "5c2fe3f3f918b25771c4b144e0483996578f6dc293a2db45979ab3d597af0790",
       "transformations": []
     },
     {
       "path": "deploy/installer/build-native-retention-package.py",
-      "sourceSha256": "9012fced95692dbe9ef2a021c604eaf1c33b2522ac395b77c5ef2efd5dc9dff5",
-      "exportSha256": "9012fced95692dbe9ef2a021c604eaf1c33b2522ac395b77c5ef2efd5dc9dff5",
+      "sourceSha256": "e40e55278aefe1533261af94216a41fc1348eb600c62fb2c6f107b105b416d4c",
+      "exportSha256": "e40e55278aefe1533261af94216a41fc1348eb600c62fb2c6f107b105b416d4c",
       "transformations": []
     },
     {
@@ -1077,6 +1077,12 @@
       "path": "deploy/installer/company-configure.sh",
       "sourceSha256": "783ad68fdce13f5f31eca0527e01275e57b9dd486ff0a484d317d679aed962a9",
       "exportSha256": "783ad68fdce13f5f31eca0527e01275e57b9dd486ff0a484d317d679aed962a9",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company-continue.sh",
+      "sourceSha256": "ee67c7bde7d62210870c39246f5ba05c6db086ad56d8e09b4a8f7c8e4fdeac80",
+      "exportSha256": "ee67c7bde7d62210870c39246f5ba05c6db086ad56d8e09b4a8f7c8e4fdeac80",
       "transformations": []
     },
     {
@@ -1098,15 +1104,21 @@
       "transformations": []
     },
     {
+      "path": "deploy/installer/company-runtime-pair.sh",
+      "sourceSha256": "691c1a103f777e2eb10d3ba34ed88d75a5186066c09bff957c9fd55261766eb0",
+      "exportSha256": "691c1a103f777e2eb10d3ba34ed88d75a5186066c09bff957c9fd55261766eb0",
+      "transformations": []
+    },
+    {
       "path": "deploy/installer/company_authenticated_cli_compose.py",
-      "sourceSha256": "365e8c48ad86d90063e8e7a5305bc383d80bbfc62171040c67e52efd21819aea",
-      "exportSha256": "365e8c48ad86d90063e8e7a5305bc383d80bbfc62171040c67e52efd21819aea",
+      "sourceSha256": "85ae33ba03fab21ae50da3b00a1866abfcfe105ae86f513371dd62daf8b8e841",
+      "exportSha256": "85ae33ba03fab21ae50da3b00a1866abfcfe105ae86f513371dd62daf8b8e841",
       "transformations": []
     },
     {
       "path": "deploy/installer/company_authenticated_cli_inputs.py",
-      "sourceSha256": "99156be4b544dbe16fecd47b977ff790de49863588703fe1317a253dc6840928",
-      "exportSha256": "99156be4b544dbe16fecd47b977ff790de49863588703fe1317a253dc6840928",
+      "sourceSha256": "c1ffe29b2ba8f88fa7ce0156c6ef8f68007724e1cad9c857efea42d800940053",
+      "exportSha256": "c1ffe29b2ba8f88fa7ce0156c6ef8f68007724e1cad9c857efea42d800940053",
       "transformations": []
     },
     {
@@ -1177,8 +1189,8 @@
     },
     {
       "path": "deploy/installer/company_configuration.py",
-      "sourceSha256": "f6a5b0370dc6fc9aea2195315e0f19473723799714bb76c6586dc89fa73e3d90",
-      "exportSha256": "f6a5b0370dc6fc9aea2195315e0f19473723799714bb76c6586dc89fa73e3d90",
+      "sourceSha256": "a15e57dcf0af48c30ba050de4d5753800486c00f8fea7977c20342c9809a2ad0",
+      "exportSha256": "a15e57dcf0af48c30ba050de4d5753800486c00f8fea7977c20342c9809a2ad0",
       "transformations": []
     },
     {
@@ -1213,8 +1225,8 @@
     },
     {
       "path": "deploy/installer/company_full_package_emit.py",
-      "sourceSha256": "30183e590a4da3b1ac272edea88fb13d1e91ba2d9249a6f7987f1bfd1af381e9",
-      "exportSha256": "30183e590a4da3b1ac272edea88fb13d1e91ba2d9249a6f7987f1bfd1af381e9",
+      "sourceSha256": "1165c9668c9e169177dbe59c77b96e006e6def70c4c22d12069fcbe10a9d1b2e",
+      "exportSha256": "1165c9668c9e169177dbe59c77b96e006e6def70c4c22d12069fcbe10a9d1b2e",
       "transformations": []
     },
     {
@@ -1249,8 +1261,8 @@
     },
     {
       "path": "deploy/installer/company_native_retention.py",
-      "sourceSha256": "b0bebafc6b4b760f36b8e9a8a6b7f330785668840ca57bdfb8452c7ab644e2fa",
-      "exportSha256": "b0bebafc6b4b760f36b8e9a8a6b7f330785668840ca57bdfb8452c7ab644e2fa",
+      "sourceSha256": "59dbce869b73b29d98fd70499bb3af830dde7eb968ad684ab36d5eeaf4420a5d",
+      "exportSha256": "59dbce869b73b29d98fd70499bb3af830dde7eb968ad684ab36d5eeaf4420a5d",
       "transformations": []
     },
     {
@@ -1302,9 +1314,15 @@
       "transformations": []
     },
     {
+      "path": "deploy/installer/company_runtime_pair_worker.py",
+      "sourceSha256": "ef0e1232f7a02ef61ccd511a73c378bd33d9fb2f7ae98e9bd18e1af1a53d0269",
+      "exportSha256": "ef0e1232f7a02ef61ccd511a73c378bd33d9fb2f7ae98e9bd18e1af1a53d0269",
+      "transformations": []
+    },
+    {
       "path": "deploy/installer/company_seed_backend.py",
-      "sourceSha256": "ae7be5f73b5e279cde64f12bf031d0cb84576ac045f90e423775a093891fe768",
-      "exportSha256": "ae7be5f73b5e279cde64f12bf031d0cb84576ac045f90e423775a093891fe768",
+      "sourceSha256": "bb8ea717a0907727a5145c5caf84f8837a1a558c9bca4ba433701d3c748f155b",
+      "exportSha256": "bb8ea717a0907727a5145c5caf84f8837a1a558c9bca4ba433701d3c748f155b",
       "transformations": []
     },
     {
@@ -1315,8 +1333,8 @@
     },
     {
       "path": "deploy/installer/company_signed_execute_preparation.py",
-      "sourceSha256": "13592aad06aa766da05f67b154e203eec1f2352e78250b14d4c7da1b801e8a66",
-      "exportSha256": "13592aad06aa766da05f67b154e203eec1f2352e78250b14d4c7da1b801e8a66",
+      "sourceSha256": "40f4e33432979df2cea7f81aef97ddd96275c38574815ebfa6c913b325f67e35",
+      "exportSha256": "40f4e33432979df2cea7f81aef97ddd96275c38574815ebfa6c913b325f67e35",
       "transformations": []
     },
     {
@@ -1335,6 +1353,12 @@
       "path": "deploy/installer/company_startup_join.py",
       "sourceSha256": "8aa949381e170c2f58a498406644df91504c13ced6a2afcb3df229949e1bdb75",
       "exportSha256": "8aa949381e170c2f58a498406644df91504c13ced6a2afcb3df229949e1bdb75",
+      "transformations": []
+    },
+    {
+      "path": "deploy/installer/company_startup_worker.py",
+      "sourceSha256": "c59668bfcd521cd48a2c7d9c4764c552c954503720d193c88a1cbdad95807cfe",
+      "exportSha256": "c59668bfcd521cd48a2c7d9c4764c552c954503720d193c88a1cbdad95807cfe",
       "transformations": []
     },
     {
@@ -1389,6 +1413,12 @@
       "path": "docs/backend-history-tests.md",
       "sourceSha256": "1eda9d21600a1218560ed586437fad91b5ff89e7e0e8210526fc06caa249add5",
       "exportSha256": "1eda9d21600a1218560ed586437fad91b5ff89e7e0e8210526fc06caa249add5",
+      "transformations": []
+    },
+    {
+      "path": "docs/captured-owner-identity.md",
+      "sourceSha256": "9a4e36d1fa005a088e2cfa6f75c8ae44ae0a60288fddf40d0d626c8c2f0e3da9",
+      "exportSha256": "9a4e36d1fa005a088e2cfa6f75c8ae44ae0a60288fddf40d0d626c8c2f0e3da9",
       "transformations": []
     },
     {
@@ -1567,8 +1597,8 @@
     },
     {
       "path": "docs/installation-readiness.md",
-      "sourceSha256": "4c53805a219013752f403724ea8c64a0c56574a24040f542cf836e24631e36ea",
-      "exportSha256": "4c53805a219013752f403724ea8c64a0c56574a24040f542cf836e24631e36ea",
+      "sourceSha256": "244c5258f877aec843e4a0187f8cc820d0cb95ef16f50062091ac8d54efbb2df",
+      "exportSha256": "244c5258f877aec843e4a0187f8cc820d0cb95ef16f50062091ac8d54efbb2df",
       "transformations": []
     },
     {
@@ -1651,6 +1681,18 @@
       "path": "docs/native-retention-worker.md",
       "sourceSha256": "768cfa960e266bb259fc0057953366011af30ecc6cf831ea078af54507a3754a",
       "exportSha256": "768cfa960e266bb259fc0057953366011af30ecc6cf831ea078af54507a3754a",
+      "transformations": []
+    },
+    {
+      "path": "docs/native-runtime-pair.md",
+      "sourceSha256": "edcabc8df70208c7eed97e4503d3d1aa9b481006de0992bd4434ef1695223afc",
+      "exportSha256": "edcabc8df70208c7eed97e4503d3d1aa9b481006de0992bd4434ef1695223afc",
+      "transformations": []
+    },
+    {
+      "path": "docs/native-stored-startup.md",
+      "sourceSha256": "836ad4b62a9cf9aeadaff5764449147a407e6945a004840e51f660a30587d386",
+      "exportSha256": "836ad4b62a9cf9aeadaff5764449147a407e6945a004840e51f660a30587d386",
       "transformations": []
     },
     {
@@ -2089,8 +2131,8 @@
     },
     {
       "path": "scripts/bootstrap.py",
-      "sourceSha256": "682136e6088a180ad15c12dedc2e86b9d1cb02f59b385c6e473640f6218192e2",
-      "exportSha256": "682136e6088a180ad15c12dedc2e86b9d1cb02f59b385c6e473640f6218192e2",
+      "sourceSha256": "91bd411f1c6ba6649a1ab479f50c66f8a9dcaf54d623346a6a0f552b1ba9ca7b",
+      "exportSha256": "91bd411f1c6ba6649a1ab479f50c66f8a9dcaf54d623346a6a0f552b1ba9ca7b",
       "transformations": []
     },
     {
@@ -2125,8 +2167,8 @@
     },
     {
       "path": "scripts/company_captured_loader.py",
-      "sourceSha256": "83b68d84323471a22729e827fc947b4ad73c8d5dbc560b4a18d6c64d98826b4c",
-      "exportSha256": "83b68d84323471a22729e827fc947b4ad73c8d5dbc560b4a18d6c64d98826b4c",
+      "sourceSha256": "8771f51fc51766f3ee116817b374c87304c4692b72434213fa243de39269a4ff",
+      "exportSha256": "8771f51fc51766f3ee116817b374c87304c4692b72434213fa243de39269a4ff",
       "transformations": []
     },
     {
@@ -2373,8 +2415,8 @@
     },
     {
       "path": "scripts/public-history-reviewed-fixtures.json",
-      "sourceSha256": "7e9b1a6bf12c0be52f13decf6366a59fd296bf65eee299696911f60e400d05b2",
-      "exportSha256": "7e9b1a6bf12c0be52f13decf6366a59fd296bf65eee299696911f60e400d05b2",
+      "sourceSha256": "239ef4d1876c8c7051a9d3996bfa61cab3126de87c8116d25ac0e6ac696b4f49",
+      "exportSha256": "239ef4d1876c8c7051a9d3996bfa61cab3126de87c8116d25ac0e6ac696b4f49",
       "transformations": []
     },
     {
@@ -2409,8 +2451,8 @@
     },
     {
       "path": "scripts/public-release-reviewed-fixtures.json",
-      "sourceSha256": "35d57a69a7247f72ae11f5b81acedcb0c4300f54c8fa7fbb77e60d1a3eca4ec4",
-      "exportSha256": "35d57a69a7247f72ae11f5b81acedcb0c4300f54c8fa7fbb77e60d1a3eca4ec4",
+      "sourceSha256": "52aa6d648ad3709cd445900a86afa7733af614cd121ab99b2b005426da7d369b",
+      "exportSha256": "52aa6d648ad3709cd445900a86afa7733af614cd121ab99b2b005426da7d369b",
       "transformations": []
     },
     {
@@ -2529,8 +2571,8 @@
     },
     {
       "path": "scripts/startup_binding.py",
-      "sourceSha256": "54dba095654f37a349521e325480e04f0e96c2a73698c86719a7d49028765d67",
-      "exportSha256": "54dba095654f37a349521e325480e04f0e96c2a73698c86719a7d49028765d67",
+      "sourceSha256": "295c628e96835334151291b6eb585ed3b3a2373d5b5762ed788cdfa6da4e3d29",
+      "exportSha256": "295c628e96835334151291b6eb585ed3b3a2373d5b5762ed788cdfa6da4e3d29",
       "transformations": []
     },
     {
@@ -2559,8 +2601,8 @@
     },
     {
       "path": "scripts/test-company-linux.sh",
-      "sourceSha256": "1f4757dd16e742047c9f8b933acd7458e3b6514243389db00c1472f422ece69a",
-      "exportSha256": "1f4757dd16e742047c9f8b933acd7458e3b6514243389db00c1472f422ece69a",
+      "sourceSha256": "6215756246ca5c706b7d3edb323cb9bde3183a2599abdeb5b5234cbf6b73861c",
+      "exportSha256": "6215756246ca5c706b7d3edb323cb9bde3183a2599abdeb5b5234cbf6b73861c",
       "transformations": []
     },
     {
@@ -2831,8 +2873,8 @@
     },
     {
       "path": "scripts/test-runtime-pair-init.py",
-      "sourceSha256": "12230a67f87a27676b6d6bfbd565f755a644bed090c36e5cff93a3f10694a5a8",
-      "exportSha256": "12230a67f87a27676b6d6bfbd565f755a644bed090c36e5cff93a3f10694a5a8",
+      "sourceSha256": "2c6222ce9478a12763d9fb2bbaf953ff890dc7112281ef6411a2e32806d33b2c",
+      "exportSha256": "2c6222ce9478a12763d9fb2bbaf953ff890dc7112281ef6411a2e32806d33b2c",
       "transformations": []
     },
     {
@@ -2843,8 +2885,8 @@
     },
     {
       "path": "scripts/test-seed-backend-history.py",
-      "sourceSha256": "93624081336fcd8150654d7bc869c6e94df24affc53cac502f61193e0ed97746",
-      "exportSha256": "93624081336fcd8150654d7bc869c6e94df24affc53cac502f61193e0ed97746",
+      "sourceSha256": "aec14fb619d3e27f743ce7420bf097cc0a0e58fa96abea441cb14b28964fb05c",
+      "exportSha256": "aec14fb619d3e27f743ce7420bf097cc0a0e58fa96abea441cb14b28964fb05c",
       "transformations": []
     },
     {
@@ -2855,8 +2897,8 @@
     },
     {
       "path": "scripts/test-startup-binding.py",
-      "sourceSha256": "c99e7d5f4231bfcc0283db91a7ca29a1fa552f965a1dfe235cdc8eb9b3010387",
-      "exportSha256": "c99e7d5f4231bfcc0283db91a7ca29a1fa552f965a1dfe235cdc8eb9b3010387",
+      "sourceSha256": "be9c6a8a88821807a7492194d0e29599e3e2e8bae98bf40857a30d692161ff46",
+      "exportSha256": "be9c6a8a88821807a7492194d0e29599e3e2e8bae98bf40857a30d692161ff46",
       "transformations": []
     },
     {
@@ -3604,6 +3646,12 @@
       "transformations": []
     },
     {
+      "path": "tests/fixtures/company_seed_backend_before_source_terminal_fix.py",
+      "sourceSha256": "ae7be5f73b5e279cde64f12bf031d0cb84576ac045f90e423775a093891fe768",
+      "exportSha256": "ae7be5f73b5e279cde64f12bf031d0cb84576ac045f90e423775a093891fe768",
+      "transformations": []
+    },
+    {
       "path": "tests/fixtures/company_seed_backend_before_stat_compat.py",
       "sourceSha256": "41d39bcc4ffef59da27d64e924ad6434486dea4a7be13797e4b41ee4a8fbdc5a",
       "exportSha256": "41d39bcc4ffef59da27d64e924ad6434486dea4a7be13797e4b41ee4a8fbdc5a",
@@ -3634,21 +3682,33 @@
       "transformations": []
     },
     {
+      "path": "tests/fixtures/company_signed_execute_helpers_v5.json",
+      "sourceSha256": "c105c94f4482a727c3c161f87d0b450919a121a0e4383fda6ffd2a4ebbc224e8",
+      "exportSha256": "c105c94f4482a727c3c161f87d0b450919a121a0e4383fda6ffd2a4ebbc224e8",
+      "transformations": []
+    },
+    {
       "path": "tests/test_authenticated_seed.py",
       "sourceSha256": "bae0596d75470eabbe1407893dbb71a15666b4e78c487dd097fe15a47ae48eaf",
       "exportSha256": "bae0596d75470eabbe1407893dbb71a15666b4e78c487dd097fe15a47ae48eaf",
       "transformations": []
     },
     {
+      "path": "tests/test_bootstrap_render_hooks.py",
+      "sourceSha256": "27a0bb56cd6fb9785d4637d3a08ca037d376ca727951b116eb1101cc00cf9ae3",
+      "exportSha256": "27a0bb56cd6fb9785d4637d3a08ca037d376ca727951b116eb1101cc00cf9ae3",
+      "transformations": []
+    },
+    {
       "path": "tests/test_company_authenticated_cli_compose.py",
-      "sourceSha256": "e64306b7fa1ffd26938c0c74b32dca6184e32559bcaa87b9cada450eb7ad65d2",
-      "exportSha256": "e64306b7fa1ffd26938c0c74b32dca6184e32559bcaa87b9cada450eb7ad65d2",
+      "sourceSha256": "4c757b1dfef21a8de948e8219bde9a72e885952614cbc7140baf16e6029b4647",
+      "exportSha256": "4c757b1dfef21a8de948e8219bde9a72e885952614cbc7140baf16e6029b4647",
       "transformations": []
     },
     {
       "path": "tests/test_company_authenticated_cli_inputs.py",
-      "sourceSha256": "31678965fbcc4e68864103588dac2c6b9ae27543a10e54ef4af04cd90b98ec7a",
-      "exportSha256": "31678965fbcc4e68864103588dac2c6b9ae27543a10e54ef4af04cd90b98ec7a",
+      "sourceSha256": "c6260d9c99c46e70b43eb6687d9595223e61e94d3f73a13f30bb26b8551658a9",
+      "exportSha256": "c6260d9c99c46e70b43eb6687d9595223e61e94d3f73a13f30bb26b8551658a9",
       "transformations": []
     },
     {
@@ -3665,8 +3725,8 @@
     },
     {
       "path": "tests/test_company_captured_loader.py",
-      "sourceSha256": "2fad12e8967c25b267420e84ffb07ae5b9bcd364e0e2439cb765e9bc424414a5",
-      "exportSha256": "2fad12e8967c25b267420e84ffb07ae5b9bcd364e0e2439cb765e9bc424414a5",
+      "sourceSha256": "9bfbef2ee15b0b5501ad62b6db60e6c010aa8fec90c62d0a09c3a6ef35f22f83",
+      "exportSha256": "9bfbef2ee15b0b5501ad62b6db60e6c010aa8fec90c62d0a09c3a6ef35f22f83",
       "transformations": []
     },
     {
@@ -3731,14 +3791,20 @@
     },
     {
       "path": "tests/test_company_configuration_native.py",
-      "sourceSha256": "369ad4a1111af9369e505712b4485377c8e4a225aeb13f930ea79abb4e12ae9a",
-      "exportSha256": "369ad4a1111af9369e505712b4485377c8e4a225aeb13f930ea79abb4e12ae9a",
+      "sourceSha256": "16b61d40e2397bb6900bdb63c031b9b5c804048cf65babaa570b7f6d35c2d1ea",
+      "exportSha256": "16b61d40e2397bb6900bdb63c031b9b5c804048cf65babaa570b7f6d35c2d1ea",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_continuation_entry_native.py",
+      "sourceSha256": "8dc8ba20d38b6e1082fa9c6bd83f4635e09296f847b275634283fe7a445e54b4",
+      "exportSha256": "8dc8ba20d38b6e1082fa9c6bd83f4635e09296f847b275634283fe7a445e54b4",
       "transformations": []
     },
     {
       "path": "tests/test_company_fixed_execute_child.py",
-      "sourceSha256": "17fe0f11df60edef119aead2896e601fce719ddec0e9471665b09ce0df362409",
-      "exportSha256": "17fe0f11df60edef119aead2896e601fce719ddec0e9471665b09ce0df362409",
+      "sourceSha256": "e5c5990f8312a3109aa957e8b35892805d44f5c90017ae462603a2b69c1362ce",
+      "exportSha256": "e5c5990f8312a3109aa957e8b35892805d44f5c90017ae462603a2b69c1362ce",
       "transformations": []
     },
     {
@@ -3755,8 +3821,8 @@
     },
     {
       "path": "tests/test_company_fresh_assembly.py",
-      "sourceSha256": "4d1c246addbbc26618119b3ba6ef93986cfa26733270d57c6e1c88acd86caec6",
-      "exportSha256": "4d1c246addbbc26618119b3ba6ef93986cfa26733270d57c6e1c88acd86caec6",
+      "sourceSha256": "fd242f36f9db018256cab913028c980c9f7237fe5d79f25b43f8d1350a96b649",
+      "exportSha256": "fd242f36f9db018256cab913028c980c9f7237fe5d79f25b43f8d1350a96b649",
       "transformations": []
     },
     {
@@ -3767,8 +3833,8 @@
     },
     {
       "path": "tests/test_company_full_cli_package.py",
-      "sourceSha256": "21ec68cdc97eb027418731faed4b77bde6c8839dedec6ef52b52c04ee2e37128",
-      "exportSha256": "21ec68cdc97eb027418731faed4b77bde6c8839dedec6ef52b52c04ee2e37128",
+      "sourceSha256": "04e15e3fc9232e7ee7f41901c5504cc5ebeb1871307851cb4264b8da77b81b04",
+      "exportSha256": "04e15e3fc9232e7ee7f41901c5504cc5ebeb1871307851cb4264b8da77b81b04",
       "transformations": []
     },
     {
@@ -3779,8 +3845,8 @@
     },
     {
       "path": "tests/test_company_full_package.py",
-      "sourceSha256": "8db0fbf108a701a6189ce475d206cdec4f07fa2b97400ce3e58b2973382b3b22",
-      "exportSha256": "8db0fbf108a701a6189ce475d206cdec4f07fa2b97400ce3e58b2973382b3b22",
+      "sourceSha256": "02967cb3432a86cf48c6484c9f3d129a2030e1c0f6b9883359ea49db8e9e343d",
+      "exportSha256": "02967cb3432a86cf48c6484c9f3d129a2030e1c0f6b9883359ea49db8e9e343d",
       "transformations": []
     },
     {
@@ -3815,8 +3881,8 @@
     },
     {
       "path": "tests/test_company_native_retention.py",
-      "sourceSha256": "d8dd4fecbbb9a269719acd5658a98e7e4d6df0fdd3dbfb43f712bd504e37de3c",
-      "exportSha256": "d8dd4fecbbb9a269719acd5658a98e7e4d6df0fdd3dbfb43f712bd504e37de3c",
+      "sourceSha256": "2e37a1172444c848faf8c7492d63de8a503c4947f988617799dcf83b443d5f59",
+      "exportSha256": "2e37a1172444c848faf8c7492d63de8a503c4947f988617799dcf83b443d5f59",
       "transformations": []
     },
     {
@@ -3898,9 +3964,27 @@
       "transformations": []
     },
     {
+      "path": "tests/test_company_runtime_pair_entry_native.py",
+      "sourceSha256": "a82cadd7a2b9c014cd72ca6dc24bee86f2b73696aa0c8cce37f2a107555f07af",
+      "exportSha256": "a82cadd7a2b9c014cd72ca6dc24bee86f2b73696aa0c8cce37f2a107555f07af",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_runtime_pair_native.py",
+      "sourceSha256": "e0f8b9d4413e57f991e4a84344b85b100c7b742551752c7069703a0130711112",
+      "exportSha256": "e0f8b9d4413e57f991e4a84344b85b100c7b742551752c7069703a0130711112",
+      "transformations": []
+    },
+    {
       "path": "tests/test_company_runtime_pair_parent.py",
       "sourceSha256": "950bf91114ba2e0a5148d8334d7fe5dddb91466e02a000513115325a3ce833a1",
       "exportSha256": "950bf91114ba2e0a5148d8334d7fe5dddb91466e02a000513115325a3ce833a1",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_runtime_pair_worker.py",
+      "sourceSha256": "a841fe9128a2cc3da2ee523e37ec8da434c4dcf316f08cd846266754d08e8730",
+      "exportSha256": "a841fe9128a2cc3da2ee523e37ec8da434c4dcf316f08cd846266754d08e8730",
       "transformations": []
     },
     {
@@ -3941,8 +4025,8 @@
     },
     {
       "path": "tests/test_company_signed_execute_preparation.py",
-      "sourceSha256": "98b07118556242a5c38bba819efd2492dc1d3eb69f36a84b98e14467ece37a3a",
-      "exportSha256": "98b07118556242a5c38bba819efd2492dc1d3eb69f36a84b98e14467ece37a3a",
+      "sourceSha256": "01542a82d04f7c40a3eb64cb53cd4f7dc2bc096f3b80a10a63e7a09a796d9507",
+      "exportSha256": "01542a82d04f7c40a3eb64cb53cd4f7dc2bc096f3b80a10a63e7a09a796d9507",
       "transformations": []
     },
     {
@@ -3959,8 +4043,14 @@
     },
     {
       "path": "tests/test_company_source_owned_execute.py",
-      "sourceSha256": "6495889d2a60c68b8ba0db1f6daa5e867392b3ee5f006d46faae07c4ee37e103",
-      "exportSha256": "6495889d2a60c68b8ba0db1f6daa5e867392b3ee5f006d46faae07c4ee37e103",
+      "sourceSha256": "d7bcdc015fd3e9bf6c8d8de7e84b9fa7d5e6f945d267dcbe9ecbe351713364b3",
+      "exportSha256": "d7bcdc015fd3e9bf6c8d8de7e84b9fa7d5e6f945d267dcbe9ecbe351713364b3",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_source_terminal_native.py",
+      "sourceSha256": "b0f05fe553735f64dbeb103dc07c41ef9ae1944969dfcc6e45f6eea6be5f5ebf",
+      "exportSha256": "b0f05fe553735f64dbeb103dc07c41ef9ae1944969dfcc6e45f6eea6be5f5ebf",
       "transformations": []
     },
     {
@@ -3979,6 +4069,12 @@
       "path": "tests/test_company_startup_join.py",
       "sourceSha256": "056cf2d81122f1c678e8e59bc5a6d4607ad5ea046e4c82ac911e91ccd932841d",
       "exportSha256": "056cf2d81122f1c678e8e59bc5a6d4607ad5ea046e4c82ac911e91ccd932841d",
+      "transformations": []
+    },
+    {
+      "path": "tests/test_company_startup_worker.py",
+      "sourceSha256": "db2c86d57e3fba7abf8c69252ed4308830e53a86bc32e050c8e2558eff66e65c",
+      "exportSha256": "db2c86d57e3fba7abf8c69252ed4308830e53a86bc32e050c8e2558eff66e65c",
       "transformations": []
     },
     {

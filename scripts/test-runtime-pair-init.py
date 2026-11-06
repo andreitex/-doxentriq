@@ -190,6 +190,18 @@ class Controls(unittest.TestCase):
         self.assertEqual(len(f.files.inventory(f.gate().base / 'operations', 1)), 1); self.assertGreaterEqual(len(f.files.raw_reads), 2)
         f.assert_closed(self)
 
+    def test_ciphertext_timestamp_changes_during_pair_writes_do_not_break_storage_guard(self):
+        f=Fixture()
+        def change(path,value,phase):
+            if phase=='after':
+                row=f.files.file_metadata[f.backing]
+                row['st_mtime_ns']=row.get('st_mtime_ns',100)+1
+                row['st_ctime_ns']=row.get('st_ctime_ns',100)+1
+        f.files.on_write=change
+        result=f.call()
+        self.assertEqual(result['status'],'effects-confirmed');self.assertFalse(result['nativeAuthorized'])
+        self.assertNotIn(f.backing,f.files.reads);f.assert_closed(self)
+
     def test_intent_durable_readback_precedes_first_gate_pair_effect(self):
         f = Fixture(); observed = []
         def before(path, phase):

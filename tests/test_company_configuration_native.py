@@ -10,6 +10,8 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('configuration_native_outputs', ROOT / 'deploy/installer/company_configuration.py')
 Q = importlib.util.module_from_spec(spec); spec.loader.exec_module(Q)
+spec = importlib.util.spec_from_file_location('configuration_native_files', ROOT / 'scripts/checkpoint_admission.py')
+C = importlib.util.module_from_spec(spec);sys.modules[spec.name]=C;spec.loader.exec_module(C)
 NATIVE = sys.platform == 'linux' and getattr(os, 'geteuid', lambda: -1)() == 0
 
 
@@ -71,6 +73,57 @@ class NativeOutputTests(unittest.TestCase):
         self.measure(durable=True)
         path.chmod(0o640)
         with self.assertRaises(ValueError): self.measure()
+
+
+@unittest.skipUnless(NATIVE,'requires Linux root for retained-parent checks')
+class NativeRetentionParentTests(unittest.TestCase):
+    def setUp(self):
+        self.temporary=tempfile.TemporaryDirectory(prefix='doxentriq-retention-parents-')
+        self.addCleanup(self.temporary.cleanup)
+        self.data=Path(self.temporary.name);self.data.chmod(0o700)
+        (self.data/'company').mkdir(mode=0o700)
+        (self.data/'company/host-releases').mkdir(mode=0o700)
+        self.files=C.NativeFiles();self.before=set(os.listdir('/proc/self/fd'))
+
+    def tearDown(self):self.assertEqual(set(os.listdir('/proc/self/fd')),self.before)
+
+    def test_fixed_fresh_parents_sync_and_independent_readonly_digest(self):
+        with patch.object(Q.os,'fsync',wraps=os.fsync) as sync:
+            initial=Q.prepare_retention_parents(self.data,files=self.files)
+            self.assertGreaterEqual(sync.call_count,3)
+        with patch.object(Q.os,'mkdir',side_effect=AssertionError('read-only check wrote')):
+            self.assertEqual(initial,Q.retention_parents(self.data,files=self.files))
+        self.assertEqual(sorted(path.name for path in (self.data/'company').iterdir()),
+            ['host-releases','platform-releases','source-releases'])
+        for name in ('platform-releases','source-releases'):
+            info=(self.data/'company'/name).lstat()
+            self.assertEqual((info.st_uid,info.st_gid,info.st_mode&0o777),(0,0,0o700))
+
+    def test_existing_either_parent_preserves_state_without_creating_other(self):
+        for name in ('platform-releases','source-releases'):
+            with self.subTest(name=name):
+                path=self.data/'company'/name;path.mkdir(mode=0o700)
+                marker=path/'preserve';marker.write_bytes(b'prior data')
+                with self.assertRaises(ValueError):Q.prepare_retention_parents(self.data,files=self.files)
+                other='source-releases' if name=='platform-releases' else 'platform-releases'
+                self.assertFalse((self.data/'company'/other).exists());self.assertEqual(marker.read_bytes(),b'prior data')
+                marker.unlink();path.rmdir()
+
+    def test_replaced_empty_directory_changes_independent_evidence(self):
+        before=Q.prepare_retention_parents(self.data,files=self.files)
+        path=self.data/'company/platform-releases';path.rename(path.with_name('retained-old-parent'))
+        path.mkdir(mode=0o700)
+        self.assertNotEqual(before,Q.retention_parents(self.data,files=self.files))
+
+    def test_readonly_prerequisite_refuses_missing_populated_mode_and_symlink(self):
+        with self.assertRaises((ValueError,OSError)):Q.retention_parents(self.data,files=self.files)
+        Q.prepare_retention_parents(self.data,files=self.files)
+        path=self.data/'company/platform-releases';marker=path/'unexpected';marker.write_bytes(b'preserve')
+        with self.assertRaises(ValueError):Q.retention_parents(self.data,files=self.files)
+        marker.unlink();path.chmod(0o755)
+        with self.assertRaises(ValueError):Q.retention_parents(self.data,files=self.files)
+        path.chmod(0o700);path.rename(path.with_name('retained-parent'));path.symlink_to(path.with_name('retained-parent'),target_is_directory=True)
+        with self.assertRaises(ValueError):Q.retention_parents(self.data,files=self.files)
 
 
 if __name__ == '__main__': unittest.main(verbosity=2)

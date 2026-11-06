@@ -70,5 +70,11 @@
     "sha256": "d5adb3dd23782958a2be0fd7494158a1f6b8015323f0be1f1e2db511453ec4c0",
     "code": "trial_endpoint",
     "reason": "Synthetic isolated filesystem-qualification DNS alias and generated test CA, not a customer address."
+  },
+  {
+    "path": "scripts/bootstrap.py",
+    "sha256": "91bd411f1c6ba6649a1ab479f50c66f8a9dcaf54d623346a6a0f552b1ba9ca7b",
+    "code": "credential_url",
+    "reason": "Redis and RabbitMQ URLs interpolate protected runtime credential variables; AST review after captured identity/render-hook changes confirms no literal credential. This exact source blob also passed independent secret scanning."
   }
 ]

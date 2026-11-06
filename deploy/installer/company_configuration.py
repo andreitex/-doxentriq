@@ -231,6 +231,44 @@ def wizard_outputs(data, configuration, *, durable):
     return sha(canonical(rows))
 
 
+def retention_parents(data, *, files, durable=False):
+    """Read-only empty-parent proof; creation and later release writes are separate."""
+    require(type(durable) is bool)
+    data=Path(data);device=files.protected(data,directory=True,private=True).st_dev
+    company=data/'company'
+    owner=files.protected(company,directory=True,private=True)
+    require(owner.st_dev==device and stat.S_IMODE(owner.st_mode)==0o700)
+    rows={}
+    keys=('st_dev','st_ino','st_mode','st_uid','st_gid','st_nlink','st_size','st_mtime_ns','st_ctime_ns')
+    identity=lambda info:tuple(getattr(info,key) for key in keys)
+    for name in ('platform-releases','source-releases'):
+        path=company/name;before=files.protected(path,directory=True,private=True)
+        require(before.st_dev==device and stat.S_IMODE(before.st_mode)==0o700)
+        fd=os.open(path,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC)
+        try:
+            require(identity(os.fstat(fd))==identity(before) and files.inventory(path,0)==[])
+            if durable:os.fsync(fd)
+            require(identity(os.fstat(fd))==identity(before)==identity(files.protected(path,directory=True,private=True)))
+            rows[name]=dict(identity=identity(before)[:5],children=[])
+        finally:os.close(fd)
+    require(identity(files.protected(company,directory=True,private=True))==identity(owner))
+    if durable:files.sync_directory(company)
+    return sha(canonical(rows))
+
+
+def require_absent_retention_parents(data, *, files):
+    data=Path(data);device=files.protected(data,directory=True,private=True).st_dev
+    company=files.protected(data/'company',directory=True,private=True)
+    require(company.st_dev==device and stat.S_IMODE(company.st_mode)==0o700)
+    require(all(not os.path.lexists(data/'company'/name) for name in ('platform-releases','source-releases')))
+
+
+def prepare_retention_parents(data, *, files):
+    require_absent_retention_parents(data,files=files)
+    for name in ('platform-releases','source-releases'):files.mkdir(Path(data)/'company'/name)
+    return retention_parents(data,files=files,durable=True)
+
+
 def run(entry, *, full_entry_module, held, assembly, parent, request, request_raw,
         worker_sha256, command, execute, host_directory=Path('/etc/autosoft'), answers=None):
     """Perform the actual original configure/placement calls, or remeasure them.
@@ -268,6 +306,7 @@ def run(entry, *, full_entry_module, held, assembly, parent, request, request_ra
         # replaying prompts or changing partial secrets/layout from a prior try.
         for path in (data / 'config', data / 'secrets', data / 'quota'):
             require(not os.path.lexists(path))
+        require_absent_retention_parents(data,files=files)
         files.mkdir(data / 'config')
         captured = dict(fingerprint=held.metadata['signingKeyFingerprint'],
                         configs={name: held.configs[name] for name in CONFIGS})
@@ -279,6 +318,7 @@ def run(entry, *, full_entry_module, held, assembly, parent, request, request_ra
         assembly.call(LAYOUT, 'prepare', data, files=files,
                       build_mount=lambda path: R.builds_proof(path, command=command))
         files.mkdir(data / 'config/repository-seed')
+        prepare_retention_parents(data,files=files)
     check()
     quiet(command)
     require(S.encrypted_proof(data, receipt, command=command) == mount)
@@ -299,6 +339,7 @@ def run(entry, *, full_entry_module, held, assembly, parent, request, request_ra
     for name in R.BROKER_DIRECTORIES:
         require(files.names(data / 'runtime' / name, 0) == [])
     outputs_sha = wizard_outputs(data, configuration, durable=execute)
+    parents_sha = retention_parents(data,files=files,durable=execute)
     check()
     return dict(schemaVersion=1, scope='COMPANY_CONFIGURATION_AND_PLACEMENT_ONLY',
         requestSha256=sha(request_raw), actionSha256=action(request_raw, worker_sha256),
@@ -306,6 +347,6 @@ def run(entry, *, full_entry_module, held, assembly, parent, request, request_ra
         configurationSha256=sha(canonical(configuration)), encryptedMountSha256=sha(canonical(mount)),
         layoutSha256=sha(canonical(files.read(data / 'config/runtime-layout/layout.json'))),
         signedConfigurationSha256=sha(canonical({name: sha(held.configs[name]) for name in CONFIGS})),
-        wizardOutputsSha256=outputs_sha, modelCatalogSource='operator-supplied',
+        wizardOutputsSha256=outputs_sha, retentionParentsSha256=parents_sha, modelCatalogSource='operator-supplied',
         servicesStarted=False, runtimePairInitialized=False, fullInstallationCompleted=False,
         outerContextsRequireClosure=True)

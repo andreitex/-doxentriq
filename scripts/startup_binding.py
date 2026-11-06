@@ -35,10 +35,16 @@ SCOPE = 'STARTUP_BINDING_ONLY'
 
 
 @contextmanager
-def _controls(files, directories, records):
-    """Own only finite, noninheritable read FDs. Never read backing/key bytes."""
+def _controls(files, directories, records, *, backing_file=None):
+    """Hold exact controls; allow ciphertext timestamps only on named backing.
+
+    The authenticated storage record selects this one metadata-only file. Its
+    device, inode, mode, owner, group, link count and size stay exact. Keys and
+    configuration retain all nine fields. No backing/key bytes are read.
+    """
     C.require(type(directories) is dict and 0 < len(directories) <= 64)
     C.require(type(records) is dict and 0 < len(records) <= 8)
+    C.require(backing_file is None or backing_file in records and records[backing_file] is None)
     handles, errors = [], []
     try:
         for path, (uid, gid, modes) in directories.items():
@@ -50,18 +56,20 @@ def _controls(files, directories, records):
             before = files.protected(path, private=True)
             C.require(maximum is None or type(maximum) is int and 0 < before.st_size <= maximum)
             fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC | getattr(os, 'O_BINARY', 0))
-            handles.append((path, fd, files.descriptor(fd), False, maximum))
-            files.compare_opened(before, files.descriptor(fd))
+            length = 7 if path == backing_file else 9
+            handles.append((path, fd, files.descriptor(fd), False, (maximum, length)))
+            C.require(C.identity(before)[:length] == C.identity(files.descriptor(fd))[:length])
         yield
         for path, fd, before, directory, policy in handles:
             current = files.directory(path, *policy) if directory else files.protected(path, private=True)
             opened = files.descriptor(fd)
-            files.compare_opened(current, opened)
             if directory:
+                files.compare_opened(current, opened)
                 C.require(C.directory_binding(opened) == C.directory_binding(before),
                           'Startup control directory changed during verification')
             else:
-                C.require(C.identity(opened) == C.identity(before),
+                length = policy[1]
+                C.require(C.identity(current)[:length] == C.identity(opened)[:length] == C.identity(before)[:length],
                           'Startup control record changed during verification')
     finally:
         for _, fd, _, _, _ in reversed(handles):
@@ -138,6 +146,7 @@ def verify(data, root, *, host_directory=Path('/etc/autosoft'), files=None, comm
     before = _host(data, root, host_directory, files)
     intent, final, receipt, config, installation_id = before
     storage = Path(final['storage_file'])
+    C.require(storage != host_directory / 'storage.key', 'Backing file cannot alias the unlock key')
     directories = {}
     for path in (*reversed(data.parents), data, *reversed(root.parents), root,
                  *reversed(host_directory.parents), host_directory,
@@ -155,7 +164,7 @@ def verify(data, root, *, host_directory=Path('/etc/autosoft'), files=None, comm
                host_directory / 'installation.storage-receipt.json': C.MAX_RECORD,
                data / 'config/installation.json': C.MAX_RECORD,
                storage: None, host_directory / 'storage.key': None}
-    with _controls(files, directories, records):
+    with _controls(files, directories, records, backing_file=storage):
         C.require(_host(data, root, host_directory, files) == before,
                   'Host binding changed before initialized inspection')
         backing = files.protected(storage, private=True)
@@ -195,6 +204,7 @@ def fresh_storage_context(data, root, *, host_directory=Path('/etc/autosoft'), f
     before = _host(data, root, host_directory, files)
     intent, final, receipt, config, installation_id = before
     storage = Path(final['storage_file'])
+    C.require(storage != host_directory / 'storage.key', 'Backing file cannot alias the unlock key')
     directories = {}
     for path in (*reversed(data.parents), data, *reversed(root.parents), root,
                  *reversed(host_directory.parents), host_directory,
@@ -214,7 +224,7 @@ def fresh_storage_context(data, root, *, host_directory=Path('/etc/autosoft'), f
                storage: None, host_directory / 'storage.key': None}
     base = data / 'config/runtime-layout'
     layout_records = {base / name: C.MAX_RECORD for name in ('intent.json', 'layout.json', 'confirmed.json')}
-    with _controls(files, directories, records), _controls(files, {base: (0, 0, {0o700})}, layout_records):
+    with _controls(files, directories, records, backing_file=storage), _controls(files, {base: (0, 0, {0o700})}, layout_records):
         C.require(_host(data, root, host_directory, files) == before)
         backing = files.protected(storage, private=True)
         C.require(intent['proposal']['capacity_gib'] * 1024**3 <= backing.st_size < 2**63)

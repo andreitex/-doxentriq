@@ -20,13 +20,14 @@ import importlib.util
 if '__company_captured_dependencies__' in globals():
     from types import MappingProxyType, ModuleType
     _captured_dependencies = __company_captured_dependencies__
-    if type(_captured_dependencies) is not MappingProxyType or set(_captured_dependencies) != {'scripts/registry_manifest.py', 'scripts/runtime_layout.py', 'scripts/installation_identity.py'}:
+    if type(_captured_dependencies) is not MappingProxyType or set(_captured_dependencies) != {'scripts/registry_manifest.py', 'scripts/runtime_layout.py', 'scripts/installation_identity.py', 'scripts/identity.py'}:
         raise ValueError('company-captured-dependencies-unavailable')
     if any(type(_captured_dependencies[key]) is not ModuleType for key in _captured_dependencies):
         raise ValueError('company-captured-dependencies-unavailable')
     _registry = _captured_dependencies['scripts/registry_manifest.py']
     _layout = _captured_dependencies['scripts/runtime_layout.py']
     _identity = _captured_dependencies['scripts/installation_identity.py']
+    _owner_identity = _captured_dependencies['scripts/identity.py']
 else:
     _registry_spec = importlib.util.spec_from_file_location('bootstrap_registry_manifest', Path(__file__).resolve().with_name('registry_manifest.py'))
     _registry = importlib.util.module_from_spec(_registry_spec)
@@ -39,6 +40,9 @@ else:
     _identity_spec = importlib.util.spec_from_file_location('bootstrap_installation_identity', Path(__file__).resolve().with_name('installation_identity.py'))
     _identity = importlib.util.module_from_spec(_identity_spec)
     _identity_spec.loader.exec_module(_identity)
+    _owner_identity_spec = importlib.util.spec_from_file_location('bootstrap_owner_identity', Path(__file__).resolve().with_name('identity.py'))
+    _owner_identity = importlib.util.module_from_spec(_owner_identity_spec)
+    _owner_identity_spec.loader.exec_module(_owner_identity)
 qualify_registry_manifest = _registry.qualify
 
 
@@ -479,7 +483,6 @@ def certificates(data, cfg):
 
 
 def realm(data, cfg, oidc_secret, owner_password, provisioner_secret):
-    from identity import owner_recovery_realm
     providers = []
     for provider in ("google", "microsoft"):
         if cfg["sso"] not in {provider, "both"}:
@@ -511,17 +514,35 @@ def realm(data, cfg, oidc_secret, owner_password, provisioner_secret):
                                 protocolMappers=[dict(name="verified-authentication-method", protocol="openid-connect", protocolMapper="oidc-amr-mapper", config={"id.token.claim": "true", "access.token.claim": "true"}), dict(name="admin-audience", protocol="openid-connect", protocolMapper="oidc-audience-mapper", config={"included.client.audience": "autosoft-admin", "access.token.claim": "true", "id.token.claim": "false"})])],
                   users=[dict(id=cfg["owner_subject"], username="owner", enabled=True, emailVerified=False, requiredActions=["UPDATE_PASSWORD", "CONFIGURE_TOTP"], realmRoles=["platform-owner", "platform-admin"], credentials=[dict(type="password", value=owner_password, temporary=True)]), dict(username="service-account-platform-provisioner", enabled=True, serviceAccountClientId="platform-provisioner", clientRoles={"realm-management": ["manage-clients"]})])
     result["clients"][1]["protocolMappers"].append(dict(name="verified-identity-provider", protocol="openid-connect", protocolMapper="oidc-usersessionmodel-note-mapper", config={"user.session.note": "identity_provider", "claim.name": "identity_provider", "jsonType.label": "String", "access.token.claim": "true", "id.token.claim": "true"}))
-    result = owner_recovery_realm(result, cfg["owner_subject"])
+    result = _owner_identity.owner_recovery_realm(result, cfg["owner_subject"])
     write(data / "config/realm.json", result, uid=1000)
 
 
-def render(data, root):
+def render(data, root, *, verify_layout=None):
+    """Render with fresh legacy placement or explicitly verified existing layout.
+
+    The callback is trusted company wiring, not administrator input or a grant
+    of source/parent authority. Native callers must retain those lifetimes and
+    separately guard the renderer's filesystem and process effects.
+    """
+    captured = '__company_captured_dependencies__' in globals()
+    if verify_layout is not None and not callable(verify_layout):
+        raise ValueError('A checked read-only layout callback is required')
+    if captured and verify_layout is None:
+        raise ValueError('Captured rendering requires explicit read-only layout verification')
     offsets = data / 'otel-offsets'
     if offsets.exists() or offsets.is_symlink():
         info = offsets.lstat()
         if not stat.S_ISDIR(info.st_mode) or info.st_uid != 10001 or info.st_gid != 10001 or stat.S_IMODE(info.st_mode) != 0o750:
             raise ValueError('Preserve and review unsafe existing collector offset storage; expected UID/GID10001 mode0750 directory')
-    _layout.prepare(data)
+    if verify_layout is None:
+        _layout.prepare(data)
+    else:
+        placement = verify_layout(data)
+        if type(placement) is not dict or placement != dict(scope='RUNTIME_PLACEMENT_ONLY',
+                status='verified', changed=False, backupReady=False) or any(
+                type(placement.get(name)) is not bool for name in ('changed', 'backupReady')):
+            raise ValueError('Existing runtime layout was not verified without changes')
     if not offsets.exists():
         offsets.mkdir(mode=0o750)
         os.chown(offsets, 10001, 10001)
@@ -742,8 +763,8 @@ def render(data, root):
     print("Service configuration rendered; existing credentials preserved.")
 
 
-def verify(data):
-    cfg = json.loads((data / "config/installation.json").read_text())
+def _verify_legacy_source(data, cfg):
+    """Original standalone CLI source path; never used by captured verification."""
     if cfg.get('company_public_fingerprint'):
         bundle = data / 'config/company-release'
         host = _identity.verify_host_record(Path('/etc/autosoft'))
@@ -753,6 +774,26 @@ def verify(data):
             raw = (data / 'config' / filename).read_bytes()
             if type(row) is not dict or set(row) != {'bytes', 'sha256'} or type(row['bytes']) is not int or len(raw) != row['bytes'] or hashlib.sha256(raw).hexdigest() != row['sha256']:
                 raise ValueError('Active deployment files differ from the signed company release')
+
+
+def verify_data(data, *, command=None):
+    """Check runtime/model configuration, secret modes/key size and TLS.
+
+    This read-only component performs no source authentication or installation
+    admission. A supplied trusted command must raise on failure and return None;
+    it receives only the fixed absolute OpenSSL executable and checked arguments.
+    Missing commands never skip TLS: legacy mode runs the original subprocess,
+    while captured mode refuses an implicit process fallback.
+    """
+    if command is not None and not callable(command):
+        raise ValueError('A checked TLS command callback is required')
+    if '__company_captured_dependencies__' in globals() and command is None:
+        raise ValueError('Captured data verification requires an explicit checked command')
+    def openssl(arguments):
+        if command is None:
+            subprocess.run(['openssl', *arguments], check=True, stdout=subprocess.DEVNULL)
+        elif command(['/usr/bin/openssl', *arguments]) is not None:
+            raise ValueError('Checked TLS commands must raise on failure and return None')
     manifest = json.loads((data / "config/runtime-manifest.json").read_text())
     if manifest.get("schemaVersion") != 1 or not isinstance(manifest.get("templates"), dict) or not manifest["templates"]:
         raise ValueError("Runtime manifest schemaVersion=1 and nonempty templates required")
@@ -791,10 +832,43 @@ def verify(data):
     if len(key) != 32:
         raise ValueError("Secret encryption key must contain exactly 32 bytes")
     for service in ("mysql", "redis", "rabbitmq", "keycloak", "registry", "control", "broker", "packager", "prometheus", "loki", "grafana", "otel"):
-        subprocess.run(["openssl", "verify", "-CAfile", str(data / "tls/ca.crt"), str(data / f"tls/{service}/{service}.crt")], check=True, stdout=subprocess.DEVNULL)
-        subprocess.run(["openssl", "x509", "-checkend", "604800", "-noout", "-in", str(data / f"tls/{service}/{service}.crt")], check=True, stdout=subprocess.DEVNULL)
-    subprocess.run(['openssl', 'verify', '-CAfile', str(data / 'tls/ca.crt'), str(data / 'secrets/runtime/app-issuer.crt')], check=True, stdout=subprocess.DEVNULL)
-    subprocess.run(['openssl', 'x509', '-checkend', '2592000', '-noout', '-in', str(data / 'secrets/runtime/app-issuer.crt')], check=True, stdout=subprocess.DEVNULL)
+        openssl(["verify", "-CAfile", str(data / "tls/ca.crt"), str(data / f"tls/{service}/{service}.crt")])
+        openssl(["x509", "-checkend", "604800", "-noout", "-in", str(data / f"tls/{service}/{service}.crt")])
+    openssl(['verify', '-CAfile', str(data / 'tls/ca.crt'), str(data / 'secrets/runtime/app-issuer.crt')])
+    openssl(['x509', '-checkend', '2592000', '-noout', '-in', str(data / 'secrets/runtime/app-issuer.crt')])
+
+
+def verify(data, *, source_verifier=None, command=None):
+    """Authenticate source, then check data; native authority stays with caller.
+
+    An explicit source_verifier(data, configuration) must use the original live
+    schema4 verifier/held source, raise on failure and return None. It is trusted
+    company wiring, never a success flag or administrator-selected callback.
+    The callback is rechecked after data/TLS validation and must remain live.
+    Existing standalone CLI behavior retains its legacy source authentication.
+    """
+    captured = '__company_captured_dependencies__' in globals()
+    if source_verifier is not None and not callable(source_verifier):
+        raise ValueError('A live source verification callback is required')
+    if command is not None and not callable(command):
+        raise ValueError('A checked TLS command callback is required')
+    if captured and (source_verifier is None or command is None):
+        raise ValueError('Captured verification requires live source and checked command callbacks')
+    configuration_path = data / 'config/installation.json'
+    configuration_raw = configuration_path.read_bytes()
+    cfg = json.loads(configuration_raw)
+    if source_verifier is None:
+        _verify_legacy_source(data, cfg)
+    elif source_verifier(data, json.loads(configuration_raw)) is not None:
+        raise ValueError('Live source verification must raise on failure and return None')
+    verify_data(data, command=command)
+    if source_verifier is not None:
+        if configuration_path.read_bytes() != configuration_raw:
+            raise ValueError('Installation configuration changed during verification')
+        if source_verifier(data, json.loads(configuration_raw)) is not None:
+            raise ValueError('Live source verification must raise on failure and return None')
+        if configuration_path.read_bytes() != configuration_raw:
+            raise ValueError('Installation configuration changed during source recheck')
     print("TLS, secret permissions, and runtime manifests validated.")
 
 
