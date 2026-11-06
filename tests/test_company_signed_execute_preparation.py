@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 HERE = ROOT / 'deploy/installer'
 BASIS = ROOT / 'tests/test_company_authenticated_cli_inputs.py'
 BASIS_PIN = '31678965fbcc4e68864103588dac2c6b9ae27543a10e54ef4af04cd90b98ec7a'
-PROFILE_PIN = '313044bac815ad811e515bcac3b2f728cc54176e95dc8b7ba6c4130dc44281b5'
+PROFILE_PIN = '4425bac76c98f1ad63806cd7f429cf8edab7000d18c878876844518a8cf5471a'
 
 
 def fixture_basis():
@@ -39,10 +39,10 @@ T = fixture_basis()
 
 
 def helper_profile():
-    raw = (ROOT / 'tests/fixtures/company_signed_execute_helpers_v3.json').read_bytes()
+    raw = (ROOT / 'tests/fixtures/company_signed_execute_helpers_v4.json').read_bytes()
     assert T.sha(raw) == PROFILE_PIN
     profile = json.loads(raw)
-    assert len(profile['helpers']) == 15 and profile['totalBytes'] == 246223
+    assert len(profile['helpers']) == 15 and profile['totalBytes'] == 246382
     result = {}
     for row in profile['helpers']:
         path = ROOT / row['path']
@@ -136,7 +136,7 @@ class Controls(unittest.TestCase):
         p = f.prepare()
         data = p.capture_preparation()
         self.assertIs(type(data), MappingProxyType)
-        self.assertEqual((data['signedHelperCount'], data['signedHelperBytes']), (15, 246223))
+        self.assertEqual((data['signedHelperCount'], data['signedHelperBytes']), (15, 246382))
         self.assertEqual(set(data['helperPins']), set(HELPERS))
         for path, (body, row) in HELPERS.items():
             self.assertEqual(dict(data['helperPins'][path]), {'bytes': len(body), 'sha256': T.sha(body)})

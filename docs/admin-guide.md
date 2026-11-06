@@ -1,11 +1,11 @@
-# Managing applications with AutoSoft
+# Managing applications with Doxentriq
 
 This guide is for the person who decides what an application should do and who
 may use it. IT installs and maintains the platform. You describe the work, try
 the result and approve changes. You do not need to choose a programming language
 or an AI model.
 
-AutoSoft is currently pre-production software. Some integrations and recovery
+Doxentriq is currently pre-production software. Some integrations and recovery
 tasks still need company or IT assistance. A successful test of one application
 does not mean every requested application or integration is ready for use.
 
@@ -41,7 +41,7 @@ Choose an application in the sidebar. Its main sections are:
 3. Send the request. Leave the request budget empty to use the configured
    default, or enter a smaller maximum if desired. The platform chooses models
    automatically and must stay within the available allowance.
-4. Answer any business questions in **Help AutoSoft continue**, then select
+4. Answer any business questions in **Help Doxentriq continue**, then select
    **Continue request**. For example, explain who approves a purchase or which
    document fields the team must search.
 5. Follow the recorded progress. You can close the browser and return later;
@@ -164,7 +164,7 @@ or rollback while its outcome is uncertain.
 
 | What you see | What to do |
 |---|---|
-| A business question | Answer it in **Help AutoSoft continue**. |
+| A business question | Answer it in **Help Doxentriq continue**. |
 | Spending limit reached | Review the proposed new maximum, or leave the request paused. Monthly allowance may also need attention. |
 | Protected setup is needed | Ask IT to correct configuration using protected settings, then retry. |
 | Model billing needs review | Ask IT to reconcile the uncertain charge; do not repeat the request. |

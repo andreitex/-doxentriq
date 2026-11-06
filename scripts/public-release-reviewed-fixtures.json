@@ -55,7 +55,7 @@
   },
   {
     "path": "scripts/bootstrap.py",
-    "sha256": "cce4bef2d3e887f525b7eeefa61b5888b09e261bfd1987b8bb2112531d703e87",
+    "sha256": "32cea039d7da0b7f7cc872cdb347787da602a94131527b3337e7668c7c642230",
     "code": "credential_url",
     "reason": "URL is assembled from protected runtime credential variables; this reviewed source contains no literal credential in the URL."
   },

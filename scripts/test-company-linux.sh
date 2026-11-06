@@ -41,7 +41,7 @@ import hashlib,importlib.util,json,os,pathlib,sys,unittest
 source,folder=map(pathlib.Path,sys.argv[1:])
 sys.path.insert(0,str(source/'scripts'))
 reports=[]
-names=['scripts/'+name for name in ('test-deployment.py','test-install-runtime-gate.py','test-quota-helper.py','test-host-remediation.py','test-host-queries.py','test-host-kernel-security.py','test-host-package-inventory.py','test-maintenance-scanner.py','test-maintenance-scanner-diagnostics.py','test-maintenance-scanner-image-memory.py','test-maintenance-scanner-coverage.py','test-maintenance-image-export.py','test-maintenance-broker-security.py','test-registry-manifest.py','test-logging.py','test-pki.py','test-samba.py','test-recovery-tools.py','test-recovery-services.py','test-backup-quiescence.py','test-backup-recovery.py','test-recovery-chain.py','test-identity.py')]
+names=['scripts/'+name for name in ('test-deployment.py','test-install-runtime-gate.py','test-quota-helper.py','test-quota-startup.py','test-host-remediation.py','test-host-queries.py','test-host-kernel-security.py','test-host-package-inventory.py','test-maintenance-scanner.py','test-maintenance-scanner-diagnostics.py','test-maintenance-scanner-image-memory.py','test-maintenance-scanner-coverage.py','test-maintenance-image-export.py','test-maintenance-broker-security.py','test-registry-manifest.py','test-logging.py','test-pki.py','test-samba.py','test-recovery-tools.py','test-recovery-services.py','test-backup-quiescence.py','test-backup-recovery.py','test-recovery-chain.py','test-identity.py')]
 names.append('deploy/connectors/test-filesystem.py')
 names.append('test/test_checkpoint_admission.py')
 names.append('scripts/test-quota-admission.py')

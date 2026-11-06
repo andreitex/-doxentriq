@@ -7,7 +7,7 @@ export function requestGuidance(job: JobRecord, app?: AppRecord): { title: strin
   };
   if (job.stage === 'preview') return {
     title: 'Preparing your preview',
-    description: 'AutoSoft is checking the candidate application. Wait for Ready for your review before approving publication.'
+    description: 'Doxentriq is checking the candidate application. Wait for Ready for your review before approving publication.'
   };
   if (job.stage === 'completed') return app?.activeReleaseId && app.activeReleaseId === job.result?.releaseId ? {
     title: 'This version is live',
@@ -26,7 +26,7 @@ export function requestGuidance(job: JobRecord, app?: AppRecord): { title: strin
   };
   if (['queued', 'specification', 'implementation', 'verification', 'deployment', 'observation'].includes(job.stage)) return {
     title: 'You can return to this conversation later',
-    description: 'The request continues on the server if you close this page. Recorded progress will load when you return. AutoSoft will pause when your input or approval is needed.'
+    description: 'The request continues on the server if you close this page. Recorded progress will load when you return. Doxentriq will pause when your input or approval is needed.'
   };
   return undefined;
 }

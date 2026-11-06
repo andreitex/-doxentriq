@@ -1,0 +1,58 @@
+[
+  {
+    "path": "apps/admin/test/stripe-webhooks.test.tsx",
+    "blobSha256": "ce2ae092cc8774ba0fcbe471e24c16aae85e25969a3df800d1bd584afe69a90a",
+    "rule": "generic-api-key",
+    "line": 14,
+    "reason": "Synthetic Stripe signing-secret fixture with ascending character runs, used by isolated UI serialization tests with a fabricated account. No provider request is made."
+  },
+  {
+    "path": "apps/admin/test/stripe-webhooks.test.tsx",
+    "blobSha256": "ce2ae092cc8774ba0fcbe471e24c16aae85e25969a3df800d1bd584afe69a90a",
+    "rule": "generic-api-key",
+    "line": 31,
+    "reason": "Second deterministic Stripe signing-secret fixture in the same isolated rotation-form test, using ascending character runs and no provider request."
+  },
+  {
+    "path": "apps/control/test/protected-metadata.test.ts",
+    "blobSha256": "d2049d3a4bd0e9ed81ecfcc84048b4f1a8d2bbcc40ab3ef7cbe3504b4200711c",
+    "rule": "generic-api-key",
+    "line": 113,
+    "reason": "Synthetic provider-header marker installed only for a test with global fetch replaced by an assertion stub. The marker is not a provider credential."
+  },
+  {
+    "path": "packages/core/test/model-http.test.ts",
+    "blobSha256": "5ffe725c01eeab82d016f070d75b1b492fccee14778a494314c4adf4d7b38f59",
+    "rule": "generic-api-key",
+    "line": 58,
+    "reason": "Static UUID fixture used to verify that arbitrary credential-shaped values are excluded from request identifiers. Network dispatch is replaced by a supplied test fetch function."
+  },
+  {
+    "path": "tools/qualify-models.ts",
+    "blobSha256": "0322a564b7bd904590e3ab0a83bbe489446a49fb79413d6fa10e198e0f97ffb7",
+    "rule": "generic-api-key",
+    "line": 121,
+    "reason": "Deliberately fabricated secret canary inside a model-safety evaluation prompt; the following assertion rejects responses that repeat this canary. It is not used for authentication."
+  },
+  {
+    "path": "tests/test_company_fixed_execute_child.py",
+    "blobSha256": "0a496694d0634fffddb544ce5e0a11ebb66deeea639e413c37a45484e5e72d43",
+    "rule": "generic-api-key",
+    "line": 24,
+    "reason": "SHA-256 source-integrity pin in the FIXTURE_PINS table for a packaged test helper whose filename contains a credential-related word; this digest is not an authentication credential."
+  },
+  {
+    "path": "services/runtime/go.sum",
+    "blobSha256": "bc4772bf7f82edbb4d0c1abd386b46f88fbda9373894cb62761448c4301248c4",
+    "rule": "generic-api-key",
+    "line": 5,
+    "reason": "Public Go module-integrity checksum in go.sum, following the module/version/h1-SHA256 grammar. Scanning objects without filename-based exclusions also examines dependency checksum files."
+  },
+  {
+    "path": "tests/test_company_fixed_execute_child.py",
+    "blobSha256": "17fe0f11df60edef119aead2896e601fce719ddec0e9471665b09ce0df362409",
+    "rule": "generic-api-key",
+    "line": 24,
+    "reason": "Refreshed SHA-256 source-integrity pin in FIXTURE_PINS after the root-owned 0555 ancestor compatibility fix. The value exactly matches tests/test_company_signed_execute_preparation.py; it is not an authentication credential. The historical blob review remains separate."
+  }
+]

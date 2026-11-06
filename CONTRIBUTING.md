@@ -1,6 +1,6 @@
 # Contributing
 
-AutoSoft source is licensed under [Apache-2.0](LICENSE). The project repository
+Doxentriq source is licensed under [Apache-2.0](LICENSE). The project repository
 is [andreitex/-doxentriq](https://github.com/andreitex/-doxentriq). Contributions
 intended for inclusion are submitted under that license. Do not submit company
 or customer code without permission to distribute it under those terms.

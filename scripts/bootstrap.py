@@ -805,30 +805,73 @@ def mirror_bases(data, root):
 def seed_repository(data, root):
     raise ValueError("Mutable repository seeding is disabled; use the held authenticated seed API")
 
+
+def quota_service_unit(data, root):
+    # Paths are arguments to systemd, not shell text; reject specifiers,
+    # whitespace, traversal and additional directives rather than escaping them.
+    for path in (str(data), str(root)):
+        if not re.fullmatch(r'/[A-Za-z0-9_./-]+', path) or any(part in ('', '.', '..') for part in path.split('/')[1:]):
+            raise ValueError('Exact absolute quota-service paths are required')
+    return f'''[Unit]
+Description=Doxentriq restricted application storage quota helper
+RequiresMountsFor={data}
+Requires=var-log-journal.mount
+After=var-log-journal.mount
+Before=docker.service autosoft.service
+[Service]
+Type=notify
+NotifyAccess=main
+ExecStartPre=/bin/bash {root}/scripts/storage-guard.sh
+ExecStart=/usr/bin/python3 -I -B {root}/scripts/quota-helper.py
+RuntimeDirectory=autosoft
+RuntimeDirectoryMode=0750
+RuntimeDirectoryPreserve=yes
+UMask=0077
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=90
+TimeoutStopSec=90
+KillMode=mixed
+SendSIGKILL=no
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+RestrictAddressFamilies=AF_UNIX
+ReadWritePaths={data}/runtime/storage {data}/quota /run/autosoft
+CapabilityBoundingSet=CAP_SYS_ADMIN CAP_CHOWN CAP_FOWNER CAP_DAC_OVERRIDE
+[Install]
+WantedBy=multi-user.target
+'''
+
+
 def systemd(data, root):
     cfg = json.loads((data / "config/installation.json").read_text())
     builds_mount = subprocess.check_output(["systemd-escape", "--path", "--suffix=mount", str(data / "runtime/builds")], text=True).strip()
     units = {
-        "autosoft.service": f"[Unit]\nDescription=Autosoft platform\nRequires=docker.service autosoft-quota.service {builds_mount}\nAfter=docker.service network-online.target autosoft-quota.service {builds_mount}\nRequiresMountsFor={data}\n[Service]\nType=oneshot\nRemainAfterExit=yes\nExecStart=/bin/bash {root}/scripts/autosoft.sh start\nExecStop=/bin/bash {root}/scripts/autosoft.sh stop\nTimeoutStartSec=600\n[Install]\nWantedBy=multi-user.target\n",
+        "autosoft.service": f"[Unit]\nDescription=Doxentriq platform\nRequires=docker.service autosoft-quota.service {builds_mount}\nAfter=docker.service network-online.target autosoft-quota.service {builds_mount}\nRequiresMountsFor={data}\n[Service]\nType=oneshot\nRemainAfterExit=yes\nExecStart=/bin/bash {root}/scripts/autosoft.sh start\nExecStop=/bin/bash {root}/scripts/autosoft.sh stop\nTimeoutStartSec=600\n[Install]\nWantedBy=multi-user.target\n",
         builds_mount: f"[Unit]\nDescription=Bounded ephemeral generated build workspace\nRequiresMountsFor={data}\nBefore=autosoft.service\n[Mount]\nWhat=tmpfs\nWhere={data}/runtime/builds\nType=tmpfs\nOptions=size=2G,mode=0700,uid=10001,gid=10001,nosuid,nodev\n[Install]\nWantedBy=multi-user.target\n",
-        "autosoft-quota.service": f"[Unit]\nDescription=Restricted application storage quota helper\nRequiresMountsFor={data}\nBefore=autosoft.service\n[Service]\nType=simple\nExecStart=/usr/bin/python3 {root}/scripts/quota-helper.py\nRuntimeDirectory=autosoft\nRuntimeDirectoryMode=0750\nRestart=on-failure\nNoNewPrivileges=true\nProtectSystem=strict\nProtectHome=true\nPrivateTmp=true\nReadWritePaths={data}/runtime/storage {data}/quota /run/autosoft\nCapabilityBoundingSet=CAP_SYS_ADMIN CAP_CHOWN CAP_FOWNER CAP_DAC_OVERRIDE\n[Install]\nWantedBy=multi-user.target\n",
-        "autosoft-security.service": f"[Unit]\nDescription=Autosoft daily security inspection\nRequiresMountsFor={data}\n[Service]\nType=oneshot\nExecStart=/bin/bash {root}/scripts/security-check.sh\n",
-        "autosoft-certificates.service": f"[Unit]\nDescription=Autosoft certificate renewal\nRequiresMountsFor={data}\n[Service]\nType=oneshot\nExecStart=/bin/bash {root}/scripts/certificates.sh renew\n",
-        "autosoft-log-retention.service": f"[Unit]\nDescription=Autosoft seven-day log retention\nRequiresMountsFor={data}\n[Service]\nType=oneshot\nExecStart=/bin/bash {root}/scripts/autosoft.sh prune-logs\n",
+        "autosoft-quota.service": quota_service_unit(data, root),
+        "autosoft-security.service": f"[Unit]\nDescription=Doxentriq daily security inspection\nRequiresMountsFor={data}\n[Service]\nType=oneshot\nExecStart=/bin/bash {root}/scripts/security-check.sh\n",
+        "autosoft-certificates.service": f"[Unit]\nDescription=Doxentriq certificate renewal\nRequiresMountsFor={data}\n[Service]\nType=oneshot\nExecStart=/bin/bash {root}/scripts/certificates.sh renew\n",
+        "autosoft-log-retention.service": f"[Unit]\nDescription=Doxentriq seven-day log retention\nRequiresMountsFor={data}\n[Service]\nType=oneshot\nExecStart=/bin/bash {root}/scripts/autosoft.sh prune-logs\n",
         "autosoft-logs.service": f"[Unit]\nDescription=Capture redacted Docker service logs for Loki\nRequiresMountsFor={data}\n[Service]\nType=oneshot\nExecStart=/usr/bin/python3 {root}/scripts/maintenance.py capture-logs\n",
         "autosoft-logs.timer": "[Timer]\nOnBootSec=1m\nOnUnitActiveSec=1m\nPersistent=true\n[Install]\nWantedBy=timers.target\n",
     }
     for name in ("security", "certificates", "log-retention"):
-        units[f"autosoft-{name}.timer"] = f"[Unit]\nDescription=Autosoft {name} daily schedule\n[Timer]\nOnCalendar=*-*-* 02:00:00 {cfg.get('timezone','UTC')}\nRandomizedDelaySec=30m\nPersistent=true\n[Install]\nWantedBy=timers.target\n"
-    units["autosoft-backup.service"] = f"[Unit]\nDescription=Autosoft encrypted consistent local backup\nRequiresMountsFor={data}\n[Service]\nType=oneshot\nExecStart=/bin/bash {root}/scripts/autosoft.sh backup\nTimeoutStartSec=infinity\n"
+        units[f"autosoft-{name}.timer"] = f"[Unit]\nDescription=Doxentriq {name} daily schedule\n[Timer]\nOnCalendar=*-*-* 02:00:00 {cfg.get('timezone','UTC')}\nRandomizedDelaySec=30m\nPersistent=true\n[Install]\nWantedBy=timers.target\n"
+    units["autosoft-backup.service"] = f"[Unit]\nDescription=Doxentriq encrypted consistent local backup\nRequiresMountsFor={data}\n[Service]\nType=oneshot\nExecStart=/bin/bash {root}/scripts/autosoft.sh backup\nTimeoutStartSec=infinity\n"
     units["autosoft-backup.timer"] = f"[Timer]\nOnCalendar=*-*-* 03:00:00 {cfg.get('timezone','UTC')}\nPersistent=true\n[Install]\nWantedBy=timers.target\n"
-    units["autosoft-incremental.service"] = f"[Unit]\nDescription=Autosoft encrypted closed MySQL binlog archive\nRequiresMountsFor={data}\n[Service]\nType=oneshot\nExecStart=/usr/bin/python3 {root}/scripts/maintenance.py incremental\n"
+    units["autosoft-incremental.service"] = f"[Unit]\nDescription=Doxentriq encrypted closed MySQL binlog archive\nRequiresMountsFor={data}\n[Service]\nType=oneshot\nExecStart=/usr/bin/python3 {root}/scripts/maintenance.py incremental\n"
     units["autosoft-incremental.timer"] = "[Timer]\nOnBootSec=15m\nOnUnitActiveSec=15m\nPersistent=true\n[Install]\nWantedBy=timers.target\n"
-    units["autosoft-restore-verify.service"] = f"[Unit]\nDescription=Autosoft isolated latest-checkpoint MySQL restoration verification\nRequiresMountsFor={data}\n[Service]\nType=oneshot\nExecStart=/usr/bin/python3 {root}/scripts/maintenance.py restore-verify-latest\nTimeoutStartSec=infinity\n"
+    units["autosoft-restore-verify.service"] = f"[Unit]\nDescription=Doxentriq isolated latest-checkpoint MySQL restoration verification\nRequiresMountsFor={data}\n[Service]\nType=oneshot\nExecStart=/usr/bin/python3 {root}/scripts/maintenance.py restore-verify-latest\nTimeoutStartSec=infinity\n"
     units["autosoft-restore-verify.timer"] = f"[Timer]\nOnCalendar=Sun *-*-* 04:00:00 {cfg.get('timezone','UTC')}\nPersistent=true\n[Install]\nWantedBy=timers.target\n"
     for name, content in units.items():
         write(Path("/etc/systemd/system") / name, content, 0o644)
-    write(Path('/etc/systemd/system/docker.service.d/autosoft-storage.conf'), f'[Unit]\nRequiresMountsFor={data}\nRequires={builds_mount} var-log-journal.mount\nAfter={builds_mount} var-log-journal.mount\n[Service]\nExecStartPre=/bin/bash {root}/scripts/storage-guard.sh\n', 0o644)
+    # Keep the exact encrypted-volume guard installed by the foundation. Quota
+    # readiness is a separate full-install dependency, including Docker's own
+    # restart-policy restoration before the platform oneshot can run.
+    write(Path('/etc/systemd/system/docker.service.d/autosoft-quota.conf'), f'[Unit]\nRequires=autosoft-quota.service {builds_mount}\nAfter=autosoft-quota.service {builds_mount}\n', 0o644)
 
 
 def foundation(data, root):

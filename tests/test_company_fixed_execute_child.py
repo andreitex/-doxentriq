@@ -20,7 +20,7 @@ OPERATION = 'a' * 32
 LOGICAL = ('/opt/autosoft-company/incoming/release', '/opt/autosoft-company/bootstrap/company.pem',
            '/opt/autosoft-company/incoming/source')
 FIXTURE_PINS = {
-    'tests/test_company_signed_execute_preparation.py': 'cf686a40862af0032a857eacb899583c39006082dd8966f0af0a08217683ea57',
+    'tests/test_company_signed_execute_preparation.py': '98b07118556242a5c38bba819efd2492dc1d3eb69f36a84b98e14467ece37a3a',
     'tests/test_authenticated_seed.py': 'a542927968dadce36f7218f7ccb8a0210a8656ad84c8e7182873734d1bce782e',
     'scripts/test-installer-parent.py': '7a4cca80c1d0d584d17e3e156d4bcfd496b49d1640011532c7c0156dd662f7a3',
     'tests/test_company_seed_runner.py': 'fe44538e9f2c120f0dc5022d1f5b862d7283513b704be030214d223ac80f8ea8',

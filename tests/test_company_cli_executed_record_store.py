@@ -161,6 +161,22 @@ class StorageControls(unittest.TestCase):
         self.assertFalse(any(e[0] in ('write','fchmod','fsync','pread') for e in self.s.events))
         first=len(self.s.events);self.m.UNRELEASED.clear();self.denied();self.assertEqual(first,len(self.s.events))
 
+    def test_readonly_root_ancestor_publishes_without_changing_permissions(self):
+        self.s.entries['/']['meta'][2]=stat.S_IFDIR|0o555
+        result=self.store()
+        self.assertTrue(result['ownedResourcesKnownReleased'])
+        self.assertEqual(stat.S_IMODE(self.s.entries['/']['meta'][2]),0o555)
+        self.assertEqual(self.s.entries[ROOT+'/executed.json']['body'],self.raw)
+
+    def test_writable_ancestor_and_readonly_terminal_stage_still_refuse(self):
+        for path,permission in (('/',0o775),('/opt',0o757),(ROOT,0o555)):
+            with self.subTest(path=path,permission=permission):
+                self.setUp()
+                self.s.entries[path]['meta'][2]=stat.S_IFDIR|permission
+                if path==ROOT:self.expected=dict(zip(FIELDS,self.s.entries[ROOT]['meta']))
+                self.denied()
+                self.assertNotIn(ROOT+'/executed.json',self.s.entries)
+
     def test_one_success_is_still_one_use(self):
         self.store();before=list(self.s.events);self.denied();self.assertEqual(before,self.s.events)
 

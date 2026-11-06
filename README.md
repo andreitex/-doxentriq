@@ -1,4 +1,4 @@
-# AutoSoft
+# Doxentriq
 
 Build and improve applications by describing what you need in chat. An IT
 operator installs and maintains one instance for an organization. Administrators
@@ -12,6 +12,10 @@ remain unfinished. A running trial does not establish those results. Read
 [release requirements](RELEASING.md) before distributing source or images.
 The project is licensed under [Apache-2.0](LICENSE). The public source destination
 is [andreitex/-doxentriq](https://github.com/andreitex/-doxentriq).
+The [public secret audit](docs/public-security-audit.md) records its exact
+history, artifact and credential-comparison coverage. The
+[website claims review](docs/website-audit.md) distinguishes implemented controls
+from remaining installation and recovery acceptance.
 
 ## Everyday administration
 

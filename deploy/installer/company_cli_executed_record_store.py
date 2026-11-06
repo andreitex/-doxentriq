@@ -246,7 +246,9 @@ def _factory(namespace, public, error_type, primitives):
             parent=None
             for name in ['/',*stage_directory.split('/')[1:]]:
                 row=acquire(name,0|65536|131072|524288|2048,parent,'directory')
-                actual=row['identity'];need(isdir(actual[2]) and mode(actual[2]) in (0o700,0o755) and actual[3:5]==(0,0) and actual[5]>=2)
+                # Rocky may mount the root directory with mode0555. This is
+                # stricter than0755; the terminal stage remains exactly0700.
+                actual=row['identity'];need(isdir(actual[2]) and mode(actual[2]) in (0o555,0o700,0o755) and actual[3:5]==(0,0) and actual[5]>=2)
                 record['directories'].append(row);parent=row['fd']
             stage=record['directories'][-1]
             need(stage['identity']==expected and mode(stage['identity'][2])==0o700)

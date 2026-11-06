@@ -1,6 +1,6 @@
 # Security policy
 
-AutoSoft is pre-release software. No production-supported release or response-time
+Doxentriq is pre-release software. No production-supported release or response-time
 commitment has been announced. A passing source test does not certify an installed
 system, its dependencies, a generated application or a third-party connection.
 

@@ -21,7 +21,7 @@ export function localInvitationBlockedReason(policy: AppAccessPolicy, ready: boo
 export function FirstLocalAccountSetup({ snapshot, roles, ready, busy, onDraft }: { snapshot: AppAccessSnapshot; roles: AppAccessRole[]; ready: boolean; busy: boolean; onDraft: () => void }) {
   if (snapshot.policy.roles.length) return null;
   return <section className="settings-card"><h2>Set up your first app administrator</h2>
-    <p>Your platform account manages AutoSoft. To sign in inside this app, create an app account with its own password and authenticator.</p>
+    <p>Your platform account manages Doxentriq. To sign in inside this app, create an app account with its own password and authenticator.</p>
     <ol><li>Draft an <strong>App administrators</strong> role, then use <strong>Review access policy</strong> below to approve its permissions and allow local invitations.</li><li>Under <strong>Invite a local app user</strong>, enter your email, select the approved role, and review the invitation separately.</li><li>Open the private invitation link, choose your app password, then enroll your authenticator at app sign-in.</li></ol>
     <p><strong>This role includes every verified permission in this app.</strong> It may allow changing or deleting app records where those permissions exist. It grants no platform or other-app access. Create narrower roles for other users.</p>
     {snapshot.permissions.length ? <details><summary>Review all {snapshot.permissions.length} app permissions</summary><ul>{snapshot.permissions.map(permission => <li key={permission}><code>{permission}</code></li>)}</ul></details> : <p>No verified app permissions are available. Ask IT to check the published app before continuing.</p>}

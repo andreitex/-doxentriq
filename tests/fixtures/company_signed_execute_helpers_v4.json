@@ -1,0 +1,132 @@
+{
+  "enrollmentPerformed": false,
+  "helpers": [
+    {
+      "basis": "deploy/installer/company_cli_record.py",
+      "bytes": 4410,
+      "gitMode": "100644",
+      "path": "deploy/installer/company_cli_record.py",
+      "role": "record",
+      "sha256": "c48f61c44a0694ff0ae308970ca656c5f418f641f8e2f28329ac110e93d9f10d"
+    },
+    {
+      "basis": "deploy/installer/company_cli_record_io.py",
+      "bytes": 27601,
+      "gitMode": "100644",
+      "path": "deploy/installer/company_cli_record_io.py",
+      "role": "io",
+      "sha256": "306b81f7cea78fa5eb25622e84115da7154ce82fad936644b1dccc6e8609ca47"
+    },
+    {
+      "basis": "deploy/installer/company_cli_record_publish.py",
+      "bytes": 15822,
+      "gitMode": "100644",
+      "path": "deploy/installer/company_cli_record_publish.py",
+      "role": "publisher",
+      "sha256": "dff4e2c0a57ebf35bfcddcb922f19f8df6e84f7ab1e90e0eef9e9adb8c0ce698"
+    },
+    {
+      "basis": "deploy/installer/company_cli_captured_publish.py",
+      "bytes": 6083,
+      "gitMode": "100644",
+      "path": "deploy/installer/company_cli_captured_publish.py",
+      "role": "captured",
+      "sha256": "a56ddb3264ac748ea6ea935de72549caba8b09eebe6119fbbdffef8c96a406b5"
+    },
+    {
+      "basis": "deploy/installer/company_cli_stage_child.py",
+      "bytes": 17727,
+      "gitMode": "100644",
+      "path": "deploy/installer/company_cli_stage_child.py",
+      "role": "stage",
+      "sha256": "8e1097816963e48ce2157da4d69ab45cc158da787861209a0c38118f3cd09b69"
+    },
+    {
+      "basis": "deploy/installer/company_release_crypto.py",
+      "bytes": 25854,
+      "gitMode": "100644",
+      "path": "deploy/installer/company_release_crypto.py",
+      "role": "crypto",
+      "sha256": "ac1ee990cce7ceedef03b76e1d23d7ca5d4203dcf88c1783adc8e5954f5fdc1b"
+    },
+    {
+      "basis": "deploy/installer/company_live_completion_receiver.py",
+      "bytes": 23261,
+      "gitMode": "100644",
+      "path": "deploy/installer/company_live_completion_receiver.py",
+      "role": "receiver",
+      "sha256": "772ab815a523ed08eb5d1b73f6cd05db95a5a5bddc1e9bf709ecc4a2369d67e9"
+    },
+    {
+      "basis": "deploy/installer/company_cli_live_verify_caller.py",
+      "bytes": 32248,
+      "gitMode": "100644",
+      "path": "deploy/installer/company_cli_live_verify_caller.py",
+      "role": "caller",
+      "sha256": "ca2de8ec2fab602ba3fa4be18d887850545b3bdd00e1612d471ebb51be61a924"
+    },
+    {
+      "basis": "deploy/installer/company_cli_executed_record_store.py",
+      "bytes": 17552,
+      "gitMode": "100644",
+      "path": "deploy/installer/company_cli_executed_record_store.py",
+      "role": "record-store",
+      "sha256": "06499c1ad7b6747e29279276960ea6cf76365331d8ffc0f9d5bc3cff5828f2d7"
+    },
+    {
+      "basis": "deploy/installer/company_bash_execution_status.py",
+      "bytes": 12797,
+      "gitMode": "100644",
+      "path": "deploy/installer/company_bash_execution_status.py",
+      "role": "execution-status",
+      "sha256": "1ca5846d66a066f503af0a45786f1362847c6ccfaf919481527e760d14fdcd80"
+    },
+    {
+      "basis": "deploy/installer/company_cli_verify_invocation.py",
+      "bytes": 7206,
+      "gitMode": "100644",
+      "path": "deploy/installer/company_cli_verify_invocation.py",
+      "role": "verify-invocation",
+      "sha256": "5a4d9a475a4a77f4b0e2fce46bf48ad31825b279581840cde2fe5a9ec4e9d47d"
+    },
+    {
+      "basis": "deploy/installer/company_cli_execute_bootstrap.py",
+      "bytes": 14062,
+      "gitMode": "100644",
+      "path": "deploy/installer/company_cli_execute_bootstrap.py",
+      "role": "execute-bootstrap",
+      "sha256": "19c396d40bd74bc3672effaa9ddb6be5dd35534be1e3dd3edd652137f4880277"
+    },
+    {
+      "basis": "deploy/installer/company_authenticated_cli_inputs.py",
+      "bytes": 14204,
+      "gitMode": "100644",
+      "path": "deploy/installer/company_authenticated_cli_inputs.py",
+      "role": "source-inputs",
+      "sha256": "99156be4b544dbe16fecd47b977ff790de49863588703fe1317a253dc6840928"
+    },
+    {
+      "basis": "deploy/installer/company_authenticated_cli_compose.py",
+      "bytes": 17289,
+      "gitMode": "100644",
+      "path": "deploy/installer/company_authenticated_cli_compose.py",
+      "role": "composition",
+      "sha256": "365e8c48ad86d90063e8e7a5305bc383d80bbfc62171040c67e52efd21819aea"
+    },
+    {
+      "basis": "deploy/installer/build-full-cli-package.py",
+      "bytes": 10266,
+      "gitMode": "100644",
+      "path": "deploy/installer/build-full-cli-package.py",
+      "role": "delivery",
+      "sha256": "05e04b4e86c35d1bcc70ae0c251088e8b9789968ef070c2ae983393e2cc70a12"
+    }
+  ],
+  "nativeExecuted": false,
+  "reason": "Allow root-owned mode0555 ancestors in the executed-record publisher for Rocky Linux; terminal stage remains0700. Earlier profiles remain retained.",
+  "revision": 4,
+  "schemaVersion": 1,
+  "scope": "FIXED_TEST_PUBLIC_HELPER_PROFILE_DATA_ONLY",
+  "signingPerformed": false,
+  "totalBytes": 246382
+}

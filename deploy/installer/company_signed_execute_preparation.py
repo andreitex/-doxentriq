@@ -16,7 +16,7 @@ HELPERS=(
  ('crypto','deploy/installer/company_release_crypto.py','ac1ee990cce7ceedef03b76e1d23d7ca5d4203dcf88c1783adc8e5954f5fdc1b',25854),
  ('receiver','deploy/installer/company_live_completion_receiver.py','772ab815a523ed08eb5d1b73f6cd05db95a5a5bddc1e9bf709ecc4a2369d67e9',23261),
  ('caller','deploy/installer/company_cli_live_verify_caller.py','ca2de8ec2fab602ba3fa4be18d887850545b3bdd00e1612d471ebb51be61a924',32248),
- ('record-store','deploy/installer/company_cli_executed_record_store.py','c4ac7faef7e0bbb25034552774ea1ef524f9a81aae4b02bca15337fd7b0bb107',17393),
+ ('record-store','deploy/installer/company_cli_executed_record_store.py','06499c1ad7b6747e29279276960ea6cf76365331d8ffc0f9d5bc3cff5828f2d7',17552),
  ('execution-status','deploy/installer/company_bash_execution_status.py','1ca5846d66a066f503af0a45786f1362847c6ccfaf919481527e760d14fdcd80',12797),
  ('verify-invocation','deploy/installer/company_cli_verify_invocation.py','5a4d9a475a4a77f4b0e2fce46bf48ad31825b279581840cde2fe5a9ec4e9d47d',7206),
  ('execute-bootstrap','deploy/installer/company_cli_execute_bootstrap.py','19c396d40bd74bc3672effaa9ddb6be5dd35534be1e3dd3edd652137f4880277',14062),
@@ -163,7 +163,7 @@ def _factory(public,error_kind,namespace,primitives):
     found=vars(helper).get(key);need(type(found) is tuple and len(found)==len(expected) and all(type(row) is tuple and len(row)==2 and all(type(item) is str for item in row) for row in found));need(found==expected)
    getter=gettype(bootstrap_kind,'__dict__').get('construction_modules');need(type(getter) is property and type(getter.fget) is fn and getter.fget.__globals__ is vars(helper));record['construction_getter']=getter.fget;record['functions']+=tuple(function(value) for value in (capture_bootstrap,getter.fget));record['tables']+=(tables(bootstrap_kind),)
    bootstrap=boundary(record,'original-execute-bootstrap-capture',capture_bootstrap,actual,actual_pins,sys_module=sys_module,_save='bootstrap');need(type(bootstrap) is bootstrap_kind);live(record)
-   record['summary']=proxy(dict(scope='SIGNED_EXECUTE_PREPARATION_DATA_ONLY',deliveryRaw=delivery['deliveryRaw'],authentication=frozen(auth),programCaptures=proxy(actual),programPins=frozen(actual_pins),helperPins=frozen(record['helper_pins']),signedHelperCount=15,signedHelperBytes=246223,sourceObjectTransferred=False,downstreamOriginalSourceReauthenticationRequired=True,initialOriginSelfAuthenticated=False,operationalCodeCompiled=False,childPrepared=False,stageDispatched=False,nativeExecuted=False,executionEvidenceIssued=False,stageAcknowledged=False))
+   record['summary']=proxy(dict(scope='SIGNED_EXECUTE_PREPARATION_DATA_ONLY',deliveryRaw=delivery['deliveryRaw'],authentication=frozen(auth),programCaptures=proxy(actual),programPins=frozen(actual_pins),helperPins=frozen(record['helper_pins']),signedHelperCount=15,signedHelperBytes=246382,sourceObjectTransferred=False,downstreamOriginalSourceReauthenticationRequired=True,initialOriginSelfAuthenticated=False,operationalCodeCompiled=False,childPrepared=False,stageDispatched=False,nativeExecuted=False,executionEvidenceIssued=False,stageAcknowledged=False))
    value=object.__new__(kind);record['value']=value;registry[id(value)]=record;guard(record);return value
   except BaseException as error:retain(record,'signed-execute-prepare',error);deny()
  def main(argv=None):deny()
