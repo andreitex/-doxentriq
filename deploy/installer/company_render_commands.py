@@ -27,6 +27,25 @@ def require(ok,message='Fixed rendering command refused; preserve the operation 
 def ident(s):return tuple(getattr(s,k) for k in ('st_dev','st_ino','st_mode','st_uid','st_gid','st_nlink','st_size','st_mtime_ns','st_ctime_ns'))
 
 
+def canonical_digest_reference(value):
+    """Normalize only Docker Hub's implicit registry and library namespace."""
+    require(type(value) is str and re.fullmatch(r'[a-z0-9._:/-]+@sha256:[a-f0-9]{64}',value) is not None)
+    repository,digest=value.split('@');parts=repository.split('/')
+    require(all(part and part not in ('.','..') for part in parts))
+    if len(parts)>1 and ('.' in parts[0] or ':' in parts[0] or parts[0]=='localhost'):
+        registry,parts=parts[0],parts[1:]
+    else:registry='docker.io'
+    require(not any(':' in part for part in parts),'Tagged pinned aliases are unsupported')
+    if registry=='docker.io' and len(parts)==1:parts=['library',*parts]
+    return registry+'/'+('/'.join(parts))+'@'+digest
+
+
+def pinned_reference_present(wanted,references):
+    require(type(references) is list)
+    expected=canonical_digest_reference(wanted)
+    return any(canonical_digest_reference(value)==expected for value in references)
+
+
 def grammar(io):
     """The exact original renderer's finite OpenSSL command set."""
     d=io.root;ca=d+'/tls/ca.crt';key=d+'/tls/ca.key';allowed={}
@@ -167,7 +186,8 @@ class NativeCommands:
             finally:os.close(fd)
         image=json.loads(self._docker(['image','inspect',self.image]))
         require(type(image) is list and len(image)==1 and image[0].get('Os')=='linux' and image[0].get('Architecture')=='amd64')
-        require(self.image in image[0].get('RepoDigests',[]) and re.fullmatch('sha256:[a-f0-9]{64}',image[0].get('Id','')) is not None)
+        require(pinned_reference_present(self.image,image[0].get('RepoDigests',[]))
+            and re.fullmatch('sha256:[a-f0-9]{64}',image[0].get('Id','')) is not None)
         self.image_id=image[0]['Id']
         config=image[0]['Config'];require(config.get('Entrypoint') in (None,[]))
         volumes=config.get('Volumes') or {}

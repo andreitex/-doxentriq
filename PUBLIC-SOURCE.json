@@ -1291,8 +1291,8 @@
     },
     {
       "path": "deploy/installer/company_render_commands.py",
-      "sourceSha256": "0382a41d4b36c2406544e11cc650aa9e804fb183f833c0ccfbbae7a932c36f0b",
-      "exportSha256": "0382a41d4b36c2406544e11cc650aa9e804fb183f833c0ccfbbae7a932c36f0b",
+      "sourceSha256": "687c491f71b6b87d8fb029d8d02a27fcfa938bba88757f9af17fda73dd6a0aeb",
+      "exportSha256": "687c491f71b6b87d8fb029d8d02a27fcfa938bba88757f9af17fda73dd6a0aeb",
       "transformations": []
     },
     {
@@ -3977,8 +3977,8 @@
     },
     {
       "path": "tests/test_company_render_commands.py",
-      "sourceSha256": "4e17cdf9ef7efb81125cac2c927d6e65d83e1efb23016fcecb46d71e938629a9",
-      "exportSha256": "4e17cdf9ef7efb81125cac2c927d6e65d83e1efb23016fcecb46d71e938629a9",
+      "sourceSha256": "a95f08fb4d59ae8cdbe4befc7fefb41856c84e20798df5213b57d38e098ee019",
+      "exportSha256": "a95f08fb4d59ae8cdbe4befc7fefb41856c84e20798df5213b57d38e098ee019",
       "transformations": []
     },
     {

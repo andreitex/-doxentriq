@@ -1,6 +1,7 @@
 """Synthetic Docker responses test the original fixed transport decisions."""
 import importlib.util
 import json
+import stat
 from pathlib import Path
 from types import SimpleNamespace
 import unittest
@@ -44,6 +45,45 @@ class Simulated(C.NativeCommands):
 
 
 class Commands(unittest.TestCase):
+    def test_docker_hub_normalization_preserves_exact_registry_repository_and_digest(self):
+        suffix='@sha256:'+'a'*64
+        for name in ('caddy','library/caddy','docker.io/caddy','docker.io/library/caddy'):
+            with self.subTest(name=name):
+                self.assertTrue(C.pinned_reference_present('docker.io/library/caddy'+suffix,[name+suffix]))
+        self.assertTrue(C.pinned_reference_present('docker.io/company/caddy'+suffix,['company/caddy'+suffix]))
+        self.assertTrue(C.pinned_reference_present('localhost:5000/team/caddy'+suffix,['localhost:5000/team/caddy'+suffix]))
+        for name in ('evil.example/library/caddy'+suffix,'ghcr.io/library/caddy'+suffix,
+                'company/caddy'+suffix,'docker.io/library/other'+suffix,'caddy@sha256:'+'b'*64):
+            with self.subTest(name=name):
+                self.assertFalse(C.pinned_reference_present('docker.io/library/caddy'+suffix,[name]))
+        for name in ('caddy:latest'+suffix,'docker.io//caddy'+suffix,'docker.io/../caddy'+suffix,'caddy:latest'):
+            with self.subTest(name=name),self.assertRaises(ValueError):C.canonical_digest_reference(name)
+
+    def test_preflight_accepts_normalized_digest_but_still_refuses_active_engine(self):
+        class Preflight(C.NativeCommands):
+            def __init__(self,*,active=False,reference=None):
+                self.tools={};self.image='docker.io/library/caddy@sha256:'+'b'*64
+                self.io=SimpleNamespace(readonly=False);self.calls=[];self.active=active
+                self.reference=reference or 'caddy@sha256:'+'b'*64
+            def _tool(self,name):self.tools[name]=None
+            def _check(self):pass
+            def _docker(self,args):
+                self.calls.append(args)
+                if args[:2]==['image','inspect']:
+                    return json.dumps([dict(Id='sha256:'+'c'*64,Os='linux',Architecture='amd64',
+                        RepoDigests=[self.reference],Config={'Entrypoint':None,'Volumes':None})]).encode()
+                if args==['container','ls','--all','--quiet']:return b'owned-or-foreign\n' if self.active else b''
+                raise AssertionError(args)
+        socket=SimpleNamespace(st_dev=1,st_ino=2,st_mode=stat.S_IFSOCK|0o660,st_uid=0,st_gid=0,
+            st_nlink=1,st_size=0,st_mtime_ns=3,st_ctime_ns=3)
+        with patch.object(C.os,'stat',return_value=socket),patch.object(C.os.path,'exists',return_value=False):
+            c=Preflight();c.preflight();self.assertEqual(c.image_id,'sha256:'+'c'*64)
+            c=Preflight(active=True)
+            with self.assertRaisesRegex(ValueError,'inactive container engine'):c.preflight()
+            c=Preflight(reference='evil.example/library/caddy@sha256:'+'b'*64)
+            with self.assertRaises(ValueError):c.preflight()
+            self.assertEqual(c.calls,[['image','inspect',c.image]])
+
     def test_no_pull_no_network_owned_container_confirmed_then_removed(self):
         c=Simulated();c.check_output(c.original(),text=True)
         create=c.calls[0]
