@@ -368,7 +368,7 @@ def measure(state,runner,request,final_root,held,*,output=None):
     installed=json.loads(state.read('/etc/autosoft/runtime-installed.json'));require(installed == {'version':request['runscVersion'],'archive_sha512':request['runscSha512']})
     archive=state.read(data/'company/work/gvisor.tar.zstd',128*1024**2);require(hashlib.sha512(archive).hexdigest() == request['runscSha512'])
     runtime=runner.run(['/usr/bin/python3','-I','-B','-c',RUNTIME_IDENTITY,str(data/'company/work/gvisor.tar.zstd'),request['runscSha512']],60)
-    binary_pins=json.loads(runtime);require(type(binary_pins) is dict and set(binary_pins) in (set(RUNTIME_PRIMARY_FILES),set(RUNTIME_PRIMARY_FILES+RUNTIME_SIDECAR_FILES))
+    binary_pins=json.loads(runtime);require(type(binary_pins) is dict and set(binary_pins) in (set(RUNTIME_PRIMARY_FILES),set(RUNTIME_PRIMARY_FILES+RUNTIME_SIDECAR_FILES),set(RUNTIME_PRIMARY_FILES+RUNTIME_CURRENT_SIDECAR_FILES))
         and all(type(value) is str and re.fullmatch('[a-f0-9]{64}',value) is not None for value in binary_pins.values()))
     version=runner.run(['/usr/local/bin/runsc','--version'],30);require(version and len(version) <= 4096)
     require('MaxRetentionSec=7day' in state.read('/etc/systemd/journald.conf.d/autosoft.conf').decode())
@@ -381,10 +381,11 @@ def measure(state,runner,request,final_root,held,*,output=None):
 RUNTIME_PRIMARY_FILES = ('runsc', 'containerd-shim-runsc-v1')
 RUNTIME_SIDECAR_FILES = ('gvisor-bin/checkpointgofer', 'gvisor-bin/gvisor-sentry-prewarmer',
     'gvisor-bin/gvisor_sentry', 'gvisor-bin/runsc-fd-parking', 'gvisor-bin/runsc-metric-server')
+RUNTIME_CURRENT_SIDECAR_FILES = RUNTIME_SIDECAR_FILES + ('gvisor-bin/gvisor-proc-umounter',)
 
 # The complete pinned archive determines whether this is a legacy two-file
-# release or the supported sidecar layout. Never ignore an unmeasured sidecar.
-RUNTIME_IDENTITY = 'PRIMARY='+repr(RUNTIME_PRIMARY_FILES)+'\nSIDECARS='+repr(RUNTIME_SIDECAR_FILES)+'\n'+r'''
+# release or one of the exact supported sidecar layouts. Never ignore a sidecar.
+RUNTIME_IDENTITY = 'PRIMARY='+repr(RUNTIME_PRIMARY_FILES)+'\nSIDECARS='+repr(RUNTIME_SIDECAR_FILES)+'\nCURRENT_SIDECARS='+repr(RUNTIME_CURRENT_SIDECAR_FILES)+'\n'+r'''
 import contextlib,fcntl,hashlib,json,os,re,stat,subprocess,sys,tarfile
 KEYS=('st_dev','st_ino','st_mode','st_uid','st_gid','st_nlink','st_size','st_mtime_ns','st_ctime_ns')
 def identity(info):return tuple(getattr(info,key) for key in KEYS)
@@ -486,15 +487,15 @@ def verify_stream(stream,root='/usr/local/bin'):
   with tarfile.open(fileobj=bounded,mode='r|') as tar:
    for member in tar:
     name=member.name.removeprefix('./')
-    assert name not in seen and len(seen)<8 and not member.linkname and member.sparse is None
+    assert name not in seen and len(seen)<9 and not member.linkname and member.sparse is None
     assert member.mode==0o755
     seen.add(name);check()
     if name=='gvisor-bin':
      assert member.isdir() and member.size==0
      sidecar_fd=hold(root+'/gvisor-bin',root_fd,'gvisor-bin');sidecars=True
      continue
-    assert name in PRIMARY+SIDECARS and member.isfile() and 0<member.size<=256*1024**2
-    if name in SIDECARS:
+    assert name in PRIMARY+CURRENT_SIDECARS and member.isfile() and 0<member.size<=256*1024**2
+    if name in CURRENT_SIDECARS:
      if sidecar_fd is None:sidecar_fd=hold(root+'/gvisor-bin',root_fd,'gvisor-bin')
      sidecars=True;file_parent=sidecar_fd;basename=name.split('/')[1]
     else:file_parent=root_fd;basename=name
@@ -507,9 +508,10 @@ def verify_stream(stream,root='/usr/local/bin'):
     assert file_digest(file_parent,basename,member.size)==digest.hexdigest()
     rows[name]=digest.hexdigest();check()
   while bounded.read(65536):pass
-  expected=set(PRIMARY+SIDECARS) if sidecars else set(PRIMARY)
+  companions=CURRENT_SIDECARS if set(rows)&(set(CURRENT_SIDECARS)-set(SIDECARS)) else SIDECARS
+  expected=set(PRIMARY+companions) if sidecars else set(PRIMARY)
   assert set(rows)==expected and seen==(expected|{'gvisor-bin'} if sidecars else expected)
-  if sidecars:assert set(os.listdir(sidecar_fd))=={name.split('/')[1] for name in SIDECARS}
+  if sidecars:assert set(os.listdir(sidecar_fd))=={name.split('/')[1] for name in companions}
   else:assert not os.path.lexists(root+'/gvisor-bin')
   for fd,_,_,_,size,digest in leaves:
    check();assert read_digest(fd,size)==digest

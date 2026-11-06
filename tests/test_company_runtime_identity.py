@@ -35,8 +35,9 @@ class NativeRuntimeIdentityTests(unittest.TestCase):
         exec(compile(WORKER.RUNTIME_IDENTITY, '<captured runtime verifier>', 'exec'), self.namespace)
         self.verify = self.namespace['verify_stream']
 
-    def fixture(self, *, modern=True):
-        names = WORKER.RUNTIME_PRIMARY_FILES + (WORKER.RUNTIME_SIDECAR_FILES if modern else ())
+    def fixture(self, *, modern=True, current=False):
+        companions = WORKER.RUNTIME_CURRENT_SIDECAR_FILES if current else WORKER.RUNTIME_SIDECAR_FILES
+        names = WORKER.RUNTIME_PRIMARY_FILES + (companions if modern else ())
         rows = []
         for name in names:
             if '/' in name and not (self.install / 'gvisor-bin').exists():
@@ -67,9 +68,54 @@ class NativeRuntimeIdentityTests(unittest.TestCase):
     def verify_rows(self, rows):
         return self.verify(self.archive(rows), str(self.install))
 
-    def test_all_seven_current_files_are_measured(self):
+    def test_all_seven_previous_layout_files_are_measured(self):
         rows = self.fixture()
         self.assertEqual(self.verify_rows(rows), {name: hashlib.sha256(raw).hexdigest() for name, raw in rows if raw is not None})
+
+    def test_all_eight_current_files_are_measured(self):
+        rows = self.fixture(current=True)
+        self.assertEqual(len(rows), 9)
+        self.assertEqual(self.verify_rows(rows), {name: hashlib.sha256(raw).hexdigest() for name, raw in rows if raw is not None})
+
+    def test_current_archive_missing_previous_companion_rejected(self):
+        rows = self.fixture(current=True)
+        omitted = WORKER.RUNTIME_SIDECAR_FILES[0]
+        with self.assertRaises(AssertionError):
+            self.verify_rows([(name, raw) for name, raw in rows if name != omitted])
+
+    def test_previous_archive_rejects_current_installed_extra(self):
+        rows = self.fixture(current=True)
+        with self.assertRaises(AssertionError):
+            self.verify_rows(rows[:-1])
+
+    def test_current_companion_missing_or_changed_rejected(self):
+        rows = self.fixture(current=True)
+        path = self.install / 'gvisor-bin/gvisor-proc-umounter'
+        raw = path.read_bytes()
+        path.write_bytes(b'X' + raw[1:])
+        with self.assertRaises(AssertionError):
+            self.verify_rows(rows)
+        path.unlink()
+        with self.assertRaises(FileNotFoundError):
+            self.verify_rows(rows)
+
+    def test_current_companion_symlink_and_privileged_mode_rejected(self):
+        rows = self.fixture(current=True)
+        path = self.install / 'gvisor-bin/gvisor-proc-umounter'
+        path.chmod(0o4755)
+        with self.assertRaises(AssertionError):
+            self.verify_rows(rows)
+        path.chmod(0o755)
+        target = self.folder / 'elsewhere'
+        path.rename(target)
+        path.symlink_to(target)
+        with self.assertRaises(AssertionError):
+            self.verify_rows(rows)
+
+    def test_current_archive_rejects_additional_member(self):
+        rows = self.fixture(current=True)
+        with self.assertRaises(AssertionError):
+            self.verify_rows([*rows, ('gvisor-bin/unreviewed', b'bad')])
 
     def test_legacy_layout_requires_no_unmeasured_sidecar_directory(self):
         rows = self.fixture(modern=False)

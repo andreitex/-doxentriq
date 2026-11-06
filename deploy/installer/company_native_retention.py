@@ -40,7 +40,8 @@ def load_package(package=PACKAGE):
         captured[name] = raw
     require(set(captured) == {'cli', 'delivery', 'record', 'store', 'crypto', 'station', 'request', 'records',
                               'configuration', 'configuration_worker', 'repository_io', 'repository_worker',
-                              'runtime_pair_parent', 'runtime_pair_worker', 'stored_startup', 'startup_worker'})
+                              'runtime_pair_parent', 'runtime_pair_worker', 'stored_startup', 'startup_worker',
+                              'render_io', 'render_commands', 'render_verify', 'render_worker'})
     delivery = base64.b64decode(package['delivery'], validate=True)
     auth = dict(package['authentication'])
     require(len(delivery) == auth['delivery_pin']['bytes'] and sha(delivery) == auth['delivery_pin']['sha256'])
@@ -93,7 +94,8 @@ def main(argv=None):
         'configuration-action', 'configure-foundation', 'verify-configuration',
         'repository-action', 'seed-repository', 'verify-repository',
         'runtime-pair-action', 'initialize-runtime-pair', 'verify-runtime-pair',
-        'continuation-ready', 'startup-action', 'inspect-stored-startup', 'verify-stored-startup'))
+        'continuation-ready', 'startup-action', 'inspect-stored-startup', 'verify-stored-startup',
+        'render-action', 'render-ready', 'render-configuration', 'verify-render'))
     p.add_argument('--request', required=True)
     p.add_argument('--stage', choices=STAGES)
     p.add_argument('--parent', nargs=7)
@@ -107,6 +109,12 @@ def main(argv=None):
     request_raw = S.read_protected(a.request, 4096)
     request = modules['request'].validate_request(request_raw, request_sha256=sha(request_raw))
     require(Path(a.request).stem == request['operationId'] and request['operationId'] != '0'*32)
+    if a.command in ('render-action','render-ready','render-configuration','verify-render'):
+        require(a.stage is None and not a.persist)
+        worker_raw = S.read_protected(Path(__file__), 2 * 1024 ** 2)
+        modules['render_worker'].run(a.command, modules, delivery, auth, request,
+            request_raw, sha(worker_raw), a.parent)
+        return
     if a.command in ('continuation-ready', 'startup-action', 'inspect-stored-startup', 'verify-stored-startup'):
         require(a.stage is None and not a.persist)
         worker_raw = S.read_protected(Path(__file__), 2 * 1024 ** 2)

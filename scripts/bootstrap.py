@@ -418,7 +418,11 @@ def configure(data, root, *, host_directory=Path('/etc/autosoft'), files=None,
     print("Client configuration stored on the encrypted volume.")
 
 
-def certificates(data, cfg):
+def certificates(data, cfg, *, render_io=None):
+    write = globals()["write"] if render_io is None else render_io.write
+    os = globals()["os"] if render_io is None else render_io.os
+    subprocess = globals()["subprocess"] if render_io is None else render_io.process
+    shutil = globals()["shutil"] if render_io is None else render_io
     tls = data / "tls"
     ca_key, ca_crt = tls / "ca.key", tls / "ca.crt"
     if not ca_key.exists():
@@ -482,7 +486,8 @@ def certificates(data, cfg):
         strict_chain(data/'public-tls/server.crt',urllib.parse.urlsplit(cfg['admin_origin']).hostname)
 
 
-def realm(data, cfg, oidc_secret, owner_password, provisioner_secret):
+def realm(data, cfg, oidc_secret, owner_password, provisioner_secret, *, writer=None):
+    write = globals()["write"] if writer is None else writer
     providers = []
     for provider in ("google", "microsoft"):
         if cfg["sso"] not in {provider, "both"}:
@@ -518,7 +523,7 @@ def realm(data, cfg, oidc_secret, owner_password, provisioner_secret):
     write(data / "config/realm.json", result, uid=1000)
 
 
-def render(data, root, *, verify_layout=None):
+def render(data, root, *, verify_layout=None, render_io=None):
     """Render with fresh legacy placement or explicitly verified existing layout.
 
     The callback is trusted company wiring, not administrator input or a grant
@@ -526,6 +531,15 @@ def render(data, root, *, verify_layout=None):
     separately guard the renderer's filesystem and process effects.
     """
     captured = '__company_captured_dependencies__' in globals()
+    if captured and render_io is None:
+        raise ValueError('Captured rendering requires an explicit native render IO capability')
+    write = globals()['write'] if render_io is None else render_io.write
+    secret = globals()['secret'] if render_io is None else render_io.secret
+    os = globals()['os'] if render_io is None else render_io.os
+    subprocess = globals()['subprocess'] if render_io is None else render_io.process
+    shutil = globals()['shutil'] if render_io is None else render_io
+    if render_io is not None:
+        data, root = render_io.data, render_io.source
     if verify_layout is not None and not callable(verify_layout):
         raise ValueError('A checked read-only layout callback is required')
     if captured and verify_layout is None:
@@ -558,6 +572,7 @@ def render(data, root, *, verify_layout=None):
     shutil.copyfile(root / "scripts/keycloak-start.sh", data / "config/keycloak-start.sh")
     os.chmod(data / "config/keycloak-start.sh", 0o644)
     (data / 'imports').mkdir(mode=0o755, exist_ok=True)
+    os.chmod(data / 'imports', 0o755)
     catalog = data/'config/filesystem-sources.json'
     if catalog.is_symlink():
         raise SystemExit('Preserve and review the unsafe filesystem source catalog.')
@@ -634,8 +649,8 @@ def render(data, root, *, verify_layout=None):
     secret(data / "secrets/runtime/keycloak-client")
     provisioner_secret = secret(data / "secrets/runtime/keycloak-platform-client")
     secret(data / "secrets/runtime/keycloak-directory-reader")
-    realm(data, cfg, oidc_secret, owner_password, provisioner_secret)
-    certificates(data, cfg)
+    realm(data, cfg, oidc_secret, owner_password, provisioner_secret, writer=write)
+    certificates(data, cfg, render_io=render_io)
     datasource = (data / 'config/grafana-datasources.yml').read_text()
     datasource = datasource.replace('${AUTOSOFT_CA_PEM}', '|\n' + '\n'.join('        ' + line for line in (data / 'tls/ca.crt').read_text().splitlines()))
     write(data / 'config/grafana-datasources.yml', datasource, 0o644)

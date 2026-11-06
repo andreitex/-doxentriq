@@ -79,6 +79,8 @@ COPY tests/test_company_fixed_execute_child.py ./tests/test_company_fixed_execut
 COPY tests/test_company_startup_join.py ./tests/test_company_startup_join.py
 COPY tests/test_provider_preflight.py ./tests/test_provider_preflight.py
 COPY tests/test_bootstrap_render_hooks.py ./tests/test_bootstrap_render_hooks.py
+COPY tests/test_company_render_commands.py ./tests/test_company_render_commands.py
+COPY tests/test_company_render_package.py ./tests/test_company_render_package.py
 COPY tests/test_model_test_budget.py ./tests/test_model_test_budget.py
 COPY tests/test_model_budget_handover.py ./tests/test_model_budget_handover.py
 COPY tests/test_public_npm_advisories.py ./tests/test_public_npm_advisories.py
@@ -99,6 +101,8 @@ COPY tests/fixtures/company_bash_status_v1.source.txt ./tests/fixtures/company_b
 RUN apt-get update && apt-get install -y --no-install-recommends python3 openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 RUN python3 -I -B tests/test_provider_preflight.py
 RUN python3 -I -B tests/test_bootstrap_render_hooks.py
+RUN python3 -I -B tests/test_company_render_commands.py
+RUN python3 -I -B tests/test_company_render_package.py
 RUN python3 -I -B tests/test_identity_provisioning.py
 RUN python3 -I -B tests/test_model_test_budget.py
 RUN python3 -I -B tests/test_model_budget_handover.py

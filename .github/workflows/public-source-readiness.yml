@@ -84,6 +84,8 @@ jobs:
           export AUTOSOFT_TEST_ARTIFACT_ROOT
           python3 -I -B scripts/test-identity.py
           python3 -I -B tests/test_bootstrap_render_hooks.py
+          python3 -I -B tests/test_company_render_commands.py
+          python3 -I -B tests/test_company_render_package.py
           python3 -I -B tests/test_identity_provisioning.py
           python3 -I -B tests/test_company_captured_loader.py
           python3 -I -B tests/test_company_full_package.py
@@ -113,7 +115,22 @@ jobs:
           sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
             python3 -I -B tests/test_company_continuation_entry_native.py
           sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
-            python3 -I -B tests/test_company_native_retention.py
+            bash --noprofile --norc -c '
+              set -euo pipefail
+              # Raise only this test child to the original worker prerequisite.
+              native_nofile=$(ulimit -Sn)
+              if [[ "$native_nofile" != unlimited ]]; then
+                [[ "$native_nofile" =~ ^[0-9]+$ ]] || exit 74
+                if (( native_nofile < 4096 )); then ulimit -Sn 4096; fi
+              fi
+              exec python3 -I -B tests/test_company_native_retention.py
+            '
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_render_io_native.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_render_openssl_native.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_render_entry_native.py
 
   source-build:
     runs-on: ubuntu-latest

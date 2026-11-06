@@ -31,6 +31,10 @@ PROGRAMS = {
     'runtime_pair_worker': 'deploy/installer/company_runtime_pair_worker.py',
     'stored_startup': 'deploy/installer/company_stored_startup.py',
     'startup_worker': 'deploy/installer/company_startup_worker.py',
+    'render_io': 'deploy/installer/company_render_io.py',
+    'render_commands': 'deploy/installer/company_render_commands.py',
+    'render_verify': 'deploy/installer/company_render_verify.py',
+    'render_worker': 'deploy/installer/company_render_worker.py',
 }
 MAX_WORKER = 2*1024**2
 FIELDS = ('st_dev','st_ino','st_mode','st_uid','st_gid','st_nlink','st_size','st_mtime_ns','st_ctime_ns')
@@ -112,13 +116,13 @@ def assemble(root, fingerprint, *, reader):
     return worker
 
 
-def assemble_entry(root, worker, *, reader, configuration=False, repository=False, runtime_pair=False, continuation=False):
+def assemble_entry(root, worker, *, reader, configuration=False, repository=False, runtime_pair=False, continuation=False, render=False):
     root = Path(root)
-    if any(type(v) is not bool for v in (configuration,repository,runtime_pair,continuation)) or sum((configuration,repository,runtime_pair,continuation))>1:
+    if any(type(v) is not bool for v in (configuration,repository,runtime_pair,continuation,render)) or sum((configuration,repository,runtime_pair,continuation,render))>1:
         raise ValueError('exact-companion-entry-scope-required')
-    path = 'company-continue.sh' if continuation else 'company-runtime-pair.sh' if runtime_pair else 'company-repository.sh' if repository else 'company-configure.sh' if configuration else 'company-retention.sh'
+    path = 'company-render.sh' if render else 'company-continue.sh' if continuation else 'company-runtime-pair.sh' if runtime_pair else 'company-repository.sh' if repository else 'company-configure.sh' if configuration else 'company-retention.sh'
     entry = reader(root/('deploy/installer/'+path),32768)
-    if continuation:
+    if continuation or render:
         retention = reader(root/'deploy/installer/company-retention.sh',32768)
         start = b'  for stage in company-platform-store company-source-materialize; do\n'
         # The existing template is LF-normalized below solely for extraction.
@@ -145,6 +149,7 @@ def main(argv=None):
     p.add_argument('--repository-entry', type=Path, help='Optional companion company-repository.sh; seeds a quiet configured foundation without activating services')
     p.add_argument('--runtime-pair-entry', type=Path, help='Optional companion company-runtime-pair.sh; initializes fresh runtime admission/quota controls only')
     p.add_argument('--continuation-entry', type=Path, help='Optional company-continue.sh; retains and inspects stored startup in one session, without activation')
+    p.add_argument('--render-entry', type=Path, help='Company Store/Source/startup/render successor; no activation')
     a = p.parse_args(argv)
     if os.name != 'posix' or os.geteuid() != os.getegid() or os.geteuid() != 0:
         raise ValueError('company-linux-root-producer-required')
@@ -154,6 +159,9 @@ def main(argv=None):
     repository_entry = assemble_entry(a.root, worker, reader=protected_read, repository=True) if a.repository_entry else None
     runtime_pair_entry = assemble_entry(a.root, worker, reader=protected_read, runtime_pair=True) if a.runtime_pair_entry else None
     continuation_entry = assemble_entry(a.root, worker, reader=protected_read, continuation=True) if a.continuation_entry else None
+    render_entry = assemble_entry(a.root, worker, reader=protected_read, render=True) if a.render_entry else None
+    if a.render_entry and (a.render_entry.parent != a.destination.parent or a.render_entry.name != 'company-render.sh' or a.destination.name != 'company-native-retention.py' or os.path.lexists(a.render_entry)):
+        raise ValueError('fresh-exact-render-entry-required')
     if a.entry and (a.entry.parent != a.destination.parent or a.entry.name != 'company-retention.sh' or a.destination.name != 'company-native-retention.py' or a.entry.exists() or a.entry.is_symlink()):
         raise ValueError('fresh-exact-companion-entry-required')
     if a.configuration_entry and (a.configuration_entry.parent != a.destination.parent or a.configuration_entry.name != 'company-configure.sh' or a.destination.name != 'company-native-retention.py' or os.path.lexists(a.configuration_entry)):
@@ -184,7 +192,7 @@ def main(argv=None):
     try: os.fsync(parent_fd)
     finally: os.close(parent_fd)
     if protected_read(destination, MAX_WORKER) != worker: raise ValueError('package-readback-mismatch')
-    for entry_path, entry_raw in ((a.entry, entry), (a.configuration_entry, configuration_entry), (a.repository_entry, repository_entry), (a.runtime_pair_entry, runtime_pair_entry), (a.continuation_entry, continuation_entry)):
+    for entry_path, entry_raw in ((a.entry, entry), (a.configuration_entry, configuration_entry), (a.repository_entry, repository_entry), (a.runtime_pair_entry, runtime_pair_entry), (a.continuation_entry, continuation_entry), (a.render_entry, render_entry)):
         if entry_raw is None: continue
         fd = os.open(entry_path, os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW|os.O_CLOEXEC,0o400)
         try:
@@ -205,6 +213,7 @@ def main(argv=None):
         repositoryEntry=dict(path=str(a.repository_entry),**pin(repository_entry)) if repository_entry is not None else None,
         runtimePairEntry=dict(path=str(a.runtime_pair_entry),**pin(runtime_pair_entry)) if runtime_pair_entry is not None else None,
         continuationEntry=dict(path=str(a.continuation_entry),**pin(continuation_entry)) if continuation_entry is not None else None,
+        renderEntry=dict(path=str(a.render_entry),**pin(render_entry)) if render_entry is not None else None,
         fullInstallerAvailable=False), sort_keys=True))
 
 

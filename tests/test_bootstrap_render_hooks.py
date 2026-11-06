@@ -16,7 +16,7 @@ from pathlib import Path
 import stat
 import subprocess
 import tempfile
-from types import MappingProxyType, ModuleType
+from types import MappingProxyType, ModuleType, SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -50,6 +50,11 @@ class RenderLayoutTests(unittest.TestCase):
         self.data = Path(self.temp.name)
         self.root = self.data/'source'
 
+    def no_effect_io(self):
+        def forbidden(*args,**kwargs):raise AssertionError('unexpected IO effect')
+        return SimpleNamespace(data=self.data,source=self.root,write=forbidden,secret=forbidden,
+            os=SimpleNamespace(chown=forbidden,chmod=forbidden),process=SimpleNamespace(),copyfile=forbidden)
+
     def test_legacy_default_keeps_fresh_prepare(self):
         with patch.object(B._layout, 'prepare', side_effect=StopBeforeEffect) as prepare:
             with self.assertRaises(StopBeforeEffect): B.render(self.data, self.root)
@@ -67,9 +72,13 @@ class RenderLayoutTests(unittest.TestCase):
             seen.append('verified')
             return dict(scope='RUNTIME_PLACEMENT_ONLY', status='verified', changed=False, backupReady=False)
         before = sorted(p.relative_to(self.data).as_posix() for p in self.data.rglob('*'))
+        # Explicit company IO wiring is now mandatory for captured render calls.
+        # This narrow layout test stops before any write; native IO has its own
+        # actual descriptor-backed fixtures.
+        render_io=self.no_effect_io()
         with patch.object(B._layout, 'prepare', side_effect=AssertionError('fresh layout must not run')):
             with patch.object(Path, 'mkdir', side_effect=StopBeforeEffect):
-                with self.assertRaises(StopBeforeEffect): captured().render(self.data, self.root, verify_layout=layout)
+                with self.assertRaises(StopBeforeEffect): captured().render(self.data, self.root, verify_layout=layout,render_io=render_io)
         self.assertEqual(seen, ['verified'])
         self.assertEqual(before, sorted(p.relative_to(self.data).as_posix() for p in self.data.rglob('*')))
 
@@ -87,7 +96,12 @@ class RenderLayoutTests(unittest.TestCase):
         with patch.object(Path, 'exists', side_effect=AssertionError('unexpected path access')):
             for value in (None, False, 'verify'):
                 with self.subTest(value=value), self.assertRaises(ValueError):
-                    captured().render(self.data, self.root, verify_layout=value)
+                    captured().render(self.data, self.root, verify_layout=value,render_io=self.no_effect_io())
+
+    def test_captured_missing_io_refuses_before_layout_or_path_access(self):
+        with patch.object(Path,'exists',side_effect=AssertionError('unexpected path access')):
+            with self.assertRaises(ValueError):
+                captured().render(self.data,self.root,verify_layout=lambda _:self.fail('unexpected layout access'))
 
 
 class DataFixture:

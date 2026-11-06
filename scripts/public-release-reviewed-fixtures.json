@@ -82,5 +82,11 @@
     "sha256": "9835d13c73a658f7e681a35883a0a35c639e57bde0fa089791e31f225f98753c",
     "code": "credential_url",
     "reason": "The only URL credential fragments are protected runtime variable interpolations. AST comparison confirms this blob changes only the independently reviewed identity caller, preserving the Redis/RabbitMQ templates and containing no literal credential. Exact public history scanning remains mandatory."
+  },
+  {
+    "path": "scripts/bootstrap.py",
+    "sha256": "0417255ff7c8b86d645812dd45b6f2dedfef8ca92f555bc3371a65c52e9ab1f8",
+    "code": "credential_url",
+    "reason": "Exact reviewed renderer integration preserves Redis/RabbitMQ URL templates composed only from protected runtime credential variables. AST comparison limits changes to certificates, realm and render; it preserves the reviewed identity caller. No literal credential is present in either URL. Complete public history scanning remains mandatory."
   }
 ]

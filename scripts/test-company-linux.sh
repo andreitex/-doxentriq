@@ -73,6 +73,7 @@ cli_helper_tests=('tests/test_company_cli_record.py', 'tests/test_company_live_c
 names.extend(cli_helper_tests)
 names.append('tests/test_provider_preflight.py')
 names.append('tests/test_bootstrap_render_hooks.py')
+names.extend(('tests/test_company_render_commands.py','tests/test_company_render_package.py'))
 names.append('tests/test_model_test_budget.py')
 names.append('tests/test_model_budget_handover.py')
 names.append('tests/test_public_npm_advisories.py')
