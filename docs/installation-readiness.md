@@ -79,11 +79,15 @@ not replace a failing safety check with a bypass to complete this milestone.
 A fresh Rocky Linux 10.2 VM passed 42 network-control tests (162 including
 subtests), 11 native installer-source cases and five shell syntax checks. Three
 Git-dependent source cases were skipped because Git was not installed on the
-base VM. The [runtime archive verifier](runtime-archive-verification.md) passed
-17 additional native cases on that VM. These runs used private test directories
-and synthetic configuration. They did not install the platform, create its
-encrypted volume or qualify reboot recovery. The remaining release and
-activation blockers above still apply.
+base VM. After the current archive-layout update, the
+[runtime archive verifier](runtime-archive-verification.md) passed all 23 native
+cases on that VM. The [storage fault harness](storage-fault-qualification.md)
+also passed all 12 component cases, including four private mount-namespace
+fixtures using the original guard and library. These 35 cases had no skips;
+SELinux remained enforcing, and the host mount table was unchanged. They used
+synthetic configuration, executed no runtime binary or cryptsetup operation,
+and did not install the platform, create its encrypted volume or qualify reboot
+recovery. The remaining release and activation blockers above still apply.
 
 The five existing installation-budget controls passed locally. They verify
 finite positive limits and reject malformed/zero/infinite inputs before secrets

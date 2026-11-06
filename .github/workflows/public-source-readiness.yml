@@ -131,6 +131,8 @@ jobs:
             python3 -I -B tests/test_company_render_openssl_native.py
           sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
             python3 -I -B tests/test_company_render_entry_native.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_storage_fault_harness.py
 
   source-build:
     runs-on: ubuntu-latest

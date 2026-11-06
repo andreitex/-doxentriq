@@ -29,11 +29,13 @@ public Linux controls workflow and company test runner.
 
 On November 6, 2026, the original 17 native cases passed on Rocky Linux 10.2 and
 Ubuntu 24.04 under WSL. After adding the current layout, all 23 native cases
-passed under WSL, with no skips; the 61 foundation controls also passed. The
+passed under both WSL and fresh Rocky Linux 10.2, with no skips; the 61 foundation
+controls also passed under WSL. The
 actual checksum-pinned 20261005.0 and 20261102.0 archives passed seven-file and
 eight-file verification respectively in private Linux fixtures. The latter
 archive was fully checked before extraction and independently measured afterward.
-The expanded suite has not yet been run on Rocky Linux.
+The Rocky run preserved enforcing SELinux and the host mount table and left all
+platform installation paths absent.
 
 No gVisor executable was run by these checks. A separate fresh-feed scan of the
 20261102.0 binaries reported 15 High and eight Medium package findings, plus
