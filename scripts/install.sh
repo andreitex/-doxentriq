@@ -14,7 +14,25 @@ company_context() {
   require_host_capacity --foundation-only "$(awk '/MemTotal:/ {print $2}' /proc/meminfo)" "$(getconf _NPROCESSORS_ONLN)"
 }
 company_packages_phase() {
-  company_context "$@"
+  [[ $# = 19 ]] || die 'A company-approved local host package set is required.'
+  company_context "${@:1:7}"
+  local package_extension='' company_package_root='' item='' file='' expected='' actual='' offset=8
+  local -a company_package_files=()
+  case "$ID" in debian) package_extension=deb ;; rocky) package_extension=rpm ;; *) die 'Unsupported package platform.' ;; esac
+  [[ ${8} =~ ^(/opt/autosoft-company/host-packages/[a-f0-9]{64})/docker-ce\.(deb|rpm)$ ]] || die 'Invalid approved package location.'
+  company_package_root=${BASH_REMATCH[1]}
+  for item in docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin vendor-key; do
+    file=${!offset}; offset=$((offset + 1)); expected=${!offset}; offset=$((offset + 1))
+    if [[ "$item" = vendor-key ]]; then
+      [[ "$file" = "$company_package_root/docker.asc" ]] || die 'Invalid vendor key location.'
+    else
+      [[ "$file" = "$company_package_root/$item.$package_extension" ]] || die 'Approved package platform or ordering differs.'
+      company_package_files+=("$file")
+    fi
+    [[ "$expected" =~ ^[a-f0-9]{64}$ && -f "$file" && ! -L "$file" ]] || die 'Approved package missing or linked.'
+    [[ $(stat -c '%u:%g:%a:%h' -- "$file") = 0:0:400:1 ]] || die 'Approved package protection differs.'
+    actual=$(sha256sum -- "$file"); [[ ${actual%% *} = "$expected" ]] || die 'Approved package checksum differs.'
+  done
 if systemctl is-active --quiet docker.service docker.socket containerd.service; then die 'Existing active runtime requires company migration.'; fi
 for existing in /var/lib/docker /var/lib/containerd; do
  [[ ! -d "$existing" || -z "$(find "$existing" -mindepth 1 -maxdepth 1 -print -quit)" ]] || die 'Existing container data is never adopted.'
@@ -23,19 +41,14 @@ prepare_runtime_gate /etc/autosoft /etc/systemd/system
 case "$ID:$VERSION_ID" in
   debian:12|debian:13)
     apt-get update
-    apt-get install -y ca-certificates curl gnupg openssl cryptsetup cryptsetup-bin util-linux xfsprogs e2fsprogs python3 tar zstd rsync git apache2-utils
+    apt-get install -y ca-certificates curl gnupg openssl cryptsetup cryptsetup-bin util-linux iproute2 xfsprogs e2fsprogs python3 tar zstd rsync git apache2-utils
     if [[ "$VERSION_ID" = 13 ]]; then apt-get install -y systemd-cryptsetup; fi
-    install -d -m 0755 /etc/apt/keyrings
-    curl --fail --proto '=https' --tlsv1.2 https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-    chmod 0644 /etc/apt/keyrings/docker.asc
-    printf 'deb [arch=%s signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian %s stable\n' "$(dpkg --print-architecture)" "$VERSION_CODENAME" > /etc/apt/sources.list.d/autosoft-docker.list
-    apt-get update
-    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    apt-get install -y --no-install-recommends "${company_package_files[@]}"
     ;;
   rocky:9*|rocky:10*)
-    dnf install -y ca-certificates curl gnupg2 openssl cryptsetup util-linux xfsprogs e2fsprogs python3 tar zstd rsync git httpd-tools policycoreutils-python-utils
-    curl --fail --proto '=https' --tlsv1.2 https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/autosoft-docker.repo
-    dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    dnf install -y ca-certificates curl gnupg2 openssl cryptsetup util-linux iproute xfsprogs e2fsprogs python3 tar zstd rsync git httpd-tools policycoreutils-python-utils
+    rpm --import "$company_package_root/docker.asc"
+    dnf install -y --setopt=install_weak_deps=False --setopt=localpkg_gpgcheck=True "${company_package_files[@]}"
     ;;
   *) die 'Supported systems: Debian 12/13 and Rocky Linux 9/10.' ;;
 esac
@@ -45,6 +58,169 @@ major, minor = map(int, sys.argv[1].split('.')[:2])
 assert (major, minor) >= (5, 6), 'gVisor requires Linux 5.6 or newer'
 PY
 install -d -m 0700 /etc/autosoft
+}
+
+company_engine_archive_check() {
+  # Metadata-only query, checked before any company package is installed. The
+  # producer's exact file inventory excludes links, directories and scriptlets.
+  local archive=$1 name=$2
+  rpm -qp --queryformat '%{NAME}\t%{EPOCHNUM}:%{VERSION}-%{RELEASE}\t%{ARCH}\t%{FILEDIGESTALGO}\n[%{FILENAMES}\t%{LONGFILESIZES}\t%{FILEDIGESTS}\t%{FILEMODES:octal}\t%{FILEUSERNAME}\t%{FILEGROUPNAME}\t%{FILELINKTOS}\t%{FILEFLAGS}\t%{FILEDEVICES}\t%{FILEINODES}\n]' -- "$archive" | python3 -I -B -c '
+import json,stat,sys
+inventories=json.loads(sys.argv[1]);wanted=[x for x in inventories if x["package"]["name"]==sys.argv[2]];assert len(wanted)==1
+manifest=wanted[0];raw=sys.stdin.buffer.read(65537);assert 0<len(raw)<=65536 and raw.endswith(b"\n")
+lines=raw.decode("ascii").splitlines();head=lines.pop(0).split("\t");assert len(head)==4 and head[3]=="8"
+version=head[1][2:] if head[1].startswith("0:") else head[1]
+assert dict(name=head[0],version=version,architecture=head[2])=={k:manifest["package"][k] for k in ("name","version","architecture")}
+found=[];identities=set()
+for line in lines:
+ parts=line.split("\t");assert len(parts)==10
+ path,size,digest,mode,user,group,link,flags,device,inode=parts
+ assert device.isdigit() and inode.isdigit() and int(inode)>0 and (device,inode) not in identities;identities.add((device,inode))
+ expected_flag="128" if path.startswith("/usr/share/licenses/"+sys.argv[2]+"/") else "0"
+ assert size.isdigit() and all(c in "01234567" for c in mode) and mode and user==group=="root" and link=="" and flags==expected_flag
+ value=int(mode,8);assert stat.S_ISREG(value)
+ found.append(dict(path=path,bytes=int(size),sha256=digest,mode=stat.S_IMODE(value),uid=0,gid=0,type="file"))
+assert sorted(found,key=lambda x:x["path"])==manifest["files"]
+' "$DOXENTRIQ_ENGINE_MANIFESTS" "$name"
+}
+
+company_engine_scripts_check() {
+  local archive=$1 tag='' format='' output=''
+  # Query presence, including interpreter/flags and transaction trigger channels.
+  # The producer declares none, so even an empty undeclared channel is refused.
+  for tag in PREIN PREINPROG PREINFLAGS POSTIN POSTINPROG POSTINFLAGS PREUN PREUNPROG PREUNFLAGS POSTUN POSTUNPROG POSTUNFLAGS PRETRANS PRETRANSPROG PRETRANSFLAGS POSTTRANS POSTTRANSPROG POSTTRANSFLAGS PREUNTRANS PREUNTRANSPROG PREUNTRANSFLAGS POSTUNTRANS POSTUNTRANSPROG POSTUNTRANSFLAGS VERIFYSCRIPT VERIFYSCRIPTPROG VERIFYSCRIPTFLAGS TRIGGERSCRIPTS TRIGGERSCRIPTPROG TRIGGERSCRIPTFLAGS FILETRIGGERSCRIPTS FILETRIGGERSCRIPTPROG FILETRIGGERSCRIPTFLAGS TRANSFILETRIGGERSCRIPTS TRANSFILETRIGGERSCRIPTPROG TRANSFILETRIGGERSCRIPTFLAGS FILECAPS SYSUSERS POLICIES POLICYNAMES POLICYFLAGS RECOMMENDNAME SUGGESTNAME ENHANCENAME SUPPLEMENTNAME; do
+    format+="%|$tag?{$tag\\n}:{}|"
+  done
+  output=$(rpm -qp --queryformat "$format" -- "$archive") || die 'Company RPM activation metadata cannot be inspected.'
+  [[ -z "$output" ]] || die 'Company RPM activation metadata or file capabilities are forbidden.'
+}
+
+company_engine_payload_check() {
+  # The trusted worker supplies this finite table from held, catalog-pinned
+  # manifests. Check all 27 files before any installed SELinux policy is loaded.
+  python3 -I -B - "$DOXENTRIQ_ENGINE_PAYLOAD" <<'PY'
+import hashlib,json,os,stat,sys
+rows=json.loads(sys.argv[1]);assert len(rows)==27 and len({r['path'] for r in rows})==27
+fields=('st_dev','st_ino','st_mode','st_uid','st_gid','st_nlink','st_size','st_mtime_ns','st_ctime_ns')
+identity=lambda s:tuple(getattr(s,k) for k in fields)
+held=[]
+try:
+ for row in rows:
+  parent=os.open('/',os.O_RDONLY|os.O_DIRECTORY|os.O_CLOEXEC);held.append(parent)
+  parts=row['path'].split('/');assert parts[0]=='' and all(x not in ('','.','..') for x in parts[1:])
+  for part in parts[1:-1]:
+   parent=os.open(part,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC,dir_fd=parent);held.append(parent)
+   s=os.fstat(parent);assert s.st_uid==s.st_gid==0 and not s.st_mode&0o022
+  fd=os.open(parts[-1],os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK|os.O_CLOEXEC,dir_fd=parent);held.append(fd)
+  before=os.fstat(fd);assert stat.S_ISREG(before.st_mode) and before.st_nlink==1 and before.st_uid==before.st_gid==0
+  assert stat.S_IMODE(before.st_mode)==row['mode'] and before.st_size==row['bytes']
+  digest=hashlib.sha256();amount=0
+  while amount<row['bytes']:
+   chunk=os.read(fd,min(1048576,row['bytes']-amount));assert chunk;digest.update(chunk);amount+=len(chunk)
+  assert not os.read(fd,1) and digest.hexdigest()==row['sha256']
+  assert identity(before)==identity(os.fstat(fd))==identity(os.stat(parts[-1],dir_fd=parent,follow_symlinks=False))
+finally:
+ errors=[]
+ for fd in reversed(held):
+  try:os.close(fd)
+  except OSError as error:errors.append(error)
+ assert not errors
+PY
+}
+
+company_engine_group_check() {
+  local group_row='' shadow_row='' gid='' accounts=''
+  group_row=$(getent group docker) || die 'Docker system group is unavailable.'
+  [[ "$group_row" =~ ^docker:[^:]*:([0-9]+):$ ]] || die 'Existing Docker group membership requires IT reconciliation.'
+  gid=${BASH_REMATCH[1]}; [[ "$gid" != 0 ]] || die 'Docker group must not be the root group.'
+  accounts=$(getent passwd) || die 'Host account inventory is unavailable.'
+  if printf '%s\n' "$accounts" | awk -F: -v expected="$gid" '$4==expected {found=1} END {exit !found}'; then
+    die 'An account has Docker as its primary group; no membership is changed.'
+  fi
+  shadow_row=$(getent gshadow docker) || die 'Docker group access policy is unavailable.'
+  [[ "$shadow_row" =~ ^docker:([!*][^:]*):\:$ ]] || die 'Docker group password or administrative membership requires IT reconciliation.'
+}
+
+company_packages_v2_phase() {
+  [[ $# = 17 ]] || die 'Exactly four company packages and their key are required.'
+  company_context "${@:1:7}"
+  [[ "$ID" = rocky && ( "$VERSION_ID" = 9* || "$VERSION_ID" = 10* ) ]] || die 'Company DEB execution is not implemented or qualified.'
+  [[ "${DOXENTRIQ_ENGINE_KEY_FINGERPRINT:-}" =~ ^[A-F0-9]{40}$ && -n "${DOXENTRIQ_ENGINE_PAYLOAD:-}" && -n "${DOXENTRIQ_ENGINE_MANIFESTS:-}" ]] || die 'Authenticated company verification constants are unavailable.'
+  local root='' item='' file='' expected='' actual='' key='' offset=8 existing='' status=0 verify_root='' metadata='' fingerprint='' output='' policy='' selinux=''
+  local -a archives=()
+  [[ ${8} =~ ^(/opt/autosoft-company/host-packages/[a-f0-9]{64}/[a-f0-9]{64})/doxentriq-engine\.rpm$ ]] || die 'Invalid company package profile root.'
+  root=${BASH_REMATCH[1]}
+  for item in doxentriq-engine doxentriq-cli doxentriq-containerd doxentriq-compose company-key; do
+    file=${!offset}; offset=$((offset+1)); expected=${!offset}; offset=$((offset+1))
+    if [[ "$item" = company-key ]]; then
+      [[ "$file" = "$root/doxentriq-engine.asc" ]] || die 'Company key path differs.'; key=$file
+    else
+      [[ "$file" = "$root/$item.rpm" ]] || die 'Company package order differs.'; archives+=("$file")
+    fi
+    [[ "$expected" =~ ^[a-f0-9]{64}$ && -f "$file" && ! -L "$file" && $(stat -c '%u:%g:%a:%h' -- "$file") = 0:0:400:1 ]] || die 'Company input protection differs.'
+    actual=$(sha256sum -- "$file"); [[ ${actual%% *} = "$expected" ]] || die 'Company input digest differs.'
+  done
+  if systemctl is-active --quiet docker.service docker.socket containerd.service; then die 'Existing active runtime requires company migration.'; fi
+  for existing in /var/lib/docker /var/lib/containerd; do
+    [[ ! -e "$existing" || ( -d "$existing" && ! -L "$existing" && -z "$(find "$existing" -mindepth 1 -maxdepth 1 -print -quit)" ) ]] || die 'Existing runtime data is never adopted.'
+  done
+  for existing in docker docker-io docker-ee docker-ee-cli docker-ce docker-ce-cli docker-ce-rootless-extras containerd containerd.io runc podman-docker docker-buildx-plugin docker-compose-plugin docker-model-plugin doxentriq-engine doxentriq-cli doxentriq-containerd doxentriq-compose; do
+    status=0; rpm -q --quiet "$existing" >/dev/null 2>&1 || status=$?
+    [[ $status = 1 ]] || die 'Existing or uninspectable runtime package requires IT reconciliation.'
+  done
+  if getent group docker >/dev/null; then company_engine_group_check; else
+    status=$?; [[ $status = 2 ]] || die 'Docker group inventory failed.'
+  fi
+  prepare_runtime_gate /etc/autosoft /etc/systemd/system
+  # Ordinary OS prerequisites use configured signed distro repositories. Exact
+  # company archives/key have already been checked; no company RPM runs here.
+  dnf install -y --setopt=install_weak_deps=False ca-certificates curl gnupg2 openssl cryptsetup util-linux iproute xfsprogs e2fsprogs python3 tar xz zstd rsync git httpd-tools policycoreutils policycoreutils-python-utils libselinux-utils shadow-utils container-selinux nftables iptables-nft
+  verify_root=$(mktemp -d /run/doxentriq-engine-package.XXXXXXXXXXXX)
+  [[ -d "$verify_root" && ! -L "$verify_root" && $(stat -c '%u:%g:%a' -- "$verify_root") = 0:0:700 ]] || die 'Private package verification directory differs.'
+  install -d -m 0700 "$verify_root/gnupg" "$verify_root/rpmdb"
+  metadata=$(gpg --batch --no-options --homedir "$verify_root/gnupg" --with-colons --import-options show-only --dry-run --import "$key") || die 'Company public key cannot be inspected.'
+  fingerprint=$(printf '%s\n' "$metadata" | awk -F: '$1=="pub" {pub++;want=1} $1=="sec" || $1=="ssb" {bad=1} $1=="fpr" && want {print toupper($10);want=0;count++} END {if(pub!=1 || count!=1 || bad) exit 1}') || die 'Company key must have exactly one public primary identity.'
+  [[ "$fingerprint" = "$DOXENTRIQ_ENGINE_KEY_FINGERPRINT" ]] || die 'Company signing fingerprint differs before RPM import.'
+  rpm --dbpath "$verify_root/rpmdb" --initdb
+  rpm --dbpath "$verify_root/rpmdb" --import "$key"
+  for file in "${archives[@]}"; do
+    output=$(rpm --dbpath "$verify_root/rpmdb" --checksig --verbose "$file") || die 'Company RPM signature verification failed.'
+    printf '%s\n' "$output" | grep -Eq 'Signature.*: OK$' || die 'An unsigned company RPM is refused.'
+    if printf '%s\n' "$output" | grep -Eq 'NOT OK|NOKEY|NOTTRUSTED|BAD'; then die 'Company RPM signature status is unsafe.'; fi
+    for item in --scripts --triggers --filetriggers; do
+      output=$(rpm -qp "$item" -- "$file") || die 'Company RPM script inventory failed.'
+      [[ -z "$output" ]] || die 'Company packages must not contain activation scripts or triggers.'
+    done
+    company_engine_scripts_check "$file"
+    item=${file##*/}; company_engine_archive_check "$file" "${item%.rpm}"
+  done
+  rpm --import "$key"
+  dnf install -y --setopt=install_weak_deps=False --setopt=localpkg_gpgcheck=True "${archives[@]}"
+  company_engine_payload_check
+  status=0; getent group docker >/dev/null || status=$?
+  case "$status" in 0) : ;; 2) groupadd --system docker ;; *) die 'Docker group inventory failed after package installation.' ;; esac
+  company_engine_group_check
+  selinux=$(getenforce) || die 'SELinux mode cannot be observed.'
+  case "$selinux" in
+    Enforcing|Permissive)
+      for item in docker-af-alg-deny docker-af-vsock-deny; do
+        policy="/usr/share/doxentriq-engine/selinux/$item.cil"
+        semodule -i "$policy" || die 'Company SELinux deny policy activation failed; runtime remains gated.'
+      done
+      output=$(semodule -lfull) || die 'SELinux module readback failed.'
+      for item in docker-af-alg-deny docker-af-vsock-deny; do
+        printf '%s\n' "$output" | awk -v name="$item" '$1==400 && $2==name && $3=="cil" && NF==3 {count++} END {exit count!=1}' || die 'Company SELinux policy is absent or disabled.'
+      done
+      restorecon /usr/lib64/doxentriq-runtime/libseccomp.so.2 /usr/bin/docker-proxy /usr/bin/dockerd /usr/libexec/docker/docker-init /usr/bin/docker /usr/bin/containerd /usr/bin/containerd-shim-runc-v2 /usr/bin/runc /usr/libexec/docker/cli-plugins/docker-compose /usr/lib/systemd/system/docker.service /usr/lib/systemd/system/docker.socket /usr/lib/systemd/system/containerd.service /usr/share/doxentriq-engine/selinux/docker-af-alg-deny.cil /usr/share/doxentriq-engine/selinux/docker-af-vsock-deny.cil /usr/share/doxentriq-engine/selinux/docker_client.cil
+      matchpathcon -V /usr/lib64/doxentriq-runtime/libseccomp.so.2 /usr/bin/docker-proxy /usr/bin/dockerd /usr/libexec/docker/docker-init /usr/bin/docker /usr/bin/containerd /usr/bin/containerd-shim-runc-v2 /usr/bin/runc /usr/libexec/docker/cli-plugins/docker-compose
+      ;;
+    Disabled) : ;;
+    *) die 'Unsupported SELinux mode.' ;;
+  esac
+  company_engine_payload_check
+  [[ "$(getenforce)" = "$selinux" ]] || die 'SELinux mode changed during package setup.'
+  stop_gated_runtime_units
+  install -d -m 0700 /etc/autosoft
 }
 
 company_storage_phase() {

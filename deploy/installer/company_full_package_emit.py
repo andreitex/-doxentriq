@@ -22,6 +22,7 @@ PACKAGE_PATHS = ('scripts/company_captured_loader.py', 'scripts/verify-release.p
     'deploy/installer/company_full_plan.py')
 OPERATIONAL_PATHS = ('scripts/bootstrap.py', 'scripts/checkpoint_admission.py',
     'scripts/company_platform_store.py', 'scripts/company_source_tree.py',
+    'scripts/identity.py',
     'scripts/installation_identity.py', 'scripts/installer_parent.py',
     'scripts/platform_source.py', 'scripts/quota_allocation.py', 'scripts/quota_runtime.py',
     'scripts/registry_manifest.py', 'scripts/resolve-images.py', 'scripts/runtime_layout.py',

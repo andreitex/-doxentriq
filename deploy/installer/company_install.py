@@ -19,6 +19,7 @@ import uuid
 
 TRUSTED_CODE = {}  # @TRUSTED_CODE@
 COMPANY_FINGERPRINT = '@COMPANY_FINGERPRINT@'
+HOST_CATALOGS = None  # @COMPANY_HOST_CATALOGS@
 BASE = Path('/opt/autosoft-company')
 FIELDS = ('st_dev','st_ino','st_mode','st_uid','st_gid','st_nlink','st_size','st_mtime_ns','st_ctime_ns')
 ENV = {'PATH':'/usr/sbin:/usr/bin:/sbin:/bin','LC_ALL':'C','LANG':'C','HOME':'/','TZ':'UTC'}
@@ -55,7 +56,7 @@ def validate(request, fingerprint=COMPANY_FINGERPRINT):
     return dict(request)
 
 def load_trusted(records=TRUSTED_CODE):
-    require(type(records) is dict and set(records) == {'verify-release.py','installer_materialize.py','installer_parent.py'})
+    require(type(records) is dict and set(records) == {'verify-release.py','installer_materialize.py','installer_parent.py','company_native_station.py','company_host_tool_profiles.py','company_host_packages.py','company_host_package_runtime.py','company_engine_packages.py','company_engine_native.py','company_engine_elf.py'})
     result={}
     for name,row in records.items():
         require(type(row) is dict and set(row) == {'sha256','bytes','base64'} and type(row['bytes']) is int and 0 < row['bytes'] <= 131072)
@@ -135,7 +136,7 @@ class NativeRunner:
         require(not UNKNOWN and type(argv) is list and 0 < len(argv) <= 32 and type(timeout) is int and 0 < timeout <= 1800)
         require(all(type(arg) is str and 0 < len(arg.encode()) <= 65536 and '\x00' not in arg for arg in argv)
             and sum(len(arg.encode())+1 for arg in argv) <= 131072 and argv[0] in ('/bin/bash','/usr/bin/python3','/usr/bin/findmnt',
-                '/usr/bin/systemctl','/usr/bin/docker','/usr/sbin/cryptsetup','/usr/sbin/losetup','/usr/sbin/swapon','/usr/bin/systemd-escape','/usr/local/bin/runsc'))
+                '/usr/bin/systemctl','/usr/bin/docker','/usr/bin/rpm','/usr/bin/dpkg-query','/usr/bin/getent','/usr/sbin/getenforce','/usr/sbin/semodule','/usr/sbin/matchpathcon','/usr/sbin/cryptsetup','/usr/sbin/losetup','/usr/sbin/swapon','/usr/bin/systemd-escape','/usr/local/bin/runsc'))
         require(time.monotonic() < self.deadline);self.calls+=1;require(self.calls <= 48)
         process=None;pidfd=None;selector=None;streams=[];buffers={};failed=False;known=False;released=False
         end=min(self.deadline,time.monotonic()+timeout)
@@ -293,10 +294,11 @@ def roots(request):
     return BASE/'staging',data/'company/host-releases',data/'company/host-releases'/('install-'+op),BASE/'evidence'/op
 
 def phase_command(held,name,execution_root,final_root,request):
-    require(name in ('packages','storage','prepare','activate'))
+    require(name in ('packages','packages_v2','storage','prepare','activate'))
     install=held.sources['scripts/install.sh']
     require(install.startswith(b'#!/usr/bin/env bash\n# Candidate phase definitions only.')
             and all(install.count(('company_'+phase+'_phase() {').encode()) == 1 for phase in ('packages','storage','prepare','activate')))
+    if name=='packages_v2':require(install.count(b'company_packages_v2_phase() {')==1)
     # Package code runs from signed captured bytes before full-nine output capture.
     raw=b'\n'.join(held.sources[key] for key in ('scripts/lib.sh','scripts/install-runtime-gate.sh'))+b'\n'+install
     require(len(raw) < 65536)
@@ -367,10 +369,10 @@ def measure(state,runner,request,final_root,held,*,output=None):
     require(state.read('/etc/autosoft/runtime-bootstrap.ready') == b'encrypted-runtime-bootstrap-v1\n')
     installed=json.loads(state.read('/etc/autosoft/runtime-installed.json'));require(installed == {'version':request['runscVersion'],'archive_sha512':request['runscSha512']})
     archive=state.read(data/'company/work/gvisor.tar.zstd',128*1024**2);require(hashlib.sha512(archive).hexdigest() == request['runscSha512'])
-    version=runner.run(['/usr/local/bin/runsc','--version'],30);require(version and len(version) <= 4096)
-    runtime=runner.run(['/usr/bin/python3','-I','-B','-c',RUNTIME_IDENTITY,str(data/'company/work/gvisor.tar.zstd')],60)
-    binary_pins=json.loads(runtime);require(type(binary_pins) is dict and set(binary_pins) == {'runsc','containerd-shim-runsc-v1'}
+    runtime=runner.run(['/usr/bin/python3','-I','-B','-c',RUNTIME_IDENTITY,str(data/'company/work/gvisor.tar.zstd'),request['runscSha512']],60)
+    binary_pins=json.loads(runtime);require(type(binary_pins) is dict and set(binary_pins) in (set(RUNTIME_PRIMARY_FILES),set(RUNTIME_PRIMARY_FILES+RUNTIME_SIDECAR_FILES),set(RUNTIME_PRIMARY_FILES+RUNTIME_CURRENT_SIDECAR_FILES))
         and all(type(value) is str and re.fullmatch('[a-f0-9]{64}',value) is not None for value in binary_pins.values()))
+    version=runner.run(['/usr/local/bin/runsc','--version'],30);require(version and len(version) <= 4096)
     require('MaxRetentionSec=7day' in state.read('/etc/systemd/journald.conf.d/autosoft.conf').decode())
     require(not any(line.split()[2] == 'swap' for line in state.read('/etc/fstab').decode().splitlines() if line.strip() and not line.lstrip().startswith('#') and len(line.split()) >= 3))
     require(runner.run(['/usr/sbin/swapon','--noheadings','--show'],30).strip() == b'')
@@ -378,62 +380,222 @@ def measure(state,runner,request,final_root,held,*,output=None):
         'installationId':final['installation_id'],'releaseSha256':held.metadata['releaseSha256'],'treeSha256':output.recheck() if output is not None else inventory(state,final_root,held),
         'hostSha256':sha(canonical(records)),'runscVersionSha256':sha(version),'runtimeBinaryPins':binary_pins,'fullPlatformActivated':False,'backupReady':False,'runtimePairInitialized':False}
 
-RUNTIME_IDENTITY = r'''
-import hashlib,json,os,stat,subprocess,sys,tarfile
-p=subprocess.Popen(['/usr/bin/zstd','-dc','--',sys.argv[1]],stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
-rows={};total=0;count=0
-try:
- with tarfile.open(fileobj=p.stdout,mode='r|') as tar:
-  for member in tar:
-   count+=1;assert count<=32
-   name=member.name.removeprefix('./');assert name in ('runsc','containerd-shim-runsc-v1') and member.isfile() and 0<member.size<=256*1024**2 and name not in rows
-   source=tar.extractfile(member);digest=hashlib.sha256();amount=0
-   while True:
-    raw=source.read(65536)
-    if not raw:break
-    amount+=len(raw);total+=len(raw);assert amount<=member.size and total<=512*1024**2;digest.update(raw)
-   source.close();assert amount==member.size
-   path='/usr/local/bin/'+name;before=os.lstat(path);assert stat.S_ISREG(before.st_mode) and before.st_uid==before.st_gid==0 and before.st_nlink==1 and before.st_mode&0o111 and not before.st_mode&0o022
-   fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC)
-   try:
-    keys=('st_dev','st_ino','st_mode','st_uid','st_gid','st_nlink','st_size','st_mtime_ns','st_ctime_ns');old=tuple(getattr(before,k) for k in keys);assert old==tuple(getattr(os.fstat(fd),k) for k in keys)
-    installed=hashlib.sha256();size=0
+RUNTIME_PRIMARY_FILES = ('runsc', 'containerd-shim-runsc-v1')
+RUNTIME_SIDECAR_FILES = ('gvisor-bin/checkpointgofer', 'gvisor-bin/gvisor-sentry-prewarmer',
+    'gvisor-bin/gvisor_sentry', 'gvisor-bin/runsc-fd-parking', 'gvisor-bin/runsc-metric-server')
+RUNTIME_CURRENT_SIDECAR_FILES = RUNTIME_SIDECAR_FILES + ('gvisor-bin/gvisor-proc-umounter',)
+
+# The complete pinned archive determines whether this is a legacy two-file
+# release or one of the exact supported sidecar layouts. Never ignore a sidecar.
+RUNTIME_IDENTITY = 'PRIMARY='+repr(RUNTIME_PRIMARY_FILES)+'\nSIDECARS='+repr(RUNTIME_SIDECAR_FILES)+'\nCURRENT_SIDECARS='+repr(RUNTIME_CURRENT_SIDECAR_FILES)+'\n'+r'''
+import contextlib,fcntl,hashlib,json,os,re,stat,subprocess,sys,tarfile
+KEYS=('st_dev','st_ino','st_mode','st_uid','st_gid','st_nlink','st_size','st_mtime_ns','st_ctime_ns')
+def identity(info):return tuple(getattr(info,key) for key in KEYS)
+def close_all(fds):
+ failed=False
+ for fd in reversed(fds):
+  try:os.close(fd)
+  except OSError:failed=True
+ assert not failed
+@contextlib.contextmanager
+def pinned_archive(path,expected):
+ assert os.geteuid()==os.getegid()==0 and re.fullmatch('[a-f0-9]{128}',expected)
+ assert path.startswith('/') and all(part not in ('','.','..') for part in path[1:].split('/'))
+ owned=[];directories=[]
+ def check():
+  for fd,name,before in directories:assert identity(os.fstat(fd))==before==identity(os.lstat(name))
+  assert identity(os.fstat(archive))==original==identity(os.stat(leaf,dir_fd=parent,follow_symlinks=False))
+ try:
+  parent=None;current=''
+  for part in ('/',*path[1:].split('/')[:-1]):
+   current='/' if part=='/' else current.rstrip('/')+'/'+part
+   before=os.lstat(current)
+   assert stat.S_ISDIR(before.st_mode) and before.st_uid==before.st_gid==0 and not before.st_mode&0o022
+   fd=os.open(current if parent is None else part,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC,dir_fd=parent)
+   owned.append(fd);directories.append((fd,current,identity(before)));parent=fd
+   assert identity(os.fstat(fd))==identity(before)
+  leaf=path.rsplit('/',1)[1];before=os.stat(leaf,dir_fd=parent,follow_symlinks=False)
+  assert stat.S_ISREG(before.st_mode) and before.st_uid==before.st_gid==0 and before.st_nlink==1
+  assert not before.st_mode&0o022 and 0<before.st_size<=128*1024**2
+  archive=os.open(leaf,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC,dir_fd=parent);owned.append(archive)
+  original=identity(before);check()
+  captured=os.memfd_create('doxentriq-runtime-archive',os.MFD_CLOEXEC|os.MFD_ALLOW_SEALING);owned.append(captured)
+  digest=hashlib.sha512();size=0
+  while size<before.st_size:
+   raw=os.pread(archive,min(65536,before.st_size-size),size);assert raw
+   digest.update(raw);size+=len(raw);view=memoryview(raw)
+   while view:
+    written=os.write(captured,view);assert written>0;view=view[written:]
+  assert digest.hexdigest()==expected and not os.pread(archive,1,size)
+  check()
+  seals=fcntl.F_SEAL_SEAL|fcntl.F_SEAL_SHRINK|fcntl.F_SEAL_GROW|fcntl.F_SEAL_WRITE
+  fcntl.fcntl(captured,fcntl.F_ADD_SEALS,seals);assert fcntl.fcntl(captured,fcntl.F_GET_SEALS)==seals
+  os.lseek(captured,0,os.SEEK_SET)
+  yield captured
+  check()
+  final=hashlib.sha512();offset=0
+  while offset<size:
+   raw=os.pread(archive,min(65536,size-offset),offset);assert raw
+   final.update(raw);offset+=len(raw)
+  assert final.hexdigest()==expected and not os.pread(archive,1,offset)
+  check()
+ finally:close_all(owned)
+def verify_stream(stream,root='/usr/local/bin'):
+ assert os.geteuid()==os.getegid()==0 and root.startswith('/') and root!='/'
+ assert all(part not in ('','.','..') for part in root[1:].split('/'))
+ held=[];leaves=[];owned=[];rows={};seen=set();total=0;sidecars=False
+ def hold(path,parent=None,name=None):
+  before=os.lstat(path) if parent is None else os.stat(name,dir_fd=parent,follow_symlinks=False)
+  assert stat.S_ISDIR(before.st_mode) and before.st_uid==before.st_gid==0 and not before.st_mode&0o022
+  fd=os.open(path if parent is None else name,os.O_RDONLY|os.O_NOFOLLOW|os.O_DIRECTORY|os.O_CLOEXEC,dir_fd=parent)
+  owned.append(fd)
+  held.append((fd,path,identity(before)))
+  assert identity(os.fstat(fd))==identity(before)
+  return fd
+ def check():
+  for fd,path,before in held:assert identity(os.fstat(fd))==before==identity(os.lstat(path))
+  for fd,parent,name,before,size,digest in leaves:
+   assert identity(os.fstat(fd))==before==identity(os.stat(name,dir_fd=parent,follow_symlinks=False))
+ def read_digest(fd,size):
+  digest=hashlib.sha256();offset=0
+  while offset<size:
+   raw=os.pread(fd,min(65536,size-offset),offset);assert raw
+   offset+=len(raw);digest.update(raw)
+  assert not os.pread(fd,1,size)
+  return digest.hexdigest()
+ def file_digest(parent,name,expected_size):
+  before=os.stat(name,dir_fd=parent,follow_symlinks=False)
+  assert stat.S_ISREG(before.st_mode) and before.st_uid==before.st_gid==0 and before.st_nlink==1
+  assert stat.S_IMODE(before.st_mode)==0o755 and before.st_size==expected_size
+  fd=os.open(name,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC,dir_fd=parent)
+  owned.append(fd)
+  old=identity(before);assert old==identity(os.fstat(fd))
+  digest=read_digest(fd,expected_size)
+  leaves.append((fd,parent,name,old,expected_size,digest));check()
+  return digest
+ class Bounded:
+  def __init__(self,source):self.source=source;self.size=0
+  def read(self,size):
+   assert isinstance(size,int) and size>=0
+   raw=self.source.read(min(size,65536));self.size+=len(raw)
+   assert self.size<=512*1024**2+128*1024
+   return raw
+ bounded=Bounded(stream)
+ try:
+  parent=hold('/');path=''
+  for part in root[1:].split('/'):
+   path+='/'+part;parent=hold(path,parent,part)
+  root_fd=parent;sidecar_fd=None
+  with tarfile.open(fileobj=bounded,mode='r|') as tar:
+   for member in tar:
+    name=member.name.removeprefix('./')
+    assert name not in seen and len(seen)<9 and not member.linkname and member.sparse is None
+    assert member.mode==0o755
+    seen.add(name);check()
+    if name=='gvisor-bin':
+     assert member.isdir() and member.size==0
+     sidecar_fd=hold(root+'/gvisor-bin',root_fd,'gvisor-bin');sidecars=True
+     continue
+    assert name in PRIMARY+CURRENT_SIDECARS and member.isfile() and 0<member.size<=256*1024**2
+    if name in CURRENT_SIDECARS:
+     if sidecar_fd is None:sidecar_fd=hold(root+'/gvisor-bin',root_fd,'gvisor-bin')
+     sidecars=True;file_parent=sidecar_fd;basename=name.split('/')[1]
+    else:file_parent=root_fd;basename=name
+    source=tar.extractfile(member);digest=hashlib.sha256();amount=0
     while True:
-     raw=os.read(fd,65536)
+     raw=source.read(65536)
      if not raw:break
-     size+=len(raw);assert size<=member.size;installed.update(raw)
-    assert size==member.size and installed.digest()==digest.digest() and old==tuple(getattr(os.fstat(fd),k) for k in keys)==tuple(getattr(os.lstat(path),k) for k in keys)
-   finally:os.close(fd)
-   rows[name]=digest.hexdigest()
- assert set(rows)=={'runsc','containerd-shim-runsc-v1'} and p.wait(timeout=5)==0
+     amount+=len(raw);total+=len(raw);assert amount<=member.size and total<=512*1024**2;digest.update(raw)
+    source.close();assert amount==member.size
+    assert file_digest(file_parent,basename,member.size)==digest.hexdigest()
+    rows[name]=digest.hexdigest();check()
+  while bounded.read(65536):pass
+  companions=CURRENT_SIDECARS if set(rows)&(set(CURRENT_SIDECARS)-set(SIDECARS)) else SIDECARS
+  expected=set(PRIMARY+companions) if sidecars else set(PRIMARY)
+  assert set(rows)==expected and seen==(expected|{'gvisor-bin'} if sidecars else expected)
+  if sidecars:assert set(os.listdir(sidecar_fd))=={name.split('/')[1] for name in companions}
+  else:assert not os.path.lexists(root+'/gvisor-bin')
+  for fd,_,_,_,size,digest in leaves:
+   check();assert read_digest(fd,size)==digest
+  check();return rows
+ finally:close_all(owned)
+def decode_archive(archive):
+ p=subprocess.Popen(['/usr/bin/zstd','-dc'],stdin=archive,stdout=subprocess.PIPE,
+     stderr=subprocess.DEVNULL,env={'PATH':'/usr/bin:/bin','LC_ALL':'C','LANG':'C'},cwd='/',close_fds=True)
+ try:
+  rows=verify_stream(p.stdout)
+  assert p.wait(timeout=5)==0
+  return rows
+ finally:
+  if p.stdout is not None:p.stdout.close()
+  if p.returncode is None:p.kill();p.wait(timeout=5)
+def main():
+ assert len(sys.argv)==3
+ with pinned_archive(sys.argv[1],sys.argv[2]) as archive:rows=decode_archive(archive)
  print(json.dumps(rows,sort_keys=True))
-finally:
- if p.stdout is not None:p.stdout.close()
- if p.returncode is None:p.kill();p.wait(timeout=5)
+if __name__=='__main__':main()
 '''
 
+def host_bindings(modules, catalogs=HOST_CATALOGS):
+    H,S,T,K=(modules[name] for name in ('company_host_package_runtime.py','company_native_station.py',
+        'company_host_tool_profiles.py','company_host_packages.py'))
+    with H.held_platform(S) as (observed,recheck):
+        package,tools=H.bindings(catalogs,profiles=T,packages=K,observed_platform=observed,**engine_components(modules))
+        recheck()
+    return package,tools
+
+
+def engine_components(modules):
+    return dict(engine=modules.get('company_engine_packages.py'),engine_native=modules.get('company_engine_native.py'),engine_elf=modules.get('company_engine_elf.py'))
+
+
+@contextmanager
+def package_inputs(modules,package,station,check):
+    if package.get('scope')=='COMPANY_ENGINE_EXECUTION_INPUTS_V2_ONLY':
+        E=modules['company_engine_native.py'];C=modules['company_engine_packages.py']
+        with E.held_archives(package,station,catalog=C,check_authority=check) as inputs:
+            yield 'packages_v2',lambda command:E.append_phase_arguments(command,inputs,binding=package),inputs['recheck']
+    else:
+        K=modules['company_host_packages.py']
+        with K.held_archives(package,station,check_authority=check) as (arguments,recheck):
+            yield 'packages',lambda command:K.append_phase_arguments(command,arguments),recheck
+
+
+def versioned_result(measured,package_readback):
+    require(type(measured) is dict and 'schemaVersion' not in measured and 'hostPackages' not in measured)
+    return dict(measured,schemaVersion=2,hostPackages=package_readback)
+
+
 class Worker:
-    def __init__(self,modules,state,runner,*,output_guard=persisted_output):
+    def __init__(self,modules,state,runner,*,output_guard=persisted_output,host_catalogs=HOST_CATALOGS):
         self.modules,self.state,self.runner,self.output_guard=modules,state,runner,output_guard
+        self.host_catalogs=host_catalogs
     def run(self,request,parent_input,*,verify=False):
         request=validate(request,COMPANY_FINGERPRINT);stage_parent,final_parent,final_root,evidence=roots(request)
         P=self.modules['installer_parent.py'];V=self.modules['verify-release.py'];M=self.modules['installer_materialize.py']
         with P.hold_parent(parent_input) as parent, V.authenticated_deployment(request['bundleRoot'],request['keyPath'],COMPANY_FINGERPRINT,
             expected_architecture='x86_64',source_root=request['sourceRoot']) as held:
             require(held.metadata['releaseSha256'] == request['releaseSha256'])
-            def check():require(not UNKNOWN);parent.check();held.recheck()
+            H,S,K=(self.modules[name] for name in ('company_host_package_runtime.py','company_native_station.py','company_host_packages.py'))
+            def check():require(not UNKNOWN and not S.UNRELEASED);parent.check();held.recheck()
+            package,tools=host_bindings(self.modules,self.host_catalogs)
             check()
             if verify:
                 with self.output_guard(held,final_root,M) as output:
                     output.recheck();retained=json.loads(self.state.read(evidence/'result.json'))
-                    measured=measure(self.state,self.runner,request,final_root,held,output=output)
+                    current=H.readback(package,tools,station=S,runner=self.runner,check_authority=check,**engine_components(self.modules))
+                    measured=versioned_result(measure(self.state,self.runner,request,final_root,held,output=output),current)
+                    H.verify_evidence(retained.get('hostPackages'),package,tools,current=current,engine_native=self.modules.get('company_engine_native.py'))
                     require(retained == measured);check();output.recheck()
             else:
                 for name in ('installation.intent.json','installation.json','installation.pending.json','storage.key'):
                     require(not self.state.exists(Path('/etc/autosoft')/name))
                 require(not self.state.exists(evidence) and not self.state.exists(final_root))
-                self.state.mkdir(evidence);self.state.write(evidence/'intent.json',canonical(request));check()
-                self.runner.run(phase_command(held,'packages',stage_parent,final_root,request),1800);check()
+                with package_inputs(self.modules,package,S,check) as (phase,append,recheck):
+                    self.state.mkdir(evidence);self.state.write(evidence/'intent.json',canonical(request));check()
+                    self.runner.run(append(phase_command(held,phase,stage_parent,final_root,request)),1800)
+                    recheck();check()
+                installed=H.readback(package,tools,station=S,runner=self.runner,check_authority=check,**engine_components(self.modules))
                 with M.materialized_deployment(held,stage_parent,'install-'+request['operationId']) as staged:
                     staged.recheck();check()
                     self.runner.run(phase_command(held,'storage',staged.root,final_root,request),900);staged.recheck();check()
@@ -443,7 +605,9 @@ class Worker:
                         final.recheck();check()
                         self.runner.run(phase_command(held,'activate',final.root,final_root,request),240);final.recheck();check()
                         with self.output_guard(held,final_root,M) as output:
-                            output.recheck();measured=measure(self.state,self.runner,request,final_root,held,output=output)
+                            output.recheck();current=H.readback(package,tools,station=S,runner=self.runner,check_authority=check,**engine_components(self.modules))
+                            require(current==installed)
+                            measured=versioned_result(measure(self.state,self.runner,request,final_root,held,output=output),current)
                             output.recheck();final.recheck();check()
                     staged.recheck();check()
                 check();self.state.write(evidence/'result.json',canonical(measured));check()
@@ -457,10 +621,15 @@ def main(argv=None):
     choice=parser.add_mutually_exclusive_group(required=True);choice.add_argument('--foundation-only',action='store_true');choice.add_argument('--verify',action='store_true');choice.add_argument('--describe',action='store_true')
     parser.add_argument('--request',required=True);parser.add_argument('--worker-sha',required=True);parser.add_argument('--parent',nargs=7)
     args=parser.parse_args(argv);state=NativeState()
-    require(type(args.worker_sha) is str and re.fullmatch('[a-f0-9]{64}',args.worker_sha) is not None and sha(state.read(Path(__file__),262144)) == args.worker_sha)
+    require(type(args.worker_sha) is str and re.fullmatch('[a-f0-9]{64}',args.worker_sha) is not None and sha(state.read(Path(__file__),524288)) == args.worker_sha)
     raw=state.read(path(args.request),4096);request=validate(json.loads(raw),COMPANY_FINGERPRINT);require(canonical(request) == raw)
-    if args.describe:require(args.parent is None);print(request['operationId']);return
-    modules=load_trusted();parent=modules['installer_parent.py'].ParentInput.from_argv(args.parent)
+    modules=load_trusted()
+    if args.describe:
+        require(args.parent is None)
+        package,tools=host_bindings(modules)
+        with package_inputs(modules,package,modules['company_native_station.py'],lambda:require(not UNKNOWN)) as (_,_,recheck):recheck()
+        print(request['operationId']);return
+    parent=modules['installer_parent.py'].ParentInput.from_argv(args.parent)
     require(parent.request == sha(raw) and parent.stage == 'foundation' and parent.action == sha(f'foundation-v1:{sha(raw)}:{args.worker_sha}'.encode()))
     # Quiet fixed ancestors prepared before either materializer. No chmod/adoption.
     for p in (BASE,BASE/'bootstrap',BASE/'incoming',BASE/'staging',BASE/'evidence'):

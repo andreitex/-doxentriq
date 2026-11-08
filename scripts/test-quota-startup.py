@@ -192,7 +192,7 @@ class Tests(unittest.TestCase):
                      'RequiresMountsFor=/srv/doxentriq','Before=docker.service autosoft.service',
                      'ExecStartPre=/bin/bash /opt/doxentriq/scripts/storage-guard.sh',
                      'ExecStart=/usr/bin/python3 -I -B /opt/doxentriq/scripts/quota-helper.py',
-                     'KillMode=mixed','SendSIGKILL=no','RestrictAddressFamilies=AF_UNIX'):
+                     'KillMode=mixed','SendSIGKILL=no','RestrictAddressFamilies=AF_UNIX AF_NETLINK'):
             self.assertIn(line+'\n',unit)
         for invalid in ('/', '/srv/../tmp', '/srv//data', '/srv/%n', '/srv/data\nAfter=evil', '/srv/data with space', 'relative'):
             with self.assertRaises(ValueError):B.quota_service_unit(invalid,'/opt/doxentriq')

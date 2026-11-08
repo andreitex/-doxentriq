@@ -2,10 +2,13 @@
 """Run unchanged historical backend controls with their exact historical source.
 
 V1/V2 retain fixed backend pins and V2/V3 verify the complete original V1 test
-file. The deployed backend subsequently changed for stat compatibility. This
+file. The deployed backend subsequently changed for stat compatibility and the
+actual Source terminal journal filename. This
 runner selects the matching historical test input without editing the original
-test bodies, worker pins or admission checks. V3 separately tests current code
-and rejection of the old backend. All stations are injected; no SSH or VM access.
+test bodies, worker pins or admission checks. V3 tests its exact stat-compatible
+revision and rejection of the older backend. Current code is tested separately
+by test_company_seed_backend.py and test_company_source_terminal_native.py.
+All stations here are injected; no SSH or VM access.
 """
 import hashlib
 import importlib.util
@@ -17,14 +20,19 @@ ROOT = Path(__file__).resolve().parents[1]
 LEGACY_PATH = 'deploy/installer/company_seed_backend.py'
 FIXTURE = ROOT / 'tests/fixtures/company_seed_backend_before_stat_compat.py'
 FIXTURE_PIN = ('41d39bcc4ffef59da27d64e924ad6434486dea4a7be13797e4b41ee4a8fbdc5a', 28127)
+STAT_FIXTURE = ROOT / 'tests/fixtures/company_seed_backend_before_source_terminal_fix.py'
+STAT_FIXTURE_PIN = ('ae7be5f73b5e279cde64f12bf031d0cb84576ac045f90e423775a093891fe768', 28806)
 
 
 def historical_inputs(pins):
-    historical = FIXTURE.read_bytes()
-    if (hashlib.sha256(historical).hexdigest(), len(historical)) != FIXTURE_PIN:
+    choices = {FIXTURE_PIN: FIXTURE, STAT_FIXTURE_PIN: STAT_FIXTURE}
+    row = pins.get(LEGACY_PATH, {})
+    selected = (row.get('sha256'), row.get('bytes'))
+    if selected not in choices:
+        raise ValueError('The requested control does not use a retained historical backend.')
+    historical = choices[selected].read_bytes()
+    if (hashlib.sha256(historical).hexdigest(), len(historical)) != selected:
         raise ValueError('Historical source fixture changed; refusing to run the retained controls.')
-    if pins.get(LEGACY_PATH) != dict(sha256=FIXTURE_PIN[0], bytes=FIXTURE_PIN[1]):
-        raise ValueError('The requested control does not use this historical backend.')
     values = {name: historical if name == LEGACY_PATH else (ROOT / name).read_bytes() for name in pins}
     for name, raw in values.items():
         if dict(sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw)) != pins[name]:
@@ -51,10 +59,16 @@ def main():
                 module.sources = values
             else:
                 module.SOURCES = values
+        else:
+            if module.W3.INPUT_PINS != module.C3.INPUT_PINS:
+                raise ValueError('V3 worker and carrier input pins disagree.')
+            values = historical_inputs(module.W3.INPUT_PINS)
+            module.W3.source_admission(values)
+            module.SOURCES3 = values
         suite = unittest.defaultTestLoader.loadTestsFromModule(module)
         if suite.countTestCases() != expected_count:
             raise ValueError('Historical suite membership changed; review the complete suite before proceeding.')
-        print(f'Running every V{version} control ({expected_count} tests; ' + ('historical pinned input' if version < 3 else 'current backend and legacy rejection') + ')', flush=True)
+        print(f'Running every V{version} control ({expected_count} tests; historical pinned input)', flush=True)
         result = unittest.TextTestRunner(verbosity=2).run(suite)
         passed = passed and result.wasSuccessful() and not result.skipped
         total += result.testsRun

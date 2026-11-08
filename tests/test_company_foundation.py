@@ -78,6 +78,18 @@ class Harness:
         self.modules={'installer_parent.py':SimpleNamespace(hold_parent=parent),
             'verify-release.py':SimpleNamespace(authenticated_deployment=auth),
             'installer_materialize.py':SimpleNamespace(materialized_deployment=materialize)}
+        # This original lifecycle fixture supplies synthetic package observations;
+        # actual catalog/FD readback and mismatch cases live in the dedicated suite.
+        proof={'scope':'SYNTHETIC_PACKAGE_LIFECYCLE_FIXTURE'}
+        @contextmanager
+        def archives(*_,**kw):
+            kw['check_authority']();yield tuple('synthetic' for _ in range(12)),kw['check_authority']
+        self.modules.update({'company_host_package_runtime.py':SimpleNamespace(
+            readback=lambda *a,**kw:proof,
+            verify_evidence=lambda value,*a,**kw:W.require(value==kw['current'])),
+            'company_native_station.py':SimpleNamespace(UNRELEASED=[]),
+            'company_host_packages.py':SimpleNamespace(held_archives=archives,
+                append_phase_arguments=lambda command,arguments:command+list(arguments))})
         self.runner=SimpleNamespace(run=self.run)
         @contextmanager
         def output_guard(*_):
@@ -101,7 +113,7 @@ class Harness:
         return {'scope':'FOUNDATION_ONLY','status':'effects-independently-confirmed','operationId':'1'*32,
             'fullPlatformActivated':False,'backupReady':False,'runtimePairInitialized':False}
     def execute(self,verify=False):
-        with mock.patch.object(W,'COMPANY_FINGERPRINT',FP),mock.patch.object(W,'measure',self.measure):
+        with mock.patch.object(W,'COMPANY_FINGERPRINT',FP),mock.patch.object(W,'measure',self.measure),mock.patch.object(W,'host_bindings',return_value=({},{})):
             return W.Worker(self.modules,self.state,self.runner,output_guard=self.output_guard).run(request(),object(),verify=verify)
 
 class Pipe:
@@ -220,7 +232,7 @@ class MeasurementFixture:
             ('/usr/bin/findmnt','-n','-o','SIZE','--bytes','--target','/srv/test-foundation/runtime/builds'):b'2147483648\n',
             ('/usr/bin/findmnt','-n','-o','TARGET,SOURCE,FSTYPE','--target','/var/log/journal'):b'/var/log/journal /dev/mapper/autosoft-data[/journal] xfs\n',
             ('/usr/local/bin/runsc','--version'):b'runsc version 20261001.0\n',
-            ('/usr/bin/python3','-I','-B','-c',W.RUNTIME_IDENTITY,'/srv/test-foundation/company/work/gvisor.tar.zstd'):b'{"runsc":"'+b'd'*64+b'","containerd-shim-runsc-v1":"'+b'e'*64+b'"}\n',
+            ('/usr/bin/python3','-I','-B','-c',W.RUNTIME_IDENTITY,'/srv/test-foundation/company/work/gvisor.tar.zstd',self.request['runscSha512']):b'{"runsc":"'+b'd'*64+b'","containerd-shim-runsc-v1":"'+b'e'*64+b'"}\n',
             ('/usr/sbin/swapon','--noheadings','--show'):b''}
         for unit in ('docker.service','containerd.service'):self.responses[('/usr/bin/systemctl','is-active',unit)]=b'active\n'
         self.calls=[];self.runner=SimpleNamespace(run=self.run)
@@ -348,7 +360,7 @@ class FoundationTests(unittest.TestCase):
         key=next(p for p in h.state.records if p.endswith('result.json'));h.state.records[key]=b'{"status":"fake"}\n'
         with self.assertRaises(W.FoundationUnavailable):h.execute(verify=True)
         self.assertFalse(any(p.endswith('/verified') for p in h.state.records))
-    def test_packaged_worker_embeds_three_exact_primitive_records(self):
+    def test_packaged_worker_embeds_seven_exact_primitive_records(self):
         records=B.assemble(ROOT,FP,reader=lambda p:p.read_bytes());worker=records['company_install.py']
         tree=ast.parse(worker);rows=ast.literal_eval(next(n.value for n in tree.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='TRUSTED_CODE' for t in n.targets)))
         self.assertEqual(set(rows),set(B.TRUSTED));self.assertNotIn(b'@COMPANY_FINGERPRINT@',worker)
@@ -448,6 +460,7 @@ class FoundationTests(unittest.TestCase):
             else:
                 key=next(key for key in f.responses if W.RUNTIME_IDENTITY in key);f.responses[key]=b'{"runsc":"unverified"}'
             with self.assertRaises(W.FoundationUnavailable):f.measure()
+            self.assertNotIn(('/usr/local/bin/runsc','--version'),f.calls)
     def test_real_effect_parser_tmpfs_oversize_and_swap_denied(self):
         for defect in ('size','swap'):
             f=MeasurementFixture();key=next(key for key in f.responses if ('SIZE' if defect=='size' else '/usr/sbin/swapon') in key)

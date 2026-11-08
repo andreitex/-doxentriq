@@ -1,10 +1,59 @@
 # Trusted company foundation entry
 
+## Current package-consumption path
+
+The foundation and configuration workers now share the company engine schema2
+catalog consumer. This remains a development preview: there is no eligible
+production catalog or completed clean-install acceptance. The full installer
+continues to refuse activation.
+
+The producer accepts either one company engine catalog and its independently
+approved SHA-256, or the original paired vendor package/tool catalogs. Catalogs
+must be protected files outside the source checkout. They are embedded in the
+independently authenticated worker, never selected by a client request. Mixed
+families are refused. An omitted catalog makes the foundation entry stop before
+admission or prerequisite installation; there is no latest-package fallback.
+
+The company path currently supports execution only on an exactly matched Rocky
+profile. It requires four protected RPMs, the pinned public signing key and four
+payload inventories. Before installing a company RPM, the phase verifies the
+key fingerprint, signatures in a private RPM database, forbidden script/trigger
+metadata and the exact file inventory. It checks all 27 installed files, including
+the private libseccomp library, and verifies the expected ELF linkage, Docker
+group policy and enabled SELinux controls. Signed distro utility prerequisites
+can be installed before the signing-key check; a failure there is not a promise
+that the host has remained untouched. Company Debian execution is refused.
+
+The schema2 foundation result binds the catalog and profile, package versions,
+payload hashes and provenance references. Configuration uses its own captured
+catalog and independently remeasures the current host. Legacy records, foreign
+catalogs and changed files cannot authorize configuration. Uncertain outcomes
+retain intent and diagnostics without an automatic retry.
+
+Qualification, SBOM, provenance and license hashes in the catalog are assertions
+from the trusted company producer. These consumers do not independently rerun
+security scans or validate the contents of those reports. Actual artifacts must
+pass the company's qualification and signing process before catalog approval;
+nonzero hashes or passing component tests do not make a build eligible. The
+emission tools do not sign releases. The gVisor archive still uses the separately
+approved version and SHA-512 in the foundation request; this change does not
+qualify a newly built runtime or its distribution channel.
+
+The focused Linux tests exercise real protected descriptors, data-only ELF
+validation and private mount namespaces with package/service effects stubbed.
+They cover missing catalogs, changed archives and files, signature-check
+failures, prohibited metadata, separate readback and configuration handoff.
+Real RPM installation, SELinux behavior, clean reboot and failed-unlock recovery
+remain required acceptance work. The maintained continuation worker retains its
+existing command set and does not gain a service-activation command here.
+
+## Earlier foundation integration
+
 This source slice implements the company foundation worker and the producer for
 its two-file trusted package. The reviewed phase definitions are now integrated
 in the public `scripts/install.sh`, following explicit user approval. The
 original installer and approval-review failures remain preserved in local
-evidence. All 116 focused controls pass against the public script: 61 foundation,
+evidence. That earlier run passed 116 focused controls against the public script: 61 foundation,
 28 installation-wiring and 27 source-catalog controls, with no skips. Both
 company pipelines register the foundation suite. This establishes source
 integration; the trusted entry has not run as a native Linux installer.
@@ -72,10 +121,10 @@ The worker independently observes the installation identity/receipt, backing and
 LUKS mapping, exact encrypted XFS mount, Docker/containerd roots and health,
 storage/build drop-ins, bounded build tmpfs, encrypted journal, swap absence,
 retention policy, runtime archive and installed binary hashes, and all 62 captured
-source/template/config/provenance leaves. The runtime hash probe intentionally
-supports only the two regular root archive members `runsc` and
-`containerd-shim-runsc-v1`; other archive shapes remain unsupported. It does not
-unpack arbitrary runtime members. A second worker invocation remeasures those
+source/template/config/provenance leaves. The runtime hash probe supports the
+legacy two-file archive and the exact declared five- or six-sidecar layouts;
+unknown members remain unsupported and no declared sidecar is ignored. A second
+worker invocation remeasures those
 effects and the persisted tree before returning the independent acknowledgement.
 Child exit zero is insufficient. Uncertain held closes prevent completion.
 

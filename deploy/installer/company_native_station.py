@@ -140,9 +140,10 @@ class SourceFiles:
         require(not self.owned and not UNRELEASED, 'native-source-release-unknown')
 
 
-def stage_inputs(controller, request_raw, crypto_module):
+def stage_inputs(controller, request_raw, crypto_module, *, repository_seed=False):
     """Select real collaborators; original signed-source/controller checks remain."""
     baseline()
+    require(type(repository_seed) is bool)
     # All imports complete before the original modules snapshot station globals.
     libc = ctypes.CDLL(None, use_errno=True)
     files = SourceFiles()
@@ -157,7 +158,8 @@ def stage_inputs(controller, request_raw, crypto_module):
         io_module=io, fcntl_module=fcntl, tool_catalog={path: tool_pin(path) for path in TOOLS},
         backend_budget=dict(sourceFiles=2048, sourceDirectories=512, ownedFds=2700,
             externalFdReserve=128, seconds=600, readBytes=512*1024**2, writeBytes=104*1024**2),
-        runner_budget=dict(calls=256, seconds=600, toolReadBytes=4*1024**3, outputBytes=32*1024**2),
+        runner_budget=dict(calls=4096 if repository_seed else 256, seconds=600,
+            toolReadBytes=4*1024**3, outputBytes=32*1024**2),
         clock=time.monotonic, files=files, crypto=crypto)
     return collaborators
 
