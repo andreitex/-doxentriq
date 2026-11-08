@@ -2395,8 +2395,8 @@
     },
     {
       "path": "scripts/check-native-stat.py",
-      "sourceSha256": "6790e0fea40422f07bfc258a680ee0d59d64a42e050f7cedd08eaf5526ca1c6d",
-      "exportSha256": "6790e0fea40422f07bfc258a680ee0d59d64a42e050f7cedd08eaf5526ca1c6d",
+      "sourceSha256": "16f853c9fab8581d8c53d9ae6099ebff915d278458a9e9d0cf4bd03903195830",
+      "exportSha256": "16f853c9fab8581d8c53d9ae6099ebff915d278458a9e9d0cf4bd03903195830",
       "transformations": []
     },
     {
