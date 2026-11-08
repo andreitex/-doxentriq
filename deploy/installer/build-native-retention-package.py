@@ -200,6 +200,8 @@ def assemble_entry(root, worker, *, reader, configuration=False, repository=Fals
         if b'\r' in tail or not tail.endswith(b'\n'):raise ValueError('quota-stage-lf-required')
         entry=entry[:entry.index(start)]+tail+end
         entry=entry.replace(b'--retain-render-and-initialize-private',b'--retain-render-initialize-and-start-quota')
+        entry=entry.replace(b'--recover-private-initialization',b'--recover-private-quota')
+        entry=entry.replace(b'company-private-infrastructure company-initial-identity)',b'company-private-infrastructure company-initial-identity company-private-quota)')
     if continuation or render or infrastructure or initialization or quota:
         retention = reader(root/'deploy/installer/company-retention.sh',32768)
         start = b'  for stage in company-platform-store company-source-materialize; do\n'
@@ -208,7 +210,16 @@ def assemble_entry(root, worker, *, reader, configuration=False, repository=Fals
         if retention.count(start)!=1 or entry.count(b'# @EMBED_RETENTION_STAGE_LOOP@')!=1:
             raise ValueError('exact-retention-loop-required')
         begin=retention.index(start);end=retention.index(b'  done\n',begin)+len(b'  done\n')
-        entry=entry.replace(b'# @EMBED_RETENTION_STAGE_LOOP@',retention[begin:end])
+        loop=retention[begin:end]
+        if initialization or quota:
+            # Retain the existing concrete commands/markers. Resume only the
+            # saved pending inspection; never repeat its combined mutation.
+            opening=b'  for stage in company-platform-store company-source-materialize; do\n'
+            loop=loop.replace(opening,opening+b'    if _ci_previous "$stage"; then\n      if [[ "$stage" = company-platform-store ]]; then store_outcome=$outcome; fi\n      continue\n    fi\n    if [[ "$CI_PENDING" = "$stage" ]]; then\n      action=$CI_ACTION\n      local parent=("$BASHPID" "$IL_DIR_FD" "$IL_LOCK_FD" "$session" "$request_sha" "$stage" "$action")\n    else\n')
+            boundary=b'    # Separate read-only record inspection'
+            if loop.count(boundary)!=1:raise ValueError('exact-retention-inspection-boundary-required')
+            loop=loop.replace(boundary,b'    fi\n'+boundary)
+        entry=entry.replace(b'# @EMBED_RETENTION_STAGE_LOOP@',loop)
     lock = reader(root/'scripts/install-lock.sh',32768)
     if entry.count(b'# @EMBED_INSTALL_LOCK@') != 1 or entry.count(b'@WORKER_SHA256@') != 1:
         raise ValueError('retention-entry-template-unavailable')

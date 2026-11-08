@@ -11,8 +11,11 @@ Preparation and this companion must be produced with the same worker digest.
 Choose this combined command instead of the six-stage initializer. It is not a
 post-install command for a request whose earlier initialization already finished.
 Completed and uncertain steps are not replayed. A failure preserves its files,
-process observations and stage records for company review; explicit recovery for
-private infrastructure, identity and quota is still required.
+process observations and stage records. The
+[explicit private-session recovery command](private-session-recovery.md) can
+verify recorded execution and continue that same package/request/session.
+Missing execution evidence, partial verification and uncertain identity helper
+workspaces stay blocked for company inspection.
 
 Before any quota effect, the worker reauthenticates the signed source and
 configuration, original parent confirmations, encrypted-storage placement,
@@ -56,8 +59,8 @@ encrypted unlock or signing action ran. Source inputs and the parent mount
 namespace were unchanged. CI includes these cases alongside the existing suites.
 
 Remaining work is to connect intake, foundation, preparation and this companion
-into one guided command with explicit interrupted-stage recovery; qualify signed
-artifacts and actual quota activation; gate public service startup; verify owner
+into one guided command; qualify signed artifacts, actual quota activation and
+private-stage recovery; gate public service startup; verify owner
 password/TOTP and the first backup/restore; then enable operational timers.
 Clean installation, safe rerun, reboot and failed-unlock acceptance remain open
 on every supported operating system.

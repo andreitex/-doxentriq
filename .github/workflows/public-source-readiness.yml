@@ -176,6 +176,7 @@ jobs:
                 test_company_identity_closed_native test_company_quota_activation \
                 test_company_quota_files_native test_company_quota_runtime_native \
                 test_company_quota_effects_native test_company_quota_entry_native \
+                test_company_private_recovery_native \
                 test_installed_status_native \
                 identity_components/test_identity_commands identity_components/test_identity_evidence \
                 identity_components/test_identity_split; do

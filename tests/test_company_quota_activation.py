@@ -48,8 +48,11 @@ class Package(unittest.TestCase):
         self.assertEqual(set(W.COMMANDS),{'quota-action','activate-private-quota','verify-private-quota'})
     def test_one_entry_connects_identity_to_quota_with_only_one_completion(self):
         entry=B.assemble_entry(ROOT,raw,reader=read,quota=True).decode()
-        self.assertLess(entry.index('verify-initial-identity --request'),entry.index('activate-private-quota --request'))
-        self.assertLess(entry.index('verify-private-quota --request'),entry.index('install_lock_complete "$session"'))
+        identity='_ci_step company-initial-identity identity-action provision-initial-identity verify-initial-identity initial-identity-verified-v1'
+        quota='_ci_step company-private-quota quota-action activate-private-quota verify-private-quota private-quota-verified-v1'
+        self.assertLess(entry.index(identity),entry.index(quota))
+        self.assertLess(entry.index(quota),entry.index('install_lock_complete "$session"'))
+        self.assertIn('--recover-private-quota REQUEST SESSION',entry)
         self.assertEqual(entry.count('install_lock_complete "$session"'),1)
         self.assertIn('--retain-render-initialize-and-start-quota',entry)
         self.assertNotIn('installation.complete',entry);self.assertNotIn('systemctl enable',entry)

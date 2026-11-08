@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "status": "source_candidate_not_published",
   "licenseSelected": true,
-  "fileCount": 766,
+  "fileCount": 768,
   "excludedFileCount": 709,
   "transformedFileCount": 29,
   "publicSourceCheck": {
     "schemaVersion": 1,
     "ready": true,
-    "candidateFiles": 766,
-    "scannedFiles": 766,
+    "candidateFiles": 768,
+    "scannedFiles": 768,
     "reviewedFixtureFindings": 12,
     "findingCounts": {},
     "findings": [],
@@ -31,8 +31,8 @@
     },
     {
       "path": ".github/workflows/public-source-readiness.yml",
-      "sourceSha256": "97ff54870d27ec7c02b83a8f073e5aa81446e88eb473ee09fb58b0ba6b06d115",
-      "exportSha256": "97ff54870d27ec7c02b83a8f073e5aa81446e88eb473ee09fb58b0ba6b06d115",
+      "sourceSha256": "c7b638fbda39fd04d8d913c687658c4c89943bcc99a6497bcc4f0b586435cef0",
+      "exportSha256": "c7b638fbda39fd04d8d913c687658c4c89943bcc99a6497bcc4f0b586435cef0",
       "transformations": []
     },
     {
@@ -1063,8 +1063,8 @@
     },
     {
       "path": "deploy/installer/build-native-retention-package.py",
-      "sourceSha256": "d514436e69a2fa6fe549b31474ecf78f3f4d8b3a7d2d1b8d6ebb8ebb5707e80e",
-      "exportSha256": "d514436e69a2fa6fe549b31474ecf78f3f4d8b3a7d2d1b8d6ebb8ebb5707e80e",
+      "sourceSha256": "3bc187c16aa11d4760d4fc1e078f6cb27d13d641479c28a6f838908634225a91",
+      "exportSha256": "3bc187c16aa11d4760d4fc1e078f6cb27d13d641479c28a6f838908634225a91",
       "transformations": []
     },
     {
@@ -1093,8 +1093,8 @@
     },
     {
       "path": "deploy/installer/company-initialize.sh",
-      "sourceSha256": "f3bc70c9a29229cc45c920c4f07f4131b720a212f1059d0ddb11c113894f1fc9",
-      "exportSha256": "f3bc70c9a29229cc45c920c4f07f4131b720a212f1059d0ddb11c113894f1fc9",
+      "sourceSha256": "dd0b8aa14ec00ef0b666faae27895b1c4f1756b9fdb3650eb752ca04064baeea",
+      "exportSha256": "dd0b8aa14ec00ef0b666faae27895b1c4f1756b9fdb3650eb752ca04064baeea",
       "transformations": []
     },
     {
@@ -1111,8 +1111,8 @@
     },
     {
       "path": "deploy/installer/company-quota-stage.sh",
-      "sourceSha256": "4a7d3ab821a42c5d7fe468f2641e6d2e09da2d2d09bfa5e77f6ad89ac04851c6",
-      "exportSha256": "4a7d3ab821a42c5d7fe468f2641e6d2e09da2d2d09bfa5e77f6ad89ac04851c6",
+      "sourceSha256": "61edd86ecc136c023f34206fdec3537774e05d98aa3aba139f4426ac0faa6e48",
+      "exportSha256": "61edd86ecc136c023f34206fdec3537774e05d98aa3aba139f4426ac0faa6e48",
       "transformations": []
     },
     {
@@ -1813,8 +1813,8 @@
     },
     {
       "path": "docs/installation-readiness.md",
-      "sourceSha256": "4c9ff6ba9f81a3a844564074def91d061ebaad2f0f40207655ffe9c17d0a22a4",
-      "exportSha256": "4c9ff6ba9f81a3a844564074def91d061ebaad2f0f40207655ffe9c17d0a22a4",
+      "sourceSha256": "aa111fbe53f76dc71265b55534e4b3cc647130a81a76f0bbfb6a1b86c4e1651f",
+      "exportSha256": "aa111fbe53f76dc71265b55534e4b3cc647130a81a76f0bbfb6a1b86c4e1651f",
       "transformations": []
     },
     {
@@ -1889,14 +1889,14 @@
     },
     {
       "path": "docs/native-private-initialization.md",
-      "sourceSha256": "489ea24fe292eb26b3ce9ae71d4fff58bd88baad9c4e815ac6cd50cdf8c49c9a",
-      "exportSha256": "489ea24fe292eb26b3ce9ae71d4fff58bd88baad9c4e815ac6cd50cdf8c49c9a",
+      "sourceSha256": "e56f6296f8e7955c66fc2a7dfc2b8655c839821f2eceb2b3225055b967176409",
+      "exportSha256": "e56f6296f8e7955c66fc2a7dfc2b8655c839821f2eceb2b3225055b967176409",
       "transformations": []
     },
     {
       "path": "docs/native-private-quota.md",
-      "sourceSha256": "c93c5a3910f8cc8056de99877ed96ed20a49810b61973296ee98901d263324ed",
-      "exportSha256": "c93c5a3910f8cc8056de99877ed96ed20a49810b61973296ee98901d263324ed",
+      "sourceSha256": "e3fe4f7468362867a907952fc47cd9d53aa32a80e680a344a5789389eb3a8dcf",
+      "exportSha256": "e3fe4f7468362867a907952fc47cd9d53aa32a80e680a344a5789389eb3a8dcf",
       "transformations": []
     },
     {
@@ -1942,6 +1942,12 @@
       "transformations": [
         "Remove link to private installation evidence or trial access tooling"
       ]
+    },
+    {
+      "path": "docs/private-session-recovery.md",
+      "sourceSha256": "514d099c49912c5c7fd0075e18b9c33836daee5eb6157ad5dade622f70861170",
+      "exportSha256": "514d099c49912c5c7fd0075e18b9c33836daee5eb6157ad5dade622f70861170",
+      "transformations": []
     },
     {
       "path": "docs/protected-app-metadata.md",
@@ -4235,8 +4241,8 @@
     },
     {
       "path": "tests/test_company_infrastructure_package.py",
-      "sourceSha256": "6eae8deb4d38067d0dc0e538bc31e1e07392245f9dc5bf44e11fe08455bf505c",
-      "exportSha256": "6eae8deb4d38067d0dc0e538bc31e1e07392245f9dc5bf44e11fe08455bf505c",
+      "sourceSha256": "ab877cb770e357b80da68cddd4b2a6299a1031eb5b0848cad87600c00fb9c3d3",
+      "exportSha256": "ab877cb770e357b80da68cddd4b2a6299a1031eb5b0848cad87600c00fb9c3d3",
       "transformations": []
     },
     {
@@ -4300,9 +4306,15 @@
       "transformations": []
     },
     {
+      "path": "tests/test_company_private_recovery_native.py",
+      "sourceSha256": "a3390aa53f024130f2ab9ca68a115a2ff1c1afd1075212d297d231f571a483b7",
+      "exportSha256": "a3390aa53f024130f2ab9ca68a115a2ff1c1afd1075212d297d231f571a483b7",
+      "transformations": []
+    },
+    {
       "path": "tests/test_company_quota_activation.py",
-      "sourceSha256": "e3cee20b6427ef05556ae7166627141abc88c4d77663d58542bc726dda023029",
-      "exportSha256": "e3cee20b6427ef05556ae7166627141abc88c4d77663d58542bc726dda023029",
+      "sourceSha256": "fc166772ea1a8ef0fe77db0b751003c5ed4f8404a45f26983072dc4fa964bf3d",
+      "exportSha256": "fc166772ea1a8ef0fe77db0b751003c5ed4f8404a45f26983072dc4fa964bf3d",
       "transformations": []
     },
     {

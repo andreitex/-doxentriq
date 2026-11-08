@@ -70,9 +70,11 @@ class Package(unittest.TestCase):
         text=entry.decode();self.assertLess(len(entry),32768)
         self.assertIn(__import__('hashlib').sha256(worker).hexdigest().encode(),prepare)
         self.assertIn(__import__('hashlib').sha256(worker).hexdigest().encode(),entry)
-        self.assertLess(text.index('verify-private-infrastructure --request'),text.index('provision-initial-identity --request'))
-        self.assertLess(text.index('provision-initial-identity --request'),text.index('verify-initial-identity --request'))
-        self.assertLess(text.index('verify-initial-identity --request'),text.index('install_lock_complete "$session"'))
+        infrastructure='_ci_step company-private-infrastructure infrastructure-action initialize-private-infrastructure verify-private-infrastructure private-infrastructure-verified-v1'
+        identity='_ci_step company-initial-identity identity-action provision-initial-identity verify-initial-identity initial-identity-verified-v1'
+        self.assertLess(text.index(infrastructure),text.index(identity))
+        self.assertLess(text.index(identity),text.index('install_lock_complete "$session"'))
+        self.assertIn('install_lock_verify "$session" /usr/bin/python3 -I -B "$worker" "$verify_command" --request "$request" --parent "${parent[@]}"',text)
         self.assertEqual(text.count('install_lock_complete "$session"'),1)
         self.assertNotIn('installation.complete',text)
         result=subprocess.run(['/bin/bash','--noprofile','--norc','-n'],input=entry,capture_output=True,timeout=10)

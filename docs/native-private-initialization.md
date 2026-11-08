@@ -24,10 +24,11 @@ is:
    a recorded interrupted step before continuing; incomplete effects stay blocked.
 2. Run the packaged `company-initialize.sh
    --retain-render-and-initialize-private REQUEST`.
-3. Preserve the request, package and all evidence if a step fails. Do not delete
-   evidence, rerun provisioning, or manually remove an uncertain helper. Identity
-   initialization currently needs company review after interruption; automatic
-   resume or adoption is not implemented.
+3. Preserve the request, package and all evidence if a step fails. Use the
+   [explicit private-session recovery command](private-session-recovery.md) with
+   that same request, package and session. It verifies recorded execution without
+   repeating the pending mutation. Missing or partial evidence and uncertain
+   identity workspaces remain preserved for company inspection.
 
 `REQUEST` must be the exact protected
 `/opt/autosoft-company/requests/<operation-id>.json` already prepared by the company.
@@ -37,7 +38,8 @@ For a fresh prepared request that also needs private quota activation, the
 producer can instead emit the combined [seven-stage quota companion](native-private-quota.md).
 Choose that companion instead of this six-stage command. Running it after a
 completed six-stage initialization would attempt the earlier stages again and
-is refused; existing completed or interrupted requests require company review.
+is refused. A completed session cannot be extended; an interrupted session can
+only resume the same six- or seven-stage package scope.
 
 The initializer admits six steps under one live parent and one installer lock:
 platform retention, source materialization, stored-startup verification,
@@ -69,8 +71,8 @@ Required before actual execution:
 - Correct DNS/certificate and identity configuration from IT intake.
 
 Still required for one complete guided installation: connect intake, foundation,
-preparation and this initializer in the supported entry command; define explicit
-recovery for interrupted private infrastructure/identity; provision public
+preparation and this initializer in the supported entry command; qualify explicit
+private-stage recovery on actual signed infrastructure/identity; provision public
 service units only from genuine infrastructure and identity confirmation; verify
 owner password/TOTP in the browser; take and restore a first backup checkpoint;
 enable operational timers; and demonstrate reboot, failed-unlock recovery and
