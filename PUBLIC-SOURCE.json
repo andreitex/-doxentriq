@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "status": "source_candidate_not_published",
   "licenseSelected": true,
-  "fileCount": 765,
+  "fileCount": 766,
   "excludedFileCount": 709,
   "transformedFileCount": 29,
   "publicSourceCheck": {
     "schemaVersion": 1,
     "ready": true,
-    "candidateFiles": 765,
-    "scannedFiles": 765,
+    "candidateFiles": 766,
+    "scannedFiles": 766,
     "reviewedFixtureFindings": 12,
     "findingCounts": {},
     "findings": [],
@@ -31,8 +31,8 @@
     },
     {
       "path": ".github/workflows/public-source-readiness.yml",
-      "sourceSha256": "2594a130fea6e823c695570ce69a311b24dfa38666d01e6967d963b61d7d945d",
-      "exportSha256": "2594a130fea6e823c695570ce69a311b24dfa38666d01e6967d963b61d7d945d",
+      "sourceSha256": "4976524e97bcf36fc052d83bc6d6c7a904011c328ecc68cc4851770154a2775f",
+      "exportSha256": "4976524e97bcf36fc052d83bc6d6c7a904011c328ecc68cc4851770154a2775f",
       "transformations": []
     },
     {
@@ -2391,6 +2391,12 @@
       "path": "scripts/check-deployment.mjs",
       "sourceSha256": "91c848c08805376fa106d4e52811f2c5e37a836820966c63b7975e8ab19bb07e",
       "exportSha256": "91c848c08805376fa106d4e52811f2c5e37a836820966c63b7975e8ab19bb07e",
+      "transformations": []
+    },
+    {
+      "path": "scripts/check-native-stat.py",
+      "sourceSha256": "6790e0fea40422f07bfc258a680ee0d59d64a42e050f7cedd08eaf5526ca1c6d",
+      "exportSha256": "6790e0fea40422f07bfc258a680ee0d59d64a42e050f7cedd08eaf5526ca1c6d",
       "transformations": []
     },
     {

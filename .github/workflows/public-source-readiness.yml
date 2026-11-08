@@ -64,6 +64,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Check exact native stat semantics before installer tests
+        run: python3 -I -B scripts/check-native-stat.py
       - name: Check quota readiness, Unix sockets and shutdown draining
         run: |
           sudo python3 -I -B scripts/test-quota-startup.py
