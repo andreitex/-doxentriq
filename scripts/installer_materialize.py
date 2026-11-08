@@ -273,7 +273,8 @@ def materialized_deployment(held,parent,name,*,files=None,clock=time.monotonic):
 # Its archive stays with the original verifier/Store capability. The legacy
 # schema3 entry above remains independent and unchanged.
 PLATFORM_FOUNDATION_CONFIGS = (*CONFIGS, 'platform-sources.json')
-PLATFORM_FOUNDATION_FILE_COUNT = 63
+PLATFORM_FOUNDATION_EXTRA_SOURCES = ('scripts/installation-status.py',)
+PLATFORM_FOUNDATION_FILE_COUNT = 64
 PLATFORM_FOUNDATION_TOTAL_LIMIT = TOTAL_LIMIT + FILE_LIMIT
 _PLATFORM_FOUNDATION_SOURCES = set()
 
@@ -288,7 +289,7 @@ def _require_platform_foundation_source(held, verifier):
 
 
 def capture_platform_foundation(held, *, verifier):
-    """Capture 44 host files, ten templates and nine config/provenance leaves.
+    """Capture 44 legacy host files, one diagnostic, ten templates and nine records.
 
     Genuine issuance in the caller's original verifier precedes source access.
     This does not authorize host effects, complete-bundle verification or full
@@ -317,7 +318,7 @@ def capture_platform_foundation(held, *, verifier):
                 and type(row['path']) is str and row['path'] not in signed)
         signed[row['path']] = row
     rows, totals = {}, []
-    for names in (SOURCES, TEMPLATES):
+    for names in ((*SOURCES, *PLATFORM_FOUNDATION_EXTRA_SOURCES), TEMPLATES):
         total = 0
         for name in names:
             require(name in values and name in modes and name in signed)

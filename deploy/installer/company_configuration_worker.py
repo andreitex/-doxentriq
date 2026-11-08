@@ -9,13 +9,41 @@ from pathlib import Path
 import stat
 
 
-def foundation(Q, S, V, request, held, collaborators, fingerprint):
+def host_observation(modules, catalogs, check_authority):
+    """Own authenticated catalogs and current host readback; no inherited JSON authority."""
+    H, P, K, S, F = (modules[name] for name in ('host_package_runtime', 'host_tool_profiles',
+        'host_packages', 'station', 'foundation_worker'))
+    def check():
+        H.require(not F.UNKNOWN and not S.UNRELEASED)
+        check_authority()
+    check()
+    with H.held_platform(S) as (observed, recheck):
+        package, tools = H.bindings(catalogs, profiles=P, packages=K, observed_platform=observed,
+            engine=modules.get('engine_packages'),engine_native=modules.get('engine_native'))
+        recheck(); check()
+    current = H.readback(package, tools, station=S, runner=F.NativeRunner(), check_authority=check,
+        engine=modules.get('engine_packages'),engine_native=modules.get('engine_native'),engine_elf=modules.get('engine_elf'))
+    check()
+    return H, package, tools, current
+
+
+def foundation_record_version(value):
+    """Read-only classification; legacy proof never enters the new execution path."""
+    if type(value) is dict and 'schemaVersion' not in value and 'hostPackages' not in value:
+        return 'legacy-unpinned'
+    if type(value) is dict and type(value.get('schemaVersion')) is int and value['schemaVersion'] == 2:
+        return 'pinned-v2'
+    return 'unsupported'
+
+
+def foundation(Q, S, V, request, held, collaborators, fingerprint, *, modules, host_catalogs, check_authority):
     """Bind the real confirmed schema3 foundation to this schema4 source.
 
     The installed foundation's signed 54 host/template files and five catalogs
     must exactly equal the corresponding complete-source release bytes. A
     result or marker without that original signed source is insufficient.
     """
+    H, package, tools, current = host_observation(modules, host_catalogs, check_authority)
     root = request['dataDir'] + '/company/host-releases/install-' + request['operationId']
     evidence = '/opt/autosoft-company/evidence/' + request['operationId']
     raw = {name: S.read_protected(evidence + '/' + name, 32768)
@@ -41,9 +69,11 @@ def foundation(Q, S, V, request, held, collaborators, fingerprint):
             for name, value in sorted(rows.items())}))
         host = {name: json.loads(S.read_protected('/etc/autosoft/' + name, 32768))
                 for name in ('installation.intent.json', 'installation.json', 'installation.storage-receipt.json')}
-        Q.require(set(result) == {'scope', 'status', 'operationId', 'installationId', 'releaseSha256',
+        H.require(foundation_record_version(result) == 'pinned-v2', 'Pinned foundation package evidence is required; legacy records are retained for IT inspection')
+        Q.require(set(result) == {'schemaVersion', 'hostPackages', 'scope', 'status', 'operationId', 'installationId', 'releaseSha256',
             'treeSha256', 'hostSha256', 'runscVersionSha256', 'runtimeBinaryPins',
             'fullPlatformActivated', 'backupReady', 'runtimePairInitialized'})
+        H.verify_evidence(result['hostPackages'], package, tools, current=current,engine_native=modules.get('engine_native'))
         Q.require(result['scope'] == 'FOUNDATION_ONLY' and result['status'] == 'effects-independently-confirmed'
             and result['operationId'] == request['operationId']
             and result['installationId'] == host['installation.json']['installation_id']
@@ -61,11 +91,17 @@ def foundation(Q, S, V, request, held, collaborators, fingerprint):
     return value
 
 
-def run(command, modules, delivery, auth, request, request_raw, worker_sha256, parent_args):
+def run(command, modules, delivery, auth, request, request_raw, worker_sha256, parent_args, *, host_catalogs=None):
     Q, S, C, R = (modules[name] for name in ('configuration', 'station', 'cli', 'records'))
     expected_action = Q.action(request_raw, worker_sha256)
     if command == 'configuration-action':
         Q.require(parent_args is None)
+        # Before stage effects and questionnaire: validate the own captured catalogs.
+        H = modules['host_package_runtime']
+        with H.held_platform(S) as (observed, recheck):
+            H.bindings(host_catalogs, profiles=modules['host_tool_profiles'], packages=modules['host_packages'], observed_platform=observed,
+                engine=modules.get('engine_packages'),engine_native=modules.get('engine_native'))
+            recheck()
         print(expected_action)
         return
     Q.require(command in ('configure-foundation', 'verify-configuration') and parent_args is not None)
@@ -91,6 +127,10 @@ def run(command, modules, delivery, auth, request, request_raw, worker_sha256, p
                 with entry.fresh_installation_modules(held) as assembly:
                     B = assembly.modules[Q.BOOTSTRAP]
                     commands = B.SeedCommands(collaborators['runner_module'], collaborators['runner'])
+                    def check_host_authority():
+                        parent.check(); held.recheck()
+                    foundation_sha = foundation(Q, S, V, request, held, collaborators, auth['fingerprint'],
+                        modules=modules, host_catalogs=host_catalogs, check_authority=check_host_authority)
                     if execute:
                         # Existing operation evidence belongs to the verified foundation.
                         with R.directory(operation) as (fd, check):
@@ -105,11 +145,11 @@ def run(command, modules, delivery, auth, request, request_raw, worker_sha256, p
                             actionSha256=expected_action, session=parent_input.session, workerSha256=worker_sha256)))
                         # A failed execute child cannot be made successful by verification.
                         S.read_protected(directory + '/executed.json', 32768)
-                    foundation_sha = foundation(Q, S, V, request, held, collaborators, auth['fingerprint'])
                     result = Q.run(entry, full_entry_module=F, held=held, assembly=assembly, parent=parent,
                         request=request, request_raw=request_raw, worker_sha256=worker_sha256,
                         command=commands.text, execute=execute, answers=answers)
-                    Q.require(foundation(Q, S, V, request, held, collaborators, auth['fingerprint']) == foundation_sha)
+                    Q.require(foundation(Q, S, V, request, held, collaborators, auth['fingerprint'],
+                        modules=modules, host_catalogs=host_catalogs, check_authority=check_host_authority) == foundation_sha)
                     result['foundationEvidenceSha256'] = foundation_sha
                     parent.check()
         S.require_released(collaborators)
@@ -120,10 +160,33 @@ def run(command, modules, delivery, auth, request, request_raw, worker_sha256, p
         print('Configuration and runtime placement written; independent verification is required.')
     else:
         Q.require(S.read_protected(directory + '/executed.json', 32768) == raw)
-        write(R, directory, 'verified.json', raw)
+        write_observation(R, S, directory, 'verified.json', raw)
         marker = ('configuration-verified-v1\nrequest=' + Q.sha(request_raw) + '\nsession=' + parent_args[3]
             + '\nstage=' + Q.STAGE + '\naction=' + expected_action + '\noutcome=' + Q.sha(raw) + '\n').encode()
-        write(R, directory, 'confirmation', marker, mode=0o600)
+        write_observation(R, S, directory, 'confirmation', marker, mode=0o600)
+
+
+def write_observation(R, S, directory, name, raw, *, mode=0o400):
+    """Persist a newly remeasured verification without replacing prior bytes.
+
+    Call only after original source/parent/current-effect verification. Existing
+    exact records may finish an interrupted verification; mismatches remain for
+    IT inspection. This cannot replay an execute operation or mint its evidence.
+    """
+    R.require(name in ('verified.json', 'confirmation') and type(raw) is bytes
+        and 0 < len(raw) <= 32768 and mode == (0o600 if name == 'confirmation' else 0o400))
+    target = Path(directory) / name
+    if not os.path.lexists(target):
+        return write(R, directory, name, raw, mode=mode)
+    with R.directory(directory) as (parent, check):
+        before = os.stat(name, dir_fd=parent, follow_symlinks=False)
+        R.require(stat.S_ISREG(before.st_mode) and before.st_uid == before.st_gid == 0
+            and before.st_nlink == 1 and stat.S_IMODE(before.st_mode) == mode)
+        R.require(S.read_protected(target, 32768) == raw)
+        after = os.stat(name, dir_fd=parent, follow_symlinks=False)
+        fields = ('st_dev', 'st_ino', 'st_mode', 'st_uid', 'st_gid', 'st_nlink', 'st_size', 'st_mtime_ns', 'st_ctime_ns')
+        R.require(all(getattr(before, key) == getattr(after, key) for key in fields))
+        check()
 
 
 def write(R, directory, name, raw, *, mode=0o400):

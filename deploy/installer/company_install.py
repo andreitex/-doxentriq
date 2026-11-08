@@ -19,6 +19,7 @@ import uuid
 
 TRUSTED_CODE = {}  # @TRUSTED_CODE@
 COMPANY_FINGERPRINT = '@COMPANY_FINGERPRINT@'
+HOST_CATALOGS = None  # @COMPANY_HOST_CATALOGS@
 BASE = Path('/opt/autosoft-company')
 FIELDS = ('st_dev','st_ino','st_mode','st_uid','st_gid','st_nlink','st_size','st_mtime_ns','st_ctime_ns')
 ENV = {'PATH':'/usr/sbin:/usr/bin:/sbin:/bin','LC_ALL':'C','LANG':'C','HOME':'/','TZ':'UTC'}
@@ -55,7 +56,7 @@ def validate(request, fingerprint=COMPANY_FINGERPRINT):
     return dict(request)
 
 def load_trusted(records=TRUSTED_CODE):
-    require(type(records) is dict and set(records) == {'verify-release.py','installer_materialize.py','installer_parent.py'})
+    require(type(records) is dict and set(records) == {'verify-release.py','installer_materialize.py','installer_parent.py','company_native_station.py','company_host_tool_profiles.py','company_host_packages.py','company_host_package_runtime.py','company_engine_packages.py','company_engine_native.py','company_engine_elf.py'})
     result={}
     for name,row in records.items():
         require(type(row) is dict and set(row) == {'sha256','bytes','base64'} and type(row['bytes']) is int and 0 < row['bytes'] <= 131072)
@@ -135,7 +136,7 @@ class NativeRunner:
         require(not UNKNOWN and type(argv) is list and 0 < len(argv) <= 32 and type(timeout) is int and 0 < timeout <= 1800)
         require(all(type(arg) is str and 0 < len(arg.encode()) <= 65536 and '\x00' not in arg for arg in argv)
             and sum(len(arg.encode())+1 for arg in argv) <= 131072 and argv[0] in ('/bin/bash','/usr/bin/python3','/usr/bin/findmnt',
-                '/usr/bin/systemctl','/usr/bin/docker','/usr/sbin/cryptsetup','/usr/sbin/losetup','/usr/sbin/swapon','/usr/bin/systemd-escape','/usr/local/bin/runsc'))
+                '/usr/bin/systemctl','/usr/bin/docker','/usr/bin/rpm','/usr/bin/dpkg-query','/usr/bin/getent','/usr/sbin/getenforce','/usr/sbin/semodule','/usr/sbin/matchpathcon','/usr/sbin/cryptsetup','/usr/sbin/losetup','/usr/sbin/swapon','/usr/bin/systemd-escape','/usr/local/bin/runsc'))
         require(time.monotonic() < self.deadline);self.calls+=1;require(self.calls <= 48)
         process=None;pidfd=None;selector=None;streams=[];buffers={};failed=False;known=False;released=False
         end=min(self.deadline,time.monotonic()+timeout)
@@ -293,10 +294,11 @@ def roots(request):
     return BASE/'staging',data/'company/host-releases',data/'company/host-releases'/('install-'+op),BASE/'evidence'/op
 
 def phase_command(held,name,execution_root,final_root,request):
-    require(name in ('packages','storage','prepare','activate'))
+    require(name in ('packages','packages_v2','storage','prepare','activate'))
     install=held.sources['scripts/install.sh']
     require(install.startswith(b'#!/usr/bin/env bash\n# Candidate phase definitions only.')
             and all(install.count(('company_'+phase+'_phase() {').encode()) == 1 for phase in ('packages','storage','prepare','activate')))
+    if name=='packages_v2':require(install.count(b'company_packages_v2_phase() {')==1)
     # Package code runs from signed captured bytes before full-nine output capture.
     raw=b'\n'.join(held.sources[key] for key in ('scripts/lib.sh','scripts/install-runtime-gate.sh'))+b'\n'+install
     require(len(raw) < 65536)
@@ -534,28 +536,66 @@ def main():
 if __name__=='__main__':main()
 '''
 
+def host_bindings(modules, catalogs=HOST_CATALOGS):
+    H,S,T,K=(modules[name] for name in ('company_host_package_runtime.py','company_native_station.py',
+        'company_host_tool_profiles.py','company_host_packages.py'))
+    with H.held_platform(S) as (observed,recheck):
+        package,tools=H.bindings(catalogs,profiles=T,packages=K,observed_platform=observed,**engine_components(modules))
+        recheck()
+    return package,tools
+
+
+def engine_components(modules):
+    return dict(engine=modules.get('company_engine_packages.py'),engine_native=modules.get('company_engine_native.py'),engine_elf=modules.get('company_engine_elf.py'))
+
+
+@contextmanager
+def package_inputs(modules,package,station,check):
+    if package.get('scope')=='COMPANY_ENGINE_EXECUTION_INPUTS_V2_ONLY':
+        E=modules['company_engine_native.py'];C=modules['company_engine_packages.py']
+        with E.held_archives(package,station,catalog=C,check_authority=check) as inputs:
+            yield 'packages_v2',lambda command:E.append_phase_arguments(command,inputs,binding=package),inputs['recheck']
+    else:
+        K=modules['company_host_packages.py']
+        with K.held_archives(package,station,check_authority=check) as (arguments,recheck):
+            yield 'packages',lambda command:K.append_phase_arguments(command,arguments),recheck
+
+
+def versioned_result(measured,package_readback):
+    require(type(measured) is dict and 'schemaVersion' not in measured and 'hostPackages' not in measured)
+    return dict(measured,schemaVersion=2,hostPackages=package_readback)
+
+
 class Worker:
-    def __init__(self,modules,state,runner,*,output_guard=persisted_output):
+    def __init__(self,modules,state,runner,*,output_guard=persisted_output,host_catalogs=HOST_CATALOGS):
         self.modules,self.state,self.runner,self.output_guard=modules,state,runner,output_guard
+        self.host_catalogs=host_catalogs
     def run(self,request,parent_input,*,verify=False):
         request=validate(request,COMPANY_FINGERPRINT);stage_parent,final_parent,final_root,evidence=roots(request)
         P=self.modules['installer_parent.py'];V=self.modules['verify-release.py'];M=self.modules['installer_materialize.py']
         with P.hold_parent(parent_input) as parent, V.authenticated_deployment(request['bundleRoot'],request['keyPath'],COMPANY_FINGERPRINT,
             expected_architecture='x86_64',source_root=request['sourceRoot']) as held:
             require(held.metadata['releaseSha256'] == request['releaseSha256'])
-            def check():require(not UNKNOWN);parent.check();held.recheck()
+            H,S,K=(self.modules[name] for name in ('company_host_package_runtime.py','company_native_station.py','company_host_packages.py'))
+            def check():require(not UNKNOWN and not S.UNRELEASED);parent.check();held.recheck()
+            package,tools=host_bindings(self.modules,self.host_catalogs)
             check()
             if verify:
                 with self.output_guard(held,final_root,M) as output:
                     output.recheck();retained=json.loads(self.state.read(evidence/'result.json'))
-                    measured=measure(self.state,self.runner,request,final_root,held,output=output)
+                    current=H.readback(package,tools,station=S,runner=self.runner,check_authority=check,**engine_components(self.modules))
+                    measured=versioned_result(measure(self.state,self.runner,request,final_root,held,output=output),current)
+                    H.verify_evidence(retained.get('hostPackages'),package,tools,current=current,engine_native=self.modules.get('company_engine_native.py'))
                     require(retained == measured);check();output.recheck()
             else:
                 for name in ('installation.intent.json','installation.json','installation.pending.json','storage.key'):
                     require(not self.state.exists(Path('/etc/autosoft')/name))
                 require(not self.state.exists(evidence) and not self.state.exists(final_root))
-                self.state.mkdir(evidence);self.state.write(evidence/'intent.json',canonical(request));check()
-                self.runner.run(phase_command(held,'packages',stage_parent,final_root,request),1800);check()
+                with package_inputs(self.modules,package,S,check) as (phase,append,recheck):
+                    self.state.mkdir(evidence);self.state.write(evidence/'intent.json',canonical(request));check()
+                    self.runner.run(append(phase_command(held,phase,stage_parent,final_root,request)),1800)
+                    recheck();check()
+                installed=H.readback(package,tools,station=S,runner=self.runner,check_authority=check,**engine_components(self.modules))
                 with M.materialized_deployment(held,stage_parent,'install-'+request['operationId']) as staged:
                     staged.recheck();check()
                     self.runner.run(phase_command(held,'storage',staged.root,final_root,request),900);staged.recheck();check()
@@ -565,7 +605,9 @@ class Worker:
                         final.recheck();check()
                         self.runner.run(phase_command(held,'activate',final.root,final_root,request),240);final.recheck();check()
                         with self.output_guard(held,final_root,M) as output:
-                            output.recheck();measured=measure(self.state,self.runner,request,final_root,held,output=output)
+                            output.recheck();current=H.readback(package,tools,station=S,runner=self.runner,check_authority=check,**engine_components(self.modules))
+                            require(current==installed)
+                            measured=versioned_result(measure(self.state,self.runner,request,final_root,held,output=output),current)
                             output.recheck();final.recheck();check()
                     staged.recheck();check()
                 check();self.state.write(evidence/'result.json',canonical(measured));check()
@@ -579,10 +621,15 @@ def main(argv=None):
     choice=parser.add_mutually_exclusive_group(required=True);choice.add_argument('--foundation-only',action='store_true');choice.add_argument('--verify',action='store_true');choice.add_argument('--describe',action='store_true')
     parser.add_argument('--request',required=True);parser.add_argument('--worker-sha',required=True);parser.add_argument('--parent',nargs=7)
     args=parser.parse_args(argv);state=NativeState()
-    require(type(args.worker_sha) is str and re.fullmatch('[a-f0-9]{64}',args.worker_sha) is not None and sha(state.read(Path(__file__),262144)) == args.worker_sha)
+    require(type(args.worker_sha) is str and re.fullmatch('[a-f0-9]{64}',args.worker_sha) is not None and sha(state.read(Path(__file__),524288)) == args.worker_sha)
     raw=state.read(path(args.request),4096);request=validate(json.loads(raw),COMPANY_FINGERPRINT);require(canonical(request) == raw)
-    if args.describe:require(args.parent is None);print(request['operationId']);return
-    modules=load_trusted();parent=modules['installer_parent.py'].ParentInput.from_argv(args.parent)
+    modules=load_trusted()
+    if args.describe:
+        require(args.parent is None)
+        package,tools=host_bindings(modules)
+        with package_inputs(modules,package,modules['company_native_station.py'],lambda:require(not UNKNOWN)) as (_,_,recheck):recheck()
+        print(request['operationId']);return
+    parent=modules['installer_parent.py'].ParentInput.from_argv(args.parent)
     require(parent.request == sha(raw) and parent.stage == 'foundation' and parent.action == sha(f'foundation-v1:{sha(raw)}:{args.worker_sha}'.encode()))
     # Quiet fixed ancestors prepared before either materializer. No chmod/adoption.
     for p in (BASE,BASE/'bootstrap',BASE/'incoming',BASE/'staging',BASE/'evidence'):

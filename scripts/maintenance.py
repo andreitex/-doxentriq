@@ -553,8 +553,9 @@ class Maintenance:
         report = dict(subject="vm", status="failed" if findings else "unavailable" if any(c["status"] != "passed" for c in coverage) else "passed", checkedAt=checked, feedUpdatedAt=feed, findings=findings[:10000], coverage=coverage[:100])
         write(self.data / "security/latest-host.json", report)
         if gate:
-            # The installer blocks on image/package failures; acknowledged vendor coverage gaps remain visible.
-            blockers = [c for c in coverage if c["name"].startswith("image:") or c["name"] in {"vulnerability-feed", "host-os-packages", "host-running-kernel-vendor-advisories"}]
+            # A distribution scan does not cover company-built or vendor runtimes.
+            # Missing runtime advisory coverage must also prevent initial activation.
+            blockers = [c for c in coverage if c["name"].startswith("image:") or c["name"] in {"vulnerability-feed", "host-os-packages", "host-running-kernel-vendor-advisories", "host-third-party-advisories"}]
             if findings or not blockers or any(c["status"] != "passed" for c in blockers):
                 raise ValueError("Initial security gate failed. Review encrypted security/latest-host.json; no remediation was applied.")
         else:

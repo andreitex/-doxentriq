@@ -69,6 +69,7 @@ jobs:
           sudo python3 -I -B scripts/test-quota-startup.py
           python3 -I -B scripts/test-quota-helper.py
           python3 -I -B scripts/test-host-network.py
+          python3 -I -B scripts/test-maintenance-scanner-coverage.py
       - name: Check installer records and read-only root compatibility
         run: |
           AUTOSOFT_TEST_ARTIFACT_ROOT="$(mktemp -d "${RUNNER_TEMP}/doxentriq-records.XXXXXX")"
@@ -76,6 +77,8 @@ jobs:
           python3 -I -B tests/test_company_cli_executed_record_store.py
           python3 -I -B tests/test_company_retention_records.py
           python3 -I -B tests/test_company_configuration.py
+          python3 -I -B tests/test_company_foundation.py
+          python3 -I -B tests/test_company_engine_elf.py
           python3 -I -B tests/test_company_release_producer.py
           sudo python3 -I -B tests/test_company_configuration_native.py
       - name: Check captured identity and source execution dependencies
@@ -89,6 +92,7 @@ jobs:
           python3 -I -B tests/test_identity_provisioning.py
           python3 -I -B tests/test_company_captured_loader.py
           python3 -I -B tests/test_company_full_package.py
+          python3 -I -B tests/test_platform_foundation_materialize.py
           python3 -I -B tests/test_company_full_cli_package.py
           python3 -I -B tests/test_company_authenticated_cli_inputs.py
           python3 -I -B tests/test_company_authenticated_cli_compose.py
@@ -102,8 +106,19 @@ jobs:
           DOXENTRIQ_NATIVE_TEST_ROOT=$(sudo mktemp -d /srv/doxentriq-entry.XXXXXX)
           # This fixture measures actual UID/GID against root installation state.
           sudo python3 -I -B tests/test_company_runtime_pair_worker.py
+          sudo python3 -I -B tests/test_company_preparation_recovery.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_preparation_entry_native.py
           sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
             python3 -I -B tests/test_company_foundation_entry_native.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_foundation_packages.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_engine_native.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_engine_handoff.py
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            python3 -I -B tests/test_company_engine_phase_native.py
           sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
             python3 -I -B tests/test_company_runtime_identity.py
           sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
@@ -133,6 +148,36 @@ jobs:
             python3 -I -B tests/test_company_render_entry_native.py
           sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
             python3 -I -B tests/test_storage_fault_harness.py
+          sudo python3 -I -B tests/test_storage_recovery_entry.py
+      - name: Check private infrastructure, identity and quota composition
+        shell: bash
+        run: |
+          DOXENTRIQ_NATIVE_TEST_ROOT=$(sudo mktemp -d /srv/doxentriq-initialization.XXXXXX)
+          sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            AUTOSOFT_TEST_ARTIFACT_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+            bash --noprofile --norc -c '
+              set -euo pipefail
+              native_nofile=$(ulimit -Sn)
+              if [[ "$native_nofile" != unlimited ]]; then
+                [[ "$native_nofile" =~ ^[0-9]+$ ]] || exit 74
+                if (( native_nofile < 16384 )); then ulimit -Sn 16384; fi
+              fi
+              # Engine-catalog and native-retention suites already run above.
+              # Effects here use synthetic Docker; /etc changes are isolated
+              # inside each native fixture mount namespace.
+              for suite in test_company_identity_worker test_company_identity_ancestry_native \
+                test_company_infrastructure_package test_company_initialization_entry_native \
+                test_company_infrastructure_worker test_company_infrastructure_composition_native \
+                test_company_infrastructure_host test_company_infrastructure_host_process_native \
+                test_company_identity_closed_native test_company_quota_activation \
+                test_company_quota_files_native test_company_quota_runtime_native \
+                test_company_quota_effects_native test_company_quota_entry_native \
+                test_installed_status_native \
+                identity_components/test_identity_commands identity_components/test_identity_evidence \
+                identity_components/test_identity_split; do
+                python3 -I -B "tests/$suite.py"
+              done
+            '
 
   source-build:
     runs-on: ubuntu-latest

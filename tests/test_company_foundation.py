@@ -78,6 +78,18 @@ class Harness:
         self.modules={'installer_parent.py':SimpleNamespace(hold_parent=parent),
             'verify-release.py':SimpleNamespace(authenticated_deployment=auth),
             'installer_materialize.py':SimpleNamespace(materialized_deployment=materialize)}
+        # This original lifecycle fixture supplies synthetic package observations;
+        # actual catalog/FD readback and mismatch cases live in the dedicated suite.
+        proof={'scope':'SYNTHETIC_PACKAGE_LIFECYCLE_FIXTURE'}
+        @contextmanager
+        def archives(*_,**kw):
+            kw['check_authority']();yield tuple('synthetic' for _ in range(12)),kw['check_authority']
+        self.modules.update({'company_host_package_runtime.py':SimpleNamespace(
+            readback=lambda *a,**kw:proof,
+            verify_evidence=lambda value,*a,**kw:W.require(value==kw['current'])),
+            'company_native_station.py':SimpleNamespace(UNRELEASED=[]),
+            'company_host_packages.py':SimpleNamespace(held_archives=archives,
+                append_phase_arguments=lambda command,arguments:command+list(arguments))})
         self.runner=SimpleNamespace(run=self.run)
         @contextmanager
         def output_guard(*_):
@@ -101,7 +113,7 @@ class Harness:
         return {'scope':'FOUNDATION_ONLY','status':'effects-independently-confirmed','operationId':'1'*32,
             'fullPlatformActivated':False,'backupReady':False,'runtimePairInitialized':False}
     def execute(self,verify=False):
-        with mock.patch.object(W,'COMPANY_FINGERPRINT',FP),mock.patch.object(W,'measure',self.measure):
+        with mock.patch.object(W,'COMPANY_FINGERPRINT',FP),mock.patch.object(W,'measure',self.measure),mock.patch.object(W,'host_bindings',return_value=({},{})):
             return W.Worker(self.modules,self.state,self.runner,output_guard=self.output_guard).run(request(),object(),verify=verify)
 
 class Pipe:
@@ -348,7 +360,7 @@ class FoundationTests(unittest.TestCase):
         key=next(p for p in h.state.records if p.endswith('result.json'));h.state.records[key]=b'{"status":"fake"}\n'
         with self.assertRaises(W.FoundationUnavailable):h.execute(verify=True)
         self.assertFalse(any(p.endswith('/verified') for p in h.state.records))
-    def test_packaged_worker_embeds_three_exact_primitive_records(self):
+    def test_packaged_worker_embeds_seven_exact_primitive_records(self):
         records=B.assemble(ROOT,FP,reader=lambda p:p.read_bytes());worker=records['company_install.py']
         tree=ast.parse(worker);rows=ast.literal_eval(next(n.value for n in tree.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='TRUSTED_CODE' for t in n.targets)))
         self.assertEqual(set(rows),set(B.TRUSTED));self.assertNotIn(b'@COMPANY_FINGERPRINT@',worker)

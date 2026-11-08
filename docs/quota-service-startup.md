@@ -5,6 +5,13 @@ Doxentriq's full platform unit generation now supplies a persistent
 preserved for compatibility. This source change does not install the unit on an
 existing trial or establish clean-install or reboot acceptance.
 
+The [private quota installer companion](native-private-quota.md) now connects
+the existing helper to genuine retained-source, infrastructure and initial
+identity evidence. It installs only the quota unit and its Docker dependency,
+then separately verifies the running helper. It does not invoke the legacy
+all-unit generation or start public services and timers. This path passed
+component tests; actual signed VM activation and reboot acceptance remain open.
+
 The service uses `Type=notify`. Its Python process reports readiness only after
 checking the encrypted XFS mount, the installation identity, the existing open
 checkpoint and allocation journals, the protected token, and the owned Unix

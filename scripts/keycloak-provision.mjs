@@ -35,13 +35,14 @@ function beforeDeadline(promise, signal) {
 // including a mutation whose result is uncertain, is automatically retried here.
 function transport(fetchImpl, operationSignal) {
   return async function call(path, options = {}, token) {
-    if (typeof path !== 'string' || !path.startsWith('/admin/realms/') && !path.startsWith('/realms/') || path.includes('#') || path.includes('\\') || /[\r\n\0]/.test(path)) throw new IdentityProvisioningError('Invalid identity endpoint');
+    const readiness = path === 'https://keycloak:9000/health/ready' && Object.keys(options).length === 0 && token === undefined;
+    if (typeof path !== 'string' || !readiness && !path.startsWith('/admin/realms/') && !path.startsWith('/realms/') || path.includes('#') || path.includes('\\') || /[\r\n\0]/.test(path)) throw new IdentityProvisioningError('Invalid identity endpoint');
     const { expectedStatus, ...request } = options;
     const signal = AbortSignal.any([operationSignal, AbortSignal.timeout(REQUEST_MS)]);
     let result, reader;
     try {
       signal.throwIfAborted();
-      result = await beforeDeadline(fetchImpl(BASE + path, { ...request, redirect: 'error', signal, headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}), ...request.headers } }), signal);
+      result = await beforeDeadline(fetchImpl(readiness ? path : BASE + path, { ...request, redirect: 'error', signal, headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}), ...request.headers } }), signal);
       if (!result.ok || expectedStatus !== undefined && result.status !== expectedStatus) throw new IdentityProvisioningError(`Identity provisioning failed HTTP ${result.status}`);
       const length = result.headers.get('content-length');
       if (length !== null && (!/^(0|[1-9][0-9]*)$/.test(length) || Number(length) > MAX_RESPONSE)) throw new IdentityProvisioningError('Identity response exceeds the permitted size');
@@ -197,9 +198,201 @@ export async function readConfiguration(input = process.stdin, signal = AbortSig
   catch { throw new IdentityProvisioningError('Protected identity input is not valid JSON'); }
 }
 
+// This mode is for a fresh, not-yet-public installation. It performs no realm,
+// user, client, credential, role or flow writes. OAuth token acquisition remains
+// POST and can create authentication/audit events at the identity service.
+export async function verifyInitialIdentity(config, { fetchImpl = fetch, output = console.log, operationSignal = AbortSignal.timeout(OPERATION_MS) } = {}) {
+  const refuse = () => { throw new IdentityProvisioningError('Initial identity policy verification failed; public startup remains refused'); };
+  const need = value => { if (!value) refuse(); };
+  const same = (left, right) => JSON.stringify(left) === JSON.stringify(right);
+  const uuid = value => typeof value === 'string' && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(value);
+  need(config?.action === 'verify-initial' && credential(config.bootstrapPassword) && credential(config.provisionerSecret)
+    && credential(config.directoryReaderSecret) && uuid(config.ownerSubject));
+  let origin;
+  try { origin = new URL(config.adminOrigin); } catch { refuse(); }
+  need(origin.protocol === 'https:' && origin.origin === config.adminOrigin && !origin.username && !origin.password
+    && Array.isArray(config.ssoAliases) && new Set(config.ssoAliases).size === config.ssoAliases.length
+    && config.ssoAliases.every(alias => ['google', 'microsoft'].includes(alias)));
+  const call = transport(fetchImpl, operationSignal);
+  const token = (await call('/realms/master/protocol/openid-connect/token', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'password', client_id: 'admin-cli', username: 'bootstrap-admin', password: config.bootstrapPassword }) })).access_token;
+  need(typeof token === 'string' && token.length > 0 && token.length <= 65536);
+  const get = path => call('/admin/realms/' + path, {}, token);
+  const only = rows => { need(Array.isArray(rows) && rows.length === 1 && uuid(rows[0].id)); return rows[0]; };
+  const realm = await get('platform');
+  const expected = { realm: 'platform', enabled: true, sslRequired: 'all', registrationAllowed: false,
+    resetPasswordAllowed: false, loginWithEmailAllowed: true, duplicateEmailsAllowed: false,
+    bruteForceProtected: true, failureFactor: 5, accessTokenLifespan: 300, ssoSessionIdleTimeout: 1800,
+    ssoSessionMaxLifespan: 28800, passwordPolicy: 'length(16) and digits(1) and lowerCase(1) and upperCase(1) and specialChars(1)',
+    otpPolicyType: 'totp', otpPolicyAlgorithm: 'HmacSHA1', otpPolicyDigits: 6, otpPolicyPeriod: 30,
+    otpPolicyLookAheadWindow: 1, browserFlow: 'platform-browser' };
+  need(Object.entries(expected).every(([key, value]) => realm[key] === value));
+  const owners = await get('platform/roles/platform-owner/users?first=0&max=2');
+  need(only(owners).id === config.ownerSubject);
+  const owner = await get('platform/users/' + config.ownerSubject);
+  need(owner.id === config.ownerSubject && owner.username === 'owner' && owner.enabled === true && !owner.federationLink);
+  need(same([...(owner.requiredActions ?? [])].sort(), ['CONFIGURE_RECOVERY_AUTHN_CODES', 'CONFIGURE_TOTP', 'UPDATE_PASSWORD']));
+  need(same(await get('platform/users/' + config.ownerSubject + '/federated-identity'), []));
+  const credentials = await get('platform/users/' + config.ownerSubject + '/credentials');
+  need(Array.isArray(credentials) && credentials.length === 1 && credentials[0].type === 'password');
+  const admins = await get('platform/roles/platform-admin/users?first=0&max=2');
+  need(only(admins).id === config.ownerSubject);
+  const ownerRoles = await get('platform/users/' + config.ownerSubject + '/role-mappings/realm/composite');
+  need(Array.isArray(ownerRoles) && same(ownerRoles.filter(r => r.name?.startsWith('platform-')).map(r => r.name).sort(), ['platform-admin', 'platform-owner']));
+  const required = await get('platform/authentication/required-actions');
+  for (const alias of ['UPDATE_PASSWORD', 'CONFIGURE_TOTP', 'CONFIGURE_RECOVERY_AUTHN_CODES']) {
+    const matches = required.filter(row => row.alias === alias);
+    need(matches.length === 1 && matches[0].providerId === alias && matches[0].enabled === true);
+  }
+  const reference = async (row, alias, value) => {
+    need(typeof row.authenticationConfig === 'string' && uuid(row.authenticationConfig));
+    const cfg = await get('platform/authentication/config/' + row.authenticationConfig);
+    // A masked value is not proof. This fresh stage stays unqualified when the
+    // server cannot expose exact authenticated readback of these references.
+    need(cfg.alias === alias && cfg.config?.['default.reference.value'] === value
+      && cfg.config?.['default.reference.maxAge'] === '1800');
+  };
+  const flows = [
+    ['platform-browser', [['identity-provider-redirector', 'ALTERNATIVE'], ['flow:platform-forms', 'ALTERNATIVE']]],
+    ['platform-forms', [['auth-username-password-form', 'REQUIRED', 'verified-password', 'pwd'], ['flow:platform-owner-second-factor', 'CONDITIONAL']]],
+    ['platform-owner-second-factor', [['conditional-user-configured', 'REQUIRED'], ['auth-otp-form', 'ALTERNATIVE', 'verified-otp', 'otp'], ['auth-recovery-authn-code-form', 'ALTERNATIVE', 'verified-owner-recovery', 'mfa']]],
+    ['platform-sso-otp', [['auth-otp-form', 'REQUIRED', 'verified-otp', 'otp']]],
+  ];
+  for (const [alias, wanted] of flows) {
+    const tree = await get('platform/authentication/flows/' + alias + '/executions');
+    need(Array.isArray(tree) && tree.every(row => Number.isInteger(row.level) && row.level >= 0));
+    const direct = tree.filter(row => row.level === 0).sort((a, b) => a.index - b.index);
+    need(direct.length === wanted.length && direct.every(row => Number.isInteger(row.index)));
+    need(new Set(direct.map(row => row.index)).size === direct.length);
+    for (let i = 0; i < wanted.length; i++) {
+      const row = direct[i], [name, requirement, referenceAlias, value] = wanted[i];
+      need(row.requirement === requirement && (name.startsWith('flow:')
+        ? row.authenticationFlow === true && row.displayName === name.slice(5)
+        : row.authenticationFlow !== true && row.providerId === name));
+      if (referenceAlias) await reference(row, referenceAlias, value);
+    }
+  }
+  const providers = await get('platform/identity-provider/instances');
+  need(Array.isArray(providers) && same(providers.map(p => p.alias).sort(), [...config.ssoAliases].sort()));
+  need(providers.every(p => p.enabled === true && p.trustEmail === false && p.postBrokerLoginFlowAlias === 'platform-sso-otp'
+    && p.firstBrokerLoginFlowAlias === 'first broker login' && p.providerId === (p.alias === 'google' ? 'google' : 'oidc')));
+  const client = async (name, realmName = 'platform') => {
+    const row = only(await get(realmName + '/clients?clientId=' + encodeURIComponent(name)));
+    const value = await get(realmName + '/clients/' + row.id);
+    need(value.id === row.id && value.clientId === name && value.enabled === true && value.protocol === 'openid-connect');
+    return value;
+  };
+  const admin = await client('autosoft-admin');
+  need(admin.publicClient === false && admin.standardFlowEnabled === true && admin.directAccessGrantsEnabled === false
+    && admin.implicitFlowEnabled === false && admin.serviceAccountsEnabled === false
+    && same(admin.redirectUris, [config.adminOrigin + '/auth/callback']) && same(admin.webOrigins, [config.adminOrigin])
+    && admin.attributes?.['pkce.code.challenge.method'] === 'S256');
+  const mappers = [
+    ['verified-authentication-method', 'oidc-amr-mapper', { 'id.token.claim': 'true', 'access.token.claim': 'true' }],
+    ['admin-audience', 'oidc-audience-mapper', { 'included.client.audience': 'autosoft-admin', 'access.token.claim': 'true', 'id.token.claim': 'false' }],
+    ['verified-identity-provider', 'oidc-usersessionmodel-note-mapper', { 'user.session.note': 'identity_provider', 'claim.name': 'identity_provider', 'jsonType.label': 'String', 'access.token.claim': 'true', 'id.token.claim': 'true' }],
+  ];
+  need(Array.isArray(admin.protocolMappers) && admin.protocolMappers.length === mappers.length);
+  for (const [name, mapper, fields] of mappers) {
+    const rows = admin.protocolMappers.filter(row => row.name === name);
+    need(rows.length === 1 && rows[0].protocol === 'openid-connect' && rows[0].protocolMapper === mapper
+      && Object.entries(fields).every(([key, value]) => rows[0].config?.[key] === value));
+  }
+  const provisioner = await client('autosoft-provisioner', 'master');
+  need(provisioner.publicClient === false && provisioner.standardFlowEnabled === false && provisioner.directAccessGrantsEnabled === false
+    && provisioner.implicitFlowEnabled === false && provisioner.serviceAccountsEnabled === true && provisioner.fullScopeAllowed === true);
+  const account = await get('master/clients/' + provisioner.id + '/service-account-user'); need(uuid(account.id));
+  const grants = await get('master/users/' + account.id + '/role-mappings/realm/composite');
+  const allowed = new Set(['create-realm', 'default-roles-master', 'offline_access', 'uma_authorization']);
+  need(Array.isArray(grants) && grants.some(role => role.name === 'create-realm') && grants.every(role => allowed.has(role.name)));
+  const allGrants = await get('master/users/' + account.id + '/role-mappings');
+  need(Object.values(allGrants.clientMappings ?? {}).every(mapping => mapping.mappings?.length === 0));
+  const reader = await client('platform-directory-reader');
+  need(reader.attributes?.['autosoft.directory-reader'] === '1' && reader.publicClient === false && reader.standardFlowEnabled === false
+    && reader.directAccessGrantsEnabled === false && reader.implicitFlowEnabled === false && reader.serviceAccountsEnabled === true && reader.fullScopeAllowed === false);
+  const readerAccount = await get('platform/clients/' + reader.id + '/service-account-user'); need(uuid(readerAccount.id));
+  const management = await client('realm-management');
+  const roles = ['view-identity-providers', 'view-realm', 'view-users'];
+  const exactRoles = rows => Array.isArray(rows) && same(rows.map(r => r.name).sort(), roles)
+    && rows.every(r => r.clientRole === true && r.containerId === management.id);
+  need(exactRoles(await get('platform/users/' + readerAccount.id + '/role-mappings/clients/' + management.id)));
+  need(exactRoles(await get('platform/clients/' + reader.id + '/scope-mappings/clients/' + management.id)));
+  const mappings = await get('platform/users/' + readerAccount.id + '/role-mappings');
+  need(!(mappings.realmMappings ?? []).some(r => r.name?.startsWith('platform-'))
+    && Object.values(mappings.clientMappings ?? {}).every(mapping => mapping.id === management.id && exactRoles(mapping.mappings)));
+  // Fresh installation supports no pre-existing groups or other users. This
+  // refuses inherited group grants rather than confusing direct-role member
+  // listings with complete effective membership. The composite endpoint below
+  // also expands indirect realm-role assignments for every allowed user.
+  need(same(await get('platform/groups?first=0&max=1'), []));
+  const local = await client('platform-provisioner');
+  need(local.publicClient === false && local.standardFlowEnabled === false && local.directAccessGrantsEnabled === false && local.serviceAccountsEnabled === true);
+  const localAccount = await get('platform/clients/' + local.id + '/service-account-user'); need(uuid(localAccount.id));
+  const expectedUsers = new Map([[config.ownerSubject, 'owner'], [readerAccount.id, 'service-account-platform-directory-reader'], [localAccount.id, 'service-account-platform-provisioner']]);
+  need(expectedUsers.size === 3);
+  // Keycloak26.8.1's unfiltered listing excludes service accounts. Its explicit
+  // enabled filter includes them; query BOTH values so disabled identities do
+  // not disappear from qualification. No disabled account is expected fresh.
+  const users = await get('platform/users?enabled=true&first=0&max=4');
+  need(same(await get('platform/users?enabled=false&first=0&max=1'), []));
+  need(Array.isArray(users) && users.length === 3 && new Set(users.map(user => user.id)).size === 3);
+  for (const user of users) {
+    need(expectedUsers.get(user.id) === user.username && user.enabled === true && !user.federationLink);
+    need(same(await get('platform/users/' + user.id + '/groups?first=0&max=1'), []));
+    const effective = await get('platform/users/' + user.id + '/role-mappings/realm/composite');
+    need(Array.isArray(effective));
+    const protectedRoles = effective.filter(role => ['platform-owner', 'platform-admin'].includes(role.name)).map(role => role.name).sort();
+    need(same(protectedRoles, user.id === config.ownerSubject ? ['platform-admin', 'platform-owner'] : []));
+  }
+  const inventories = new Map();
+  for (const realmName of ['master', 'platform']) {
+    const listed = await get(realmName + '/clients?first=0&max=33');
+    need(Array.isArray(listed) && listed.length > 0 && listed.length <= 32
+      && listed.every(c => uuid(c.id) && typeof c.clientId === 'string')
+      && new Set(listed.map(c => c.id)).size === listed.length && new Set(listed.map(c => c.clientId)).size === listed.length);
+    inventories.set(realmName, listed);
+  }
+  const readerClosure = ['query-groups', 'query-users', ...roles].sort();
+  for (const [realmName, subject, administrativeId, desired] of [
+    ['master', account.id, null, []],
+    ['platform', readerAccount.id, management.id, readerClosure],
+    ['platform', localAccount.id, management.id, ['manage-clients']],
+  ]) {
+    const listed = inventories.get(realmName);
+    if (administrativeId) need(listed.some(client => client.id === administrativeId && client.clientId === 'realm-management'));
+    for (const item of listed) {
+      const effective = await get(realmName + '/users/' + subject + '/role-mappings/clients/' + item.id + '/composite');
+      need(Array.isArray(effective) && effective.every(role => role.clientRole === true && role.containerId === item.id));
+      const names = effective.map(role => role.name).sort(); need(new Set(names).size === names.length);
+      // Ordinary service-account defaults can include these own-account roles.
+      // They never authorize realm/client/user administration.
+      if (item.clientId === 'account') need(names.every(name => ['manage-account', 'manage-account-links', 'view-profile'].includes(name)));
+      else need(same(names, item.id === administrativeId ? desired : []));
+    }
+  }
+  for (const [realmName, clientId, secret] of [['master', 'autosoft-provisioner', config.provisionerSecret], ['platform', 'platform-directory-reader', config.directoryReaderSecret]]) {
+    const issued = await call('/realms/' + realmName + '/protocol/openid-connect/token', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'client_credentials', client_id: clientId, client_secret: secret }) });
+    need(typeof issued?.access_token === 'string' && issued.access_token.length > 0);
+  }
+  output(JSON.stringify({ scope: 'INITIAL_IDENTITY_POLICY_READBACK', ownerSubject: config.ownerSubject,
+    configuredPolicyVerified: true, browserMfaQualified: false, publicStartupAllowed: false }));
+}
+
+export async function requireIdentityReadiness({ fetchImpl = fetch, operationSignal = AbortSignal.timeout(OPERATION_MS) } = {}) {
+  const health = await transport(fetchImpl, operationSignal)('https://keycloak:9000/health/ready');
+  if (health?.status !== 'UP' || !Array.isArray(health.checks) || !health.checks.every(check => check.status === 'UP')) {
+    throw new IdentityProvisioningError('Private identity readiness is unconfirmed; no provisioning mutation was attempted');
+  }
+}
+
+export async function runNativeIdentity(config, options = {}) {
+  if (config?.action !== 'verify-initial') validateConfig(config);
+  await requireIdentityReadiness(options);
+  return (config?.action === 'verify-initial' ? verifyInitialIdentity : runProvisioning)(config, options);
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const operationSignal = AbortSignal.timeout(OPERATION_MS);
-  try { await runProvisioning(await readConfiguration(process.stdin, operationSignal), { operationSignal }); }
+  try { await runNativeIdentity(await readConfiguration(process.stdin, operationSignal), { operationSignal }); }
   catch (error) {
     console.error(error instanceof IdentityProvisioningError ? error.message : 'Identity setup did not complete; inspect its current state before retrying');
     process.exitCode = 1;

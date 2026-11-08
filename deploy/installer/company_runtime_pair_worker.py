@@ -177,7 +177,7 @@ def run(command, modules, delivery, auth, request, request_raw, worker_sha256, p
         print('Runtime admission and quota pair initialized; separate read-only verification is required.')
     else:
         Q.require(S.read_protected(directory+'/executed.json',32768)==raw)
-        W.write(modules['records'],directory,'verified.json',raw)
+        W.write_observation(modules['records'],S,directory,'verified.json',raw)
         marker=('runtime-pair-verified-v1\nrequest='+Q.sha(request_raw)+'\nsession='+parent_args[3]
             +'\nstage='+STAGE+'\naction='+expected_action+'\noutcome='+Q.sha(raw)+'\n').encode()
-        W.write(modules['records'],directory,'confirmation',marker,mode=0o600)
+        W.write_observation(modules['records'],S,directory,'confirmation',marker,mode=0o600)

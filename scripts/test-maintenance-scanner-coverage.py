@@ -190,5 +190,30 @@ class ActualSecurityCaller(unittest.TestCase):
             self.assertEqual(coverage['status'],'unavailable')
             self.assertIn('incomplete',coverage['detail'])
 
+    def test_unknown_host_runtime_advisories_block_even_when_other_scans_pass(self):
+        with tempfile.TemporaryDirectory() as temp:
+            task,records,calls,functions=self.fixture(temp)
+            with patch.dict(C.Maintenance.security.__globals__,functions),patch('builtins.print'),self.assertRaisesRegex(ValueError,'Initial security gate failed'):
+                task.security('--gate')
+            report=records['security/latest-host.json']
+            self.assertEqual(report['findings'],[])
+            self.assertEqual(report['status'],'unavailable')
+            runtime=next(item for item in report['coverage'] if item['name']=='host-third-party-advisories')
+            self.assertEqual(runtime['status'],'unavailable')
+            ordinary=[item for item in report['coverage'] if item['name'].startswith('image:') or item['name'] in {'host-os-packages','host-running-kernel-vendor-advisories'}]
+            self.assertEqual(len(ordinary),3)
+            self.assertTrue(all(item['status']=='passed' for item in ordinary))
+
+    def test_daily_runtime_coverage_gap_remains_visible_without_stopping_reporting(self):
+        with tempfile.TemporaryDirectory() as temp:
+            task,records,calls,functions=self.fixture(temp)
+            sent=[];task.report=lambda kind,report:sent.append(copy.deepcopy(report))
+            with patch.dict(C.Maintenance.security.__globals__,functions),patch('builtins.print'):
+                task.security('--daily')
+            self.assertEqual(len(sent),1)
+            self.assertEqual(sent[0]['findings'],[])
+            self.assertEqual(sent[0]['status'],'unavailable')
+            self.assertEqual(next(item for item in sent[0]['coverage'] if item['name']=='host-third-party-advisories')['status'],'unavailable')
+
 
 if __name__=='__main__':unittest.main()

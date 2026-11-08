@@ -3,8 +3,9 @@
 The experimental company installer can now retain signed source, inspect its
 initialized runtime and render platform configuration in one admission session.
 This is an executable component, **not a completed or independently qualified
-clean-VM installer**. Identity provisioning, service activation and recovery
-acceptance remain separate work.
+clean-VM installer**. The [private initializer](native-private-initialization.md)
+connects this stage to private infrastructure and initial identity-policy
+verification. Public activation and complete recovery acceptance remain open.
 
 The company package producer's `--render-entry` option emits `company-render.sh`
 beside the authenticated native worker. After configuration, repository seeding

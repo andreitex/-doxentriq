@@ -10,6 +10,12 @@ LC_ALL=C LANG=C TZ=UTC; export LC_ALL LANG TZ
 company_entry() {
   [[ $# = 2 && $1 = --foundation-only ]] || _il_fail 'full_install_pending_signed_source_and_native_pair'
   _il_root
+  [[ @HOST_CATALOGS_AVAILABLE@ = true ]] || _il_fail authenticated_host_package_catalog_required
+  # Company DEB remains data-only; reject before admission/prerequisite effects.
+  if [[ '@HOST_CATALOG_FAMILY@' = company-v2 ]]; then
+    . /etc/os-release
+    [[ "$ID" = rocky && ( "$VERSION_ID" = 9* || "$VERSION_ID" = 10* ) ]] || _il_fail company_package_platform_unqualified
+  fi
   local request=$2 package worker expected actual request_sha action operation outcome entry status
   # Protected pre-admission reads use this process's descriptor namespace.
   # install_lock_acquire later binds the same identity to the actual lock.
@@ -20,6 +26,8 @@ company_entry() {
   _il_path "$package"; _il_ancestors "$worker"
   [[ -f "$worker" && ! -L "$worker" && $(stat -c %u -- "$worker") = 0 && $(stat -c %g -- "$worker") = 0 && $(stat -c %h -- "$worker") = 1 ]] || _il_fail untrusted_worker
   [[ $(stat -c %a -- "$worker") = 400 ]] || _il_fail untrusted_worker_mode
+  local worker_bytes; worker_bytes=$(stat -c %s -- "$worker")
+  [[ "$worker_bytes" =~ ^[0-9]+$ && "$worker_bytes" -gt 0 && "$worker_bytes" -le 524288 ]] || _il_fail worker_size
   actual=$(sha256sum -- "$worker"); [[ ${actual%% *} = "$expected" ]] || _il_fail worker_hash
   _il_path "$request"; _il_ancestors "$request"; _il_identity "$request" file >/dev/null
   _il_read "$request"; request_sha=$(_il_hash "$IL_TEXT"); request_sha=${request_sha%% *}

@@ -15,7 +15,7 @@
     "worker": "tsx apps/control/src/worker-main.ts",
     "typecheck": "tsc --noEmit && tsc -p apps/admin/tsconfig.json --noEmit && tsc -p apps/admin/test/tsconfig.json --noEmit",
     "build": "npm run typecheck && vite build --config apps/admin/vite.config.ts --configLoader native",
-    "test": "tsx --test packages/core/test/*.test.ts apps/control/test/*.test.ts tools/*.test.ts && node --test scripts/keycloak-provision.test.mjs && npm run test:ui",
+    "test": "tsx --test packages/core/test/*.test.ts apps/control/test/*.test.ts tools/*.test.ts && node --test scripts/keycloak-provision.test.mjs scripts/keycloak-verify.test.mjs && npm run test:ui",
     "test:ui": "tsx --tsconfig apps/admin/tsconfig.json --test apps/admin/test/*.test.tsx",
     "qualify:models": "tsx tools/qualify-models.ts",
     "check": "npm run typecheck && npm test && npm run build",

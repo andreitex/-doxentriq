@@ -107,7 +107,7 @@ def run(command, modules, delivery, auth, request, request_raw, worker_sha256, p
         print('Repository objects written and verified; separate read-only confirmation is required.')
     else:
         N.require(S.read_protected(directory+'/executed.json',32768) == raw)
-        W.write(R, directory, 'verified.json', raw)
+        W.write_observation(R, S, directory, 'verified.json', raw)
         marker = ('repository-verified-v1\nrequest='+Q.sha(request_raw)+'\nsession='+parent_args[3]
             +'\nstage='+STAGE+'\naction='+action+'\noutcome='+Q.sha(raw)+'\n').encode()
-        W.write(R, directory, 'confirmation', marker, mode=0o600)
+        W.write_observation(R, S, directory, 'confirmation', marker, mode=0o600)

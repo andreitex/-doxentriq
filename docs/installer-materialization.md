@@ -75,8 +75,10 @@ The company must separately authenticate the original verifier and backend. This
 route requires genuine private issuance in that verifier before reading source
 maps and throughout materialization. It independently matches the 44/10 catalogs,
 signed selected hashes and logical Git modes. It adds `platform-sources.json` to
-the five configurations, producing exactly 63 files with another 1 MiB aggregate
-allowance. The temporary adapter retains the same original held source and
+the five configurations and the separately declared `scripts/installation-status.py`
+from the signed platform manifest, producing exactly 64 files. The legacy
+44-file host catalog remains unchanged, and the existing aggregate limits are
+preserved. The temporary adapter retains the same original held source and
 expires on failure or exit; it never presents a schema3 capability.
 
 This foundation projection omits `platform-sources.tar.gz` and is not a complete
@@ -84,7 +86,11 @@ schema4 bundle. Store and the original verifier retain the archive separately.
 The full worker must use that original context and avoid the legacy schema3-only
 complete-deployment path. The local receipt (private installation record; not distributed)
 records twelve new passes and all 37 existing materializer regressions without
-skips. Native installation remains separate acceptance work.
+skips. The later installed-status projection passed 113 Linux component cases
+across seven suites, including two real copied-CLI cases in private mount
+namespaces and rejection of missing or changed signed diagnostic rows. The
+original signing and filesystem-ownership collaborators remain synthetic.
+Native installation remains separate acceptance work.
 
 The foundation materializer registration made this suite mandatory in both
 Docker and host company gates, with 58 suites and 34 temporary fixture selectors

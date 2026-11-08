@@ -31,6 +31,8 @@ def namespace_case(directory):
     entry = (ROOT / 'deploy/installer/company-install.sh').read_bytes()
     entry = entry.replace(b'# @EMBED_INSTALL_LOCK@', (ROOT / 'scripts/install-lock.sh').read_bytes())
     entry = entry.replace(b'@WORKER_SHA256@', hashlib.sha256(worker).hexdigest().encode())
+    # Synthetic worker is never executed; retain the original admission-only case.
+    entry = entry.replace(b'@HOST_CATALOGS_AVAILABLE@', b'true')
     script = root / 'company-install.sh'; script.write_bytes(entry); script.chmod(0o400)
     request = root / 'request.json'; request.write_bytes(b'{}\n'); request.chmod(0o600)
     result = subprocess.run(['/bin/bash', '--noprofile', '--norc', str(script), '--foundation-only', str(request)],

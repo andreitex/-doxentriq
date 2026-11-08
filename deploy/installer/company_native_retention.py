@@ -3,7 +3,8 @@
 IT authenticates the emitted worker out of band and runs it in a clean isolated
 root Python process. Only signed schema4 source is eligible. Execute/verify must
 be a direct child of the trusted Bash admission parent. This worker never ACKs
-that parent and never activates services, overwrites a stage or retries effects.
+that parent and never activates public services, overwrites a stage or retries effects.
+The explicit infrastructure/identity successors initialize private services only.
 """
 import argparse
 import base64
@@ -17,6 +18,9 @@ import time
 from types import ModuleType
 
 PACKAGE = None  # @NATIVE_RETENTION_PACKAGE@
+HOST_TOOL_CATALOG = None  # @COMPANY_HOST_TOOL_CATALOG@
+HOST_PACKAGE_CATALOG = None  # @COMPANY_HOST_PACKAGE_CATALOG@
+HOST_ENGINE_CATALOG = None  # @COMPANY_HOST_ENGINE_CATALOG@
 STAGES = ('company-platform-store', 'company-source-materialize')
 
 
@@ -41,7 +45,9 @@ def load_package(package=PACKAGE):
     require(set(captured) == {'cli', 'delivery', 'record', 'store', 'crypto', 'station', 'request', 'records',
                               'configuration', 'configuration_worker', 'repository_io', 'repository_worker',
                               'runtime_pair_parent', 'runtime_pair_worker', 'stored_startup', 'startup_worker',
-                              'render_io', 'render_commands', 'render_verify', 'render_worker'})
+                              'render_io', 'render_commands', 'render_verify', 'render_worker',
+                              'host_tool_profiles', 'host_packages', 'host_package_runtime', 'foundation_worker',
+                              'engine_packages', 'engine_native', 'engine_elf', 'infrastructure_host', 'infrastructure_policy', 'infrastructure_io', 'infrastructure_transport', 'infrastructure_probe', 'infrastructure_commands', 'infrastructure_evidence', 'infrastructure_verify', 'infrastructure_predecessor', 'infrastructure_worker', 'identity_io', 'identity_commands', 'identity_evidence', 'identity_split', 'identity_worker', 'identity_predecessor', 'quota_units', 'quota_service', 'quota_worker'})
     delivery = base64.b64decode(package['delivery'], validate=True)
     auth = dict(package['authentication'])
     require(len(delivery) == auth['delivery_pin']['bytes'] and sha(delivery) == auth['delivery_pin']['sha256'])
@@ -58,6 +64,35 @@ def load_package(package=PACKAGE):
         modules[name] = module
     auth.update(delivery_module=modules['delivery'], running_cli_raw=captured['cli'])
     return modules, delivery, auth
+
+
+def host_tool_binding(modules,observed_platform):
+    """The outer authenticated worker digest binds the complete catalog bytes.
+
+    This function grants no parent authority and performs no host effects. A
+    missing catalog keeps render-only packages usable while refusing any tool
+    binding inferred from installed tools. This projection does not start services.
+    """
+    if HOST_ENGINE_CATALOG is not None:
+        require(HOST_TOOL_CATALOG is None and HOST_PACKAGE_CATALOG is None,'mixed-vendor-and-company-catalogs-refused')
+        C,E,H=(modules[name] for name in ('engine_packages','engine_native','host_package_runtime'))
+        raw,digest=H.captured(HOST_ENGINE_CATALOG,C.MAX_BYTES)
+        binding=E.bind(raw,expected_catalog_sha256=digest,observed_platform=observed_platform,catalog=C)
+        return E.tool_binding(binding,C)
+    item=HOST_TOOL_CATALOG
+    require(type(item) is dict and set(item)=={'bytes','sha256','base64'})
+    require(type(item['bytes']) is int and 0<item['bytes']<=16384 and type(item['sha256']) is str)
+    require(type(item['base64']) is str and len(item['base64'])<=21848)
+    raw=base64.b64decode(item['base64'],validate=True)
+    require(len(raw)==item['bytes'] and sha(raw)==item['sha256'])
+    return modules['host_tool_profiles'].bind(raw,expected_catalog_sha256=item['sha256'],observed_platform=observed_platform)
+
+
+def host_catalogs():
+    if HOST_ENGINE_CATALOG is not None:
+        require(HOST_TOOL_CATALOG is None and HOST_PACKAGE_CATALOG is None,'mixed-vendor-and-company-catalogs-refused')
+        return {'engine':HOST_ENGINE_CATALOG}
+    return {'tools':HOST_TOOL_CATALOG,'packages':HOST_PACKAGE_CATALOG}
 
 
 def invocation(request, request_raw, stage, command, *, parent=None, plan=None, outcome=None):
@@ -95,7 +130,10 @@ def main(argv=None):
         'repository-action', 'seed-repository', 'verify-repository',
         'runtime-pair-action', 'initialize-runtime-pair', 'verify-runtime-pair',
         'continuation-ready', 'startup-action', 'inspect-stored-startup', 'verify-stored-startup',
-        'render-action', 'render-ready', 'render-configuration', 'verify-render'))
+        'render-action', 'render-ready', 'render-configuration', 'verify-render',
+        'infrastructure-action','infrastructure-ready','initialize-private-infrastructure','verify-private-infrastructure',
+        'identity-action','provision-initial-identity','verify-initial-identity',
+        'quota-action','activate-private-quota','verify-private-quota'))
     p.add_argument('--request', required=True)
     p.add_argument('--stage', choices=STAGES)
     p.add_argument('--parent', nargs=7)
@@ -109,6 +147,12 @@ def main(argv=None):
     request_raw = S.read_protected(a.request, 4096)
     request = modules['request'].validate_request(request_raw, request_sha256=sha(request_raw))
     require(Path(a.request).stem == request['operationId'] and request['operationId'] != '0'*32)
+    for label in ('infrastructure_worker','identity_worker','quota_worker'):
+        if a.command in modules[label].COMMANDS:
+            require(a.stage is None and not a.persist)
+            worker_raw=S.read_protected(Path(__file__),2*1024**2)
+            modules[label].run(a.command,modules,delivery,auth,request,request_raw,sha(worker_raw),a.parent,host_tool_binding=host_tool_binding)
+            return
     if a.command in ('render-action','render-ready','render-configuration','verify-render'):
         require(a.stage is None and not a.persist)
         worker_raw = S.read_protected(Path(__file__), 2 * 1024 ** 2)
@@ -137,7 +181,8 @@ def main(argv=None):
         require(a.stage is None and not a.persist)
         worker_raw = S.read_protected(Path(__file__), 2 * 1024 ** 2)
         modules['configuration_worker'].run(a.command, modules, delivery, auth, request,
-            request_raw, sha(worker_raw), a.parent)
+            request_raw, sha(worker_raw), a.parent,
+            host_catalogs=host_catalogs())
         return
     require(a.stage in STAGES)
     directory = Path('/opt/autosoft-company/evidence') / request['operationId'] / a.stage
