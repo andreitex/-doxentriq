@@ -93,6 +93,118 @@ class Fixture:
 
 
 class Tests(unittest.TestCase):
+    def test_rpm_alpha_and_caret_versions_remain_distribution_specific(self):
+        rocky=R.Distribution("rocky","10.2");debian=R.Distribution("debian","13")
+        for version in ("B.02.20-9.el10","1.11^20190603git9e74f2d-6.el10","2:B.02.20-9.el10"):
+            value=pkg("fixture",version,"x86_64")
+            self.assertEqual(R.package(value,rocky).version,version)
+        for version in ("B.02.20-9.el10","1.11^20190603git9e74f2d-6.el10"):
+            with self.assertRaises(R.PlanningUnavailable):R.package(pkg("fixture",version,"amd64"),debian)
+        for version in ("1;cmd","1\n2","../1","1$var","1-2-3","a:1-2","100000000:1-2","1"*201):
+            with self.subTest(version=version),self.assertRaises(R.PlanningUnavailable):
+                R.package(pkg("fixture",version,"x86_64"),rocky)
+        row=dict(Version="B.02.20",Release="9.el10",Epoch=0)
+        self.assertEqual(R.formatted_version(row,family="rocky"),"B.02.20-9.el10")
+        row=dict(Version="1.11^20190603git9e74f2d",Release="6.el10",Epoch=2)
+        self.assertEqual(R.formatted_version(row,family="rocky"),"2:1.11^20190603git9e74f2d-6.el10")
+        with self.assertRaises(R.PlanningUnavailable):R.formatted_version(row)
+        for key in ("Version","Release"):
+            with self.assertRaises(R.PlanningUnavailable):R.formatted_version(row|{key:"1-2"},family="rocky")
+
+    def dnf4_arguments(self):
+        f=Fixture("rocky");args=f.arguments();value=json.loads(f.simulation)
+        value={"version":"0.0","rpms":value["rpms"]}
+        for row in value["rpms"]:
+            row["nevra"]=row["nevra"].replace("-0:","-");row["reason"]="unknown"
+        native=raw(value);rows=value["rpms"]
+        proof=R.Dnf4PendingEvidence("dnf4-4.20.0-pending-0.0",R.sha(native),"e"*64,"f"*64,"a"*64,
+            f.parsed.identity,R.sha(args["repository_metadata"]),((rows[1]["nevra"],rows[0]["nevra"]),),())
+        args.update(simulation_output=native,simulation_context=replace(args["simulation_context"],
+            manager_version="4.20.0",stdout_sha256=R.sha(native),dnf4_pending=proof))
+        return f,args
+
+    def test_dnf4_real_pending_format_keeps_unknown_reason_and_safety_gates(self):
+        _,args=self.dnf4_arguments();result=R.plan_host_remediation(**args)
+        self.assertEqual(result.status,"proposed_untested");self.assertEqual(len(result.changes),1)
+        self.assertFalse(result.tested);self.assertFalse(result.apply_authorized);self.assertFalse(result.live_query_adapters_available)
+        self.assertTrue(result.checkpoint_required);self.assertTrue(result.approved_maintenance_window_required)
+        self.assertEqual(len(result.input_evidence_sha256),8)
+        self.assertEqual(json.loads(args["simulation_output"])["rpms"][0]["reason"],"unknown")
+
+    def test_dnf4_authentic_saved_121_row_fixture(self):
+        base=HERE.parent/"tests/fixtures"
+        native=(base/"dnf4_pending_4_20_native.json").read_bytes()
+        self.assertEqual(R.sha(native),"c63494e71d957485d7bad55733a2c6fb7a809bea04cb0b73a6488abb46ef52f8")
+        fixture=json.loads((base/"dnf4_pending_4_20_context.json").read_bytes())
+        now=datetime.fromisoformat(fixture["checkedAt"])+timedelta(seconds=1)
+        inventory=R.parse_inventory(raw(dict(schemaVersion=1,distribution=fixture["distribution"],packages=fixture["installed"],
+            metadataSha256=fixture["metadataSha256"],capturedAt=fixture["capturedAt"])),now)
+        candidates={identity(r["package"]):R.Candidate(R.Package(**r["package"]),r["repository"],r["archiveSha256"],()) for r in fixture["candidates"]}
+        repository=raw(fixture["candidates"]);p=fixture["evidence"]
+        proof=R.Dnf4PendingEvidence(p["contract"],p["native_document_sha256"],p["native_items_sha256"],p["native_receipt_sha256"],
+            p["api_contract_sha256"],inventory.identity,R.sha(repository),tuple(map(tuple,p["verified_upgrade_pairs"])),tuple(p["install_only"]))
+        context=R.SimulationContext("dnf","4.20.0",inventory.identity,inventory.identity,R.sha(repository),R.sha(native),
+            tuple(candidates),fixture["checkedAt"],fixture["durationMillis"],0,proof)
+        changes,final=R.parse_simulation(native,context,inventory,repository,candidates,now)
+        self.assertEqual(sum(r.action=="change" for r in changes),58)
+        self.assertEqual(sum(r.action=="add" for r in changes),5)
+        self.assertFalse(any(r.action=="remove" for r in changes));self.assertEqual(len(final),320)
+        original_kernel=[p for p in inventory.packages if p.source=="kernel" and p.name in
+            {"kernel","kernel-core","kernel-modules","kernel-modules-core","kernel-modules-extra"}]
+        self.assertEqual(len(original_kernel),5);self.assertTrue(all(p in final for p in original_kernel))
+
+    def test_dnf4_requires_explicit_typed_bound_contract(self):
+        _,args=self.dnf4_arguments();context=args["simulation_context"];proof=context.dnf4_pending
+        variants=[replace(context,dnf4_pending=None),replace(context,dnf4_pending={}),replace(context,manager_version="4.22.0"),
+            replace(context,dnf4_pending=replace(proof,contract="unreviewed")),
+            replace(context,dnf4_pending=replace(proof,native_document_sha256="0"*64)),
+            replace(context,dnf4_pending=replace(proof,repository_sha256="0"*64)),
+            replace(context,dnf4_pending=replace(proof,inventory_sha256="0"*64)),
+            replace(context,dnf4_pending=replace(proof,native_items_sha256="invalid")),
+            replace(context,checked_at=moment(4000)),replace(context,duration_millis=30001)]
+        for variant in variants:
+            with self.subTest(variant=variant):
+                self.assertEqual(R.plan_host_remediation(**(args|dict(simulation_context=variant))).status,"unavailable")
+
+    def test_dnf4_rejects_incomplete_or_cross_package_replacements(self):
+        _,args=self.dnf4_arguments();context=args["simulation_context"];proof=context.dnf4_pending
+        pair=proof.verified_upgrade_pairs[0]
+        for pairs in ((),(pair,pair),((pair[1],pair[0]),),((pair[0],"unlisted"),),[pair]):
+            with self.subTest(pairs=pairs):
+                result=R.plan_host_remediation(**(args|dict(simulation_context=replace(context,dnf4_pending=replace(proof,verified_upgrade_pairs=pairs)))))
+                self.assertEqual(result.status,"unavailable")
+
+    def test_dnf4_rejects_destructive_and_unrecognized_native_actions(self):
+        for action in ("Removed","Remove","Downgrade","Downgraded","Reinstall","Obsoleted","Reason Change"):
+            _,args=self.dnf4_arguments();value=json.loads(args["simulation_output"]);value["rpms"][0]["action"]=action
+            native=raw(value);context=args["simulation_context"]
+            context=replace(context,stdout_sha256=R.sha(native),dnf4_pending=replace(context.dnf4_pending,native_document_sha256=R.sha(native)))
+            self.assertEqual(R.plan_host_remediation(**(args|dict(simulation_output=native,simulation_context=context))).status,"unavailable")
+
+    def test_dnf4_zero_epoch_alias_duplicate_and_nonempty_groups_rejected(self):
+        for kind in ("duplicate","groups","environments","extra","unknown-reason"):
+            _,args=self.dnf4_arguments();value=json.loads(args["simulation_output"])
+            if kind=="duplicate":
+                duplicate=dict(value["rpms"][0]);duplicate["nevra"]=duplicate["nevra"].replace("zlib-","zlib-0:");value["rpms"].append(duplicate)
+            elif kind in {"groups","environments"}:value[kind]=[{}]
+            elif kind=="extra":value["extra"]=True
+            else:value["rpms"][0]["reason"]="invented"
+            native=raw(value);context=args["simulation_context"]
+            context=replace(context,stdout_sha256=R.sha(native),dnf4_pending=replace(context.dnf4_pending,native_document_sha256=R.sha(native)))
+            self.assertEqual(R.plan_host_remediation(**(args|dict(simulation_output=native,simulation_context=context))).status,"unavailable")
+
+    def test_dnf4_cannot_claim_non_kernel_coinstallation(self):
+        _,args=self.dnf4_arguments();value=json.loads(args["simulation_output"])
+        value["rpms"]=value["rpms"][:1];value["rpms"][0]["action"]="Install";native=raw(value);context=args["simulation_context"]
+        for install_only in ((),(value["rpms"][0]["nevra"],)):
+            proof=replace(context.dnf4_pending,native_document_sha256=R.sha(native),verified_upgrade_pairs=(),install_only=install_only)
+            changed=replace(context,stdout_sha256=R.sha(native),dnf4_pending=proof)
+            self.assertEqual(R.plan_host_remediation(**(args|dict(simulation_output=native,simulation_context=changed))).status,"unavailable")
+
+    def test_dnf4_extension_does_not_admit_unknown_reason_into_legacy_format(self):
+        f=Fixture("rocky");value=json.loads(f.simulation);value["rpms"][0]["reason"]="unknown";f.simulation=raw(value)
+        self.assertEqual(f.plan().status,"unavailable")
+
     def test_debian_candidate_requires_explicit_vendor_fix_not_fixed_version(self):
         f=Fixture();result=f.plan()
         self.assertEqual(result.status,"proposed_untested");self.assertEqual(len(result.changes),1)

@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "status": "source_candidate_not_published",
   "licenseSelected": true,
-  "fileCount": 768,
+  "fileCount": 770,
   "excludedFileCount": 709,
   "transformedFileCount": 29,
   "publicSourceCheck": {
     "schemaVersion": 1,
     "ready": true,
-    "candidateFiles": 768,
-    "scannedFiles": 768,
+    "candidateFiles": 770,
+    "scannedFiles": 770,
     "reviewedFixtureFindings": 12,
     "findingCounts": {},
     "findings": [],
@@ -31,8 +31,8 @@
     },
     {
       "path": ".github/workflows/public-source-readiness.yml",
-      "sourceSha256": "c7b638fbda39fd04d8d913c687658c4c89943bcc99a6497bcc4f0b586435cef0",
-      "exportSha256": "c7b638fbda39fd04d8d913c687658c4c89943bcc99a6497bcc4f0b586435cef0",
+      "sourceSha256": "8ec1535b8d1ff189daf45e2841027b16b70c5a4bb6354298809d2d4fddefa362",
+      "exportSha256": "8ec1535b8d1ff189daf45e2841027b16b70c5a4bb6354298809d2d4fddefa362",
       "transformations": []
     },
     {
@@ -1765,8 +1765,8 @@
     },
     {
       "path": "docs/host-remediation.md",
-      "sourceSha256": "734da13ca8cdf9431a26564319ffdcea5d94b8d0c0e7eb56d362e628084e2189",
-      "exportSha256": "a5f72c08183c5070a86b04f44f577061cc2ba66eceeaf4e8eb5df9417a4bc896",
+      "sourceSha256": "8f0702f3a2b7272f83d12ea492bc55df0bc046b6d09622b26a7f58a48eee3607",
+      "exportSha256": "5964c472782ea20f2fc1fc13b5e6e51bbac32e4a32e03923da52ef3f9921ab44",
       "transformations": [
         "Remove link to private installation evidence or trial access tooling"
       ]
@@ -2517,8 +2517,8 @@
     },
     {
       "path": "scripts/host_remediation.py",
-      "sourceSha256": "42b524d8727130af62ed62d0774620451b63d20716e7dc1042f4aec67aae2553",
-      "exportSha256": "42b524d8727130af62ed62d0774620451b63d20716e7dc1042f4aec67aae2553",
+      "sourceSha256": "2c4896dddb96606e6333a710434e35116cb880cbbf52f91594df5b185978c0b3",
+      "exportSha256": "2c4896dddb96606e6333a710434e35116cb880cbbf52f91594df5b185978c0b3",
       "transformations": []
     },
     {
@@ -2679,8 +2679,8 @@
     },
     {
       "path": "scripts/public-history-reviewed-fixtures.json",
-      "sourceSha256": "239ef4d1876c8c7051a9d3996bfa61cab3126de87c8116d25ac0e6ac696b4f49",
-      "exportSha256": "239ef4d1876c8c7051a9d3996bfa61cab3126de87c8116d25ac0e6ac696b4f49",
+      "sourceSha256": "b313b819a7b3c25d0237191c3ac6a98d0cefaf2898b2806797fb8c93f63c0b76",
+      "exportSha256": "b313b819a7b3c25d0237191c3ac6a98d0cefaf2898b2806797fb8c93f63c0b76",
       "transformations": []
     },
     {
@@ -2921,8 +2921,8 @@
     },
     {
       "path": "scripts/test-host-remediation.py",
-      "sourceSha256": "3d10ac20d33c9d98e6bfab58fc5ad96aecf0fac4a816dc799fc20092d41b84f3",
-      "exportSha256": "3d10ac20d33c9d98e6bfab58fc5ad96aecf0fac4a816dc799fc20092d41b84f3",
+      "sourceSha256": "8b2515b41ba6813ee8ee6629116cee058774513d9545cde70ef85d6374830a55",
+      "exportSha256": "8b2515b41ba6813ee8ee6629116cee058774513d9545cde70ef85d6374830a55",
       "transformations": []
     },
     {
@@ -3955,6 +3955,18 @@
       "path": "tests/fixtures/company_signed_execute_helpers_v5.json",
       "sourceSha256": "c105c94f4482a727c3c161f87d0b450919a121a0e4383fda6ffd2a4ebbc224e8",
       "exportSha256": "c105c94f4482a727c3c161f87d0b450919a121a0e4383fda6ffd2a4ebbc224e8",
+      "transformations": []
+    },
+    {
+      "path": "tests/fixtures/dnf4_pending_4_20_context.json",
+      "sourceSha256": "7517931b0a787554add9360e4448169a77580443b0378765f429d7e77240c81e",
+      "exportSha256": "7517931b0a787554add9360e4448169a77580443b0378765f429d7e77240c81e",
+      "transformations": []
+    },
+    {
+      "path": "tests/fixtures/dnf4_pending_4_20_native.json",
+      "sourceSha256": "c63494e71d957485d7bad55733a2c6fb7a809bea04cb0b73a6488abb46ef52f8",
+      "exportSha256": "c63494e71d957485d7bad55733a2c6fb7a809bea04cb0b73a6488abb46ef52f8",
       "transformations": []
     },
     {

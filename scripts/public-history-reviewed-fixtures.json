@@ -61,5 +61,12 @@
     "rule": "generic-api-key",
     "line": 24,
     "reason": "SHA-256 source-integrity pin at line24 in FIXTURE_PINS for tests/test_authenticated_seed.py after the captured owner-identity catalog/profile-v5 update changed this test file. This exact checksum authenticates test-helper source bytes, not an account or service. Earlier public blob reviews remain separate."
+  },
+  {
+    "blobSha256": "7517931b0a787554add9360e4448169a77580443b0378765f429d7e77240c81e",
+    "line": 831,
+    "path": "tests/fixtures/dnf4_pending_4_20_context.json",
+    "reason": "SHA-256 of the ordered DNF 4.20.0 source-file path/digest list used to bind a parser contract. It is deterministically recomputed from installed public RPM source metadata and is not used for authentication.",
+    "rule": "generic-api-key"
   }
 ]

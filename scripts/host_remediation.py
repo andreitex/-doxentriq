@@ -7,16 +7,18 @@ a TRUSTED verifier adapter, not a JSON 'signed' flag. No such live adapter is
 implemented here. Its future implementation must authenticate the original
 vendor metadata and the exact normalized candidate projection together.
 
-APT's documented simulation operations and DNF's stored resolved transaction
-are parsed strictly. Native manager/version/configuration qualification and
-signature verification remain separate acceptance work; injected tests do not
-qualify them. A simulation is not a transaction test or a checkpoint.
+APT's documented simulation operations, DNF's stored resolved transaction and
+the explicitly bound DNF4 pending transaction are parsed strictly. Native
+manager/version/configuration qualification and signature verification remain
+separate acceptance work; injected tests do not qualify them. A simulation is
+not a transaction test or a checkpoint.
 
 Primary contracts:
 https://manpages.debian.org/trixie/apt/apt-get.8.en.html
 https://manpages.debian.org/trixie/apt/apt-secure.8.en.html
 https://dnf.readthedocs.io/en/stable/transaction_json.html
 https://dnf.readthedocs.io/en/latest/api_transaction.html
+https://rpm.org/docs/6.0.x/man/rpm-version.7
 """
 from __future__ import annotations
 
@@ -36,6 +38,10 @@ FINGERPRINT = re.compile(r"[A-F0-9]{40}|[A-F0-9]{64}")
 NAME = re.compile(r"[a-z0-9][a-z0-9+_.-]{0,159}")
 RPM_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9+_.-]{0,159}")
 VERSION = re.compile(r"[0-9][A-Za-z0-9.+:~_-]{0,199}")
+# RPM permits alphabetic versions and the caret post-release operator. Keep
+# its EVR/component grammar separate from Debian and manager version strings.
+RPM_COMPONENT = re.compile(r"[A-Za-z0-9][A-Za-z0-9.+~_^]{0,199}")
+RPM_EVR = re.compile(r"(?=.{1,200}\Z)(?:[0-9]{1,8}:)?[A-Za-z0-9][A-Za-z0-9.+~_^]*(?:-[A-Za-z0-9][A-Za-z0-9.+~_^]*)?")
 REPO = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:/-]{0,119}")
 ADVISORY = re.compile(r"[A-Z0-9][A-Z0-9:._-]{0,99}")
 SEVERITIES = {"LOW", "MEDIUM", "HIGH", "CRITICAL"}
@@ -154,7 +160,8 @@ def package(value, distro):
     exact(value, {"name", "version", "arch", "source", "source_version", "essential"}, "invalid-package")
     name_pattern = NAME if distro.family == "debian" else RPM_NAME
     text(value["name"], name_pattern, "invalid-package"); text(value["source"], name_pattern, "invalid-package")
-    text(value["version"], VERSION, "invalid-package"); text(value["source_version"], VERSION, "invalid-package")
+    version_pattern = VERSION if distro.family == "debian" else RPM_EVR
+    text(value["version"], version_pattern, "invalid-package"); text(value["source_version"], version_pattern, "invalid-package")
     require(type(value["arch"]) is str and value["arch"] in
             ({"amd64", "all"} if distro.family == "debian" else {"x86_64", "noarch"})
             and type(value["essential"]) is bool, "invalid-package")
@@ -210,11 +217,14 @@ class Finding:
     package_identity: str
 
 
-def formatted_version(value, prefix=""):
-    version = text(value.get(prefix + "Version"), VERSION, "invalid-scanned-package")
+def formatted_version(value, prefix="", family="debian"):
     epoch, release = value.get(prefix + "Epoch", 0), value.get(prefix + "Release", "")
     require(type(epoch) is int and 0 <= epoch < 10**8 and type(release) is str, "invalid-scanned-package")
-    if release: text(release, VERSION, "invalid-scanned-package")
+    # Preserve the existing combined-EVR input when no separate components
+    # are supplied; otherwise require each RPM component independently.
+    pattern = (RPM_COMPONENT if epoch or release else RPM_EVR) if family == "rocky" else VERSION
+    version = text(value.get(prefix + "Version"), pattern, "invalid-scanned-package")
+    if release: text(release, pattern, "invalid-scanned-package")
     return (str(epoch) + ":" if epoch else "") + version + ("-" + release if release else "")
 
 
@@ -243,10 +253,10 @@ def parse_scan(raw, context, inventory, now):
     for row in rows:
         require(type(row) is dict and type(row.get("ID")) is str and 0 < len(row["ID"]) <= 500
                 and row["ID"] not in scanned, "ambiguous-scanned-package")
-        key = (row.get("Name"), formatted_version(row), row.get("Arch"))
+        key = (row.get("Name"), formatted_version(row, family=inventory.distribution.family), row.get("Arch"))
         require(key in installed, "scan-inventory-mismatch")
         target = installed[key]
-        require(row.get("SrcName") == target.source and formatted_version(row, "Src") == target.source_version
+        require(row.get("SrcName") == target.source and formatted_version(row, "Src", inventory.distribution.family) == target.source_version
                 and type(row.get("Repository")) is dict and row["Repository"].get("Class") == "official", "non-vendor-scanned-package")
         require(target.identity not in identities, "ambiguous-scanned-package")
         identities.add(target.identity); scanned[row["ID"]] = target
@@ -359,6 +369,28 @@ def parse_repository(raw, authentication, trusted_fingerprints, inventory, now):
 
 
 @dataclass(frozen=True)
+class Dnf4PendingEvidence:
+    """Trusted native adapter output, never deserialized from administrator JSON.
+
+    The adapter must check the approved 4.20.0 source/API contract, complete
+    native pending items, their replacement links, positive native RPM EVR
+    comparisons, install-only classification and owned process closure before
+    constructing this evidence. Hashes retain that proof; they do not create it.
+    Unknown reasons from a private empty history must remain unknown.
+    This type does not authorize a transaction or qualify a live adapter.
+    """
+    contract: Literal["dnf4-4.20.0-pending-0.0"]
+    native_document_sha256: str
+    native_items_sha256: str
+    native_receipt_sha256: str
+    api_contract_sha256: str
+    inventory_sha256: str
+    repository_sha256: str
+    verified_upgrade_pairs: tuple[tuple[str, str], ...]  # native old/new NEVRAs
+    install_only: tuple[str, ...]  # native incoming NEVRAs
+
+
+@dataclass(frozen=True)
 class SimulationContext:
     manager: Literal["apt-get", "dnf"]
     manager_version: str
@@ -370,6 +402,7 @@ class SimulationContext:
     checked_at: str
     duration_millis: int
     return_code: int
+    dnf4_pending: Dnf4PendingEvidence | None = None
 
 
 @dataclass(frozen=True)
@@ -467,6 +500,93 @@ def parse_dnf_transaction(raw, inventory, candidates):
     return tuple(operations)
 
 
+def parse_dnf4_pending_transaction(raw, evidence, inventory, candidates):
+    """Read native DNF 4.20.0 pending format 0.0 without relabeling it as 1.0.
+
+    Only verified upgrades and additions are accepted. This keeps native
+    unknown reasons, omitted empty groups and zero-epoch spelling intact.
+    Complete replacement and install-only evidence comes from the trusted
+    native adapter; arbitrary stored-transaction JSON is insufficient.
+    """
+    require(type(evidence) is Dnf4PendingEvidence
+            and evidence.contract == "dnf4-4.20.0-pending-0.0", "dnf4-native-evidence-unavailable")
+    for pin in (evidence.native_document_sha256, evidence.native_items_sha256,
+                evidence.native_receipt_sha256, evidence.api_contract_sha256,
+                evidence.inventory_sha256, evidence.repository_sha256):
+        text(pin, HEX, "invalid-dnf4-native-evidence")
+    require(evidence.native_document_sha256 == sha(raw) and evidence.inventory_sha256 == inventory.identity,
+            "dnf4-native-evidence-mismatch")
+    value = document(raw, MAX_SIMULATION_BYTES)
+    require(type(value) is dict and {"version", "rpms"} <= set(value) <= {"version", "rpms", "groups", "environments"}
+            and value["version"] == "0.0" and value.get("groups", []) == [] and value.get("environments", []) == []
+            and type(value["rpms"]) is list and 0 < len(value["rpms"]) <= MAX_OPERATIONS * 2, "unsupported-dnf4-pending-transaction")
+
+    def aliases(package):
+        version = package.version
+        epoch, rest = version.split(":", 1) if ":" in version else ("0", version)
+        require(epoch.isdecimal() and ":" not in rest, "invalid-dnf4-package-version")
+        names = {f"{package.name}-{epoch}:{rest}.{package.arch}"}
+        if int(epoch) == 0:names.add(f"{package.name}-{rest}.{package.arch}")
+        return names
+
+    old, available = {}, {}
+    for package in inventory.packages:
+        for name in aliases(package):
+            require(name not in old, "ambiguous-package-inventory");old[name] = package
+    for candidate in candidates.values():
+        for name in aliases(candidate.package):
+            require(name not in available, "ambiguous-package-candidate");available[name] = candidate
+    incoming, retired, seen, package_ids = {}, {}, set(), set()
+    installed_ids = {p.identity for p in inventory.packages}
+    for row in value["rpms"]:
+        exact(row, {"action", "nevra", "reason", "repo_id"}, "invalid-dnf4-pending-transaction")
+        name = row["nevra"]
+        require(type(name) is str and 0 < len(name) <= 500 and name not in seen
+                and type(row["reason"]) is str and row["reason"] in
+                {"unknown", "dependency", "clean", "group", "user", "weak-dependency"}, "invalid-dnf4-pending-transaction")
+        seen.add(name)
+        if row["action"] in {"Upgrade", "Install"}:
+            require(name in available and row["repo_id"] == available[name].repository,
+                    "simulation-candidate-not-authenticated")
+            target = available[name]
+            require(target.package.identity not in installed_ids and target.package.identity not in package_ids,
+                    "duplicate-simulation-operation")
+            package_ids.add(target.package.identity);incoming[name] = (row["action"], target)
+        elif row["action"] == "Upgraded":
+            require(name in old and row["repo_id"] == "@System", "simulation-inventory-mismatch")
+            require(old[name].identity not in package_ids, "duplicate-simulation-operation")
+            package_ids.add(old[name].identity);retired[name] = old[name]
+        else:raise PlanningUnavailable("unsupported-dnf4-pending-transaction")
+    pairs = evidence.verified_upgrade_pairs
+    require(type(pairs) is tuple and len(pairs) <= MAX_OPERATIONS
+            and all(type(pair) is tuple and len(pair) == 2 and all(type(p) is str for p in pair) for pair in pairs),
+            "invalid-dnf4-replacement-evidence")
+    require(len({p[0] for p in pairs}) == len({p[1] for p in pairs}) == len(pairs)
+            and {p[0] for p in pairs} == set(retired)
+            and {p[1] for p in pairs} == {name for name, (action, _) in incoming.items() if action == "Upgrade"},
+            "incomplete-dnf4-replacement-evidence")
+    operations = []
+    for old_name, new_name in pairs:
+        prior, target = retired[old_name], incoming[new_name][1]
+        require((prior.name, prior.arch) == (target.package.name, target.package.arch)
+                and prior.version != target.package.version, "invalid-dnf4-replacement-evidence")
+        operations.append(Change("change", prior, target.package, target.repository, target.archive_sha256))
+    install_only = evidence.install_only
+    require(type(install_only) is tuple and len(install_only) <= MAX_OPERATIONS
+            and all(type(name) is str for name in install_only) and len(set(install_only)) == len(install_only)
+            and set(install_only) <= {name for name, (action, _) in incoming.items() if action == "Install"},
+            "invalid-dnf4-install-only-evidence")
+    for name, (action, target) in incoming.items():
+        if action != "Install":continue
+        same_name = [p for p in inventory.packages if (p.name, p.arch) == (target.package.name, target.package.arch)]
+        if same_name or name in install_only:
+            require(name in install_only and target.package.source == "kernel" and target.package.name in
+                    {"kernel", "kernel-core", "kernel-modules", "kernel-modules-core", "kernel-modules-extra"},
+                    "unsupported-dnf4-coinstallation")
+        operations.append(Change("add", None, target.package, target.repository, target.archive_sha256))
+    return tuple(operations)
+
+
 def parse_simulation(raw, context, inventory, repository_raw, candidates, now):
     require(type(raw) is bytes and len(raw) <= MAX_SIMULATION_BYTES and type(context) is SimulationContext, "invalid-simulation-context")
     manager = "apt-get" if inventory.distribution.family == "debian" else "dnf"
@@ -479,7 +599,14 @@ def parse_simulation(raw, context, inventory, repository_raw, candidates, now):
     requested = context.requested_candidates
     require(type(requested) is tuple and len(requested) <= MAX_OPERATIONS and len(set(requested)) == len(requested)
             and all(type(pin) is str and pin in candidates for pin in requested), "invalid-simulation-request")
-    operations = parse_apt_simulation(raw, inventory, candidates) if manager == "apt-get" else parse_dnf_transaction(raw, inventory, candidates)
+    if context.dnf4_pending is not None:
+        require(manager == "dnf" and context.manager_version == "4.20.0"
+                and type(context.dnf4_pending) is Dnf4PendingEvidence
+                and context.dnf4_pending.repository_sha256 == context.repository_sha256,
+                "dnf4-native-contract-mismatch")
+        operations = parse_dnf4_pending_transaction(raw, context.dnf4_pending, inventory, candidates)
+    else:
+        operations = parse_apt_simulation(raw, inventory, candidates) if manager == "apt-get" else parse_dnf_transaction(raw, inventory, candidates)
     require(len(operations) <= MAX_OPERATIONS, "simulation-operation-limit")
     before, after = set(), set()
     installed = {p.identity: p for p in inventory.packages}
@@ -590,6 +717,11 @@ def plan_host_remediation(*, inventory_before: bytes, inventory_after: bytes,
         evidence = tuple(sorted((name, sha(raw)) for name, raw in (
             ("inventory_before", inventory_before), ("inventory_after", inventory_after),
             ("scan_report", scan_report), ("repository_metadata", repository_metadata), ("simulation_output", simulation_output))))
+        if simulation_context.dnf4_pending is not None:
+            native = simulation_context.dnf4_pending
+            evidence = tuple(sorted((*evidence, ("dnf4_native_items", native.native_items_sha256),
+                                     ("dnf4_native_receipt", native.native_receipt_sha256),
+                                     ("dnf4_api_contract", native.api_contract_sha256))))
         return RemediationPlan(status, "vendor-plan-needs-testing" if status == "proposed_untested" else
                                "vendor-fixes-incomplete" if unresolved else "no-medium-plus-vendor-findings",
                                operations, findings, unresolved, sha(canonical([asdict(p) for p in final_packages])),

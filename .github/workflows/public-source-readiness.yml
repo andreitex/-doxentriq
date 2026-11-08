@@ -73,6 +73,7 @@ jobs:
           sudo python3 -I -B scripts/test-quota-startup.py
           python3 -I -B scripts/test-quota-helper.py
           python3 -I -B scripts/test-host-network.py
+          python3 -I -B scripts/test-host-remediation.py
           python3 -I -B scripts/test-maintenance-scanner-coverage.py
       - name: Check installer records and read-only root compatibility
         run: |
