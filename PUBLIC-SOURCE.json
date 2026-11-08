@@ -1105,8 +1105,8 @@
     },
     {
       "path": "deploy/installer/company-prepare.sh",
-      "sourceSha256": "79fca0bd0bc64c8964b0eca797b83c22e822c2f6a3da8aeacb64b212c4fe90b9",
-      "exportSha256": "79fca0bd0bc64c8964b0eca797b83c22e822c2f6a3da8aeacb64b212c4fe90b9",
+      "sourceSha256": "d715501dd390785759b3b46322385422d7bcac5bfcbb870803005c87776a0239",
+      "exportSha256": "d715501dd390785759b3b46322385422d7bcac5bfcbb870803005c87776a0239",
       "transformations": []
     },
     {
@@ -2505,8 +2505,8 @@
     },
     {
       "path": "scripts/host_remediation.py",
-      "sourceSha256": "459615f002482395cb8ea3c1679b60434aa01de72443e8c5597f5d368a22585c",
-      "exportSha256": "459615f002482395cb8ea3c1679b60434aa01de72443e8c5597f5d368a22585c",
+      "sourceSha256": "42b524d8727130af62ed62d0774620451b63d20716e7dc1042f4aec67aae2553",
+      "exportSha256": "42b524d8727130af62ed62d0774620451b63d20716e7dc1042f4aec67aae2553",
       "transformations": []
     },
     {
@@ -2909,8 +2909,8 @@
     },
     {
       "path": "scripts/test-host-remediation.py",
-      "sourceSha256": "e0d40a80ce6ce7ef1946954d4ef821384bbae526b9189f9928945792e21a5480",
-      "exportSha256": "e0d40a80ce6ce7ef1946954d4ef821384bbae526b9189f9928945792e21a5480",
+      "sourceSha256": "3d10ac20d33c9d98e6bfab58fc5ad96aecf0fac4a816dc799fc20092d41b84f3",
+      "exportSha256": "3d10ac20d33c9d98e6bfab58fc5ad96aecf0fac4a816dc799fc20092d41b84f3",
       "transformations": []
     },
     {
@@ -4283,8 +4283,8 @@
     },
     {
       "path": "tests/test_company_preparation_entry_native.py",
-      "sourceSha256": "91a8bec23f867178f81ea36cbf2e1cf0ebebc5888fce76d48944aec0199c7f94",
-      "exportSha256": "91a8bec23f867178f81ea36cbf2e1cf0ebebc5888fce76d48944aec0199c7f94",
+      "sourceSha256": "66bcd73066508c0ae5bfe559268c0a8f2efe3d8303c02e26a77e316efd002866",
+      "exportSha256": "66bcd73066508c0ae5bfe559268c0a8f2efe3d8303c02e26a77e316efd002866",
       "transformations": []
     },
     {

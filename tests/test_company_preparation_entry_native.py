@@ -25,8 +25,19 @@ def load(name,path):
 
 def worker(mode):
     return ('ROOT='+repr(str(ROOT))+'\nBASE='+repr(str(BASE))+'\nMODE='+repr(mode)+'\n'+r'''
-import argparse,hashlib,importlib.util,json,os,sys
+import argparse,hashlib,importlib.util,json,os,sys,traceback
 from pathlib import Path
+def fixture_hook(kind,error,tb):
+ # Fixture-only locations reveal the rejected boundary without dumping locals,
+ # protected records, process environments or changing any original predicate.
+ original=error;rows=[];seen=set()
+ while error is not None and id(error) not in seen and len(rows)<8:
+  seen.add(id(error));frames=traceback.extract_tb(error.__traceback__)
+  rows.append(dict(type=type(error).__name__,frames=[dict(file=Path(f.filename).name,function=f.name,line=f.lineno)for f in frames[-12:]]))
+  error=error.__context__
+ print(json.dumps(dict(fixtureFailureLocations=rows)),file=sys.stderr)
+ sys.__excepthook__(kind,original,tb)
+sys.excepthook=fixture_hook
 def load(name,path):
  s=importlib.util.spec_from_file_location(name,path);m=importlib.util.module_from_spec(s);sys.modules[name]=m;s.loader.exec_module(m);return m
 S=load('preparation_station',Path(BASE)/'deploy/installer/company_native_station.py')
@@ -133,7 +144,9 @@ class NativePreparation(unittest.TestCase):
         self.assertEqual(r['before'],dict(sessions=1,effects=1,confirmed=0,complete=0))
         self.assertEqual(r['recoveryExit'],0,r['recoveryStderr']);self.assertEqual(r['after'],dict(sessions=1,effects=3,confirmed=3,complete=1))
     def test_partial_verification_remeasures_and_retains_exact_observation(self):
-        r=self.case('partial-verification');self.assertNotEqual(r['firstExit'],0)
+        r=self.case('partial-verification')
+        self.assertIn('Preparation stopped at company-configuration.',r['firstStderr'])
+        self.assertNotIn('unbound variable',r['firstStderr']);self.assertNotEqual(r['firstExit'],0)
         self.assertEqual(r['recoveryExit'],0,r['recoveryStderr']);self.assertEqual(r['after']['effects'],3)
     def test_missing_execute_never_replayed_or_confirmed(self):
         r=self.case('missing-execute');self.assertNotEqual(r['recoveryExit'],0);self.assertEqual(r['before'],r['after'])

@@ -34,6 +34,7 @@ MAX_SIMULATION_BYTES = 2 * 1024**2
 HEX = re.compile(r"[a-f0-9]{64}")
 FINGERPRINT = re.compile(r"[A-F0-9]{40}|[A-F0-9]{64}")
 NAME = re.compile(r"[a-z0-9][a-z0-9+_.-]{0,159}")
+RPM_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9+_.-]{0,159}")
 VERSION = re.compile(r"[0-9][A-Za-z0-9.+:~_-]{0,199}")
 REPO = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:/-]{0,119}")
 ADVISORY = re.compile(r"[A-Z0-9][A-Z0-9:._-]{0,99}")
@@ -151,7 +152,8 @@ def kernel_flavor(value):
 
 def package(value, distro):
     exact(value, {"name", "version", "arch", "source", "source_version", "essential"}, "invalid-package")
-    text(value["name"], NAME, "invalid-package"); text(value["source"], NAME, "invalid-package")
+    name_pattern = NAME if distro.family == "debian" else RPM_NAME
+    text(value["name"], name_pattern, "invalid-package"); text(value["source"], name_pattern, "invalid-package")
     text(value["version"], VERSION, "invalid-package"); text(value["source_version"], VERSION, "invalid-package")
     require(type(value["arch"]) is str and value["arch"] in
             ({"amd64", "all"} if distro.family == "debian" else {"x86_64", "noarch"})

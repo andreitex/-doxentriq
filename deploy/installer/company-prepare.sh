@@ -55,7 +55,8 @@ company_prepare_entry() {
   [[ ( $# = 2 && $1 = --prepare-foundation ) || ( $# = 3 && $1 = --recover-preparation ) ]] || _il_fail preparation_arguments
   _il_root
   local mode=$1 request=$2 recovering=${3:-} package worker expected actual request_sha operation nofile status
-  local stage action_command execute_command verify_command magic action outcome marker index=0 final_outcome current='preflight'
+  local stage action_command execute_command verify_command magic action outcome marker index=0 final_outcome
+  CP_CURRENT='preflight'
   IL_OWNER=$BASHPID
   nofile=$(ulimit -Sn)
   if [[ "$nofile" != unlimited ]]; then
@@ -81,11 +82,11 @@ company_prepare_entry() {
   else
     install_lock_acquire /etc/autosoft-install-admission "$request_sha" 30
   fi
-  trap 'status=$?; trap - EXIT; if [[ $status != 0 && ${IL_ACTIVE:-} = true ]]; then printf "Preparation stopped at %s. Session: %s. Keep records and storage. Use explicit recovery with this request/session; an unresolved write must be inspected by IT.\n" "$current" "$IL_SESSION" >&2; fi; if [[ ${IL_ACTIVE:-} = true ]]; then install_lock_release || status=74; fi; exit "$status"' EXIT
+  trap 'status=$?; trap - EXIT; if [[ $status != 0 && ${IL_ACTIVE:-} = true ]]; then printf "Preparation stopped at %s. Session: %s. Keep records and storage. Use explicit recovery with this request/session; an unresolved write must be inspected by IT.\n" "${CP_CURRENT:-preflight}" "${IL_SESSION:-unavailable}" >&2; fi; if [[ ${IL_ACTIVE:-} = true ]]; then install_lock_release || status=74; fi; exit "$status"' EXIT
   _cp_inventory "$action"
   local session=$IL_SESSION parent=() outcomes=("${CP_CONFIRMED[@]}")
   for stage in company-configuration repository-seed fresh-runtime-pair; do
-    ((index+=1)); current=$stage
+    ((index+=1)); CP_CURRENT=$stage
     if (( index <= ${#CP_CONFIRMED[@]} )); then
       printf '[%s/3] %s: prior confirmation retained.\n' "$index" "$stage"
       continue

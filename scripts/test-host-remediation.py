@@ -26,19 +26,19 @@ def identity(value):return R.Package(**value).identity
 
 
 class Fixture:
-    def __init__(self, family="debian"):
+    def __init__(self, family="debian", package_name="zlib"):
         self.family = family;self.arch = "amd64" if family == "debian" else "x86_64"
         self.distro = dict(family=family, version="13" if family == "debian" else "10.2")
         kernel_name = "linux-image-6.12.0-1-amd64" if family == "debian" else "kernel-core"
         self.kernel = pkg(kernel_name, "6.12.0-1", self.arch, "linux" if family == "debian" else "kernel")
-        self.zlib = pkg("zlib", "1.3.2-1", self.arch)
+        self.zlib = pkg(package_name, "1.3.2-1", self.arch)
         self.abi = pkg("libabi", "1.0-1", self.arch)
         self.installed = [self.kernel, self.zlib, self.abi]
         self.inventory = dict(schemaVersion=1, distribution=self.distro, packages=self.installed,
                               metadataSha256="b" * 64, capturedAt=moment(60))
         self.before = raw(self.inventory);self.after = raw(dict(self.inventory, capturedAt=moment(15)))
         self.parsed = R.parse_inventory(self.before, NOW)
-        self.target = pkg("zlib", "1.3.2-2", self.arch)
+        self.target = pkg(package_name, "1.3.2-2", self.arch)
         self.repo = "Debian:13/stable" if family == "debian" else "baseos"
         self.repository = dict(schemaVersion=1, distribution=self.distro, generatedAt=moment(3600),
                                validUntil=(NOW + timedelta(hours=2)).isoformat(), repositories=[self.repo],
@@ -104,6 +104,32 @@ class Tests(unittest.TestCase):
     def test_rocky_resolved_native_transaction_pair(self):
         result=Fixture("rocky").plan();self.assertEqual(result.status,"proposed_untested")
         self.assertEqual([(p.action,p.before.version,p.after.version) for p in result.changes],[("change","1.3.2-1","1.3.2-2")])
+
+    def test_rocky_mixed_case_names_survive_complete_planning_without_case_folding(self):
+        for name in ("NetworkManager", "libX11-devel", "perl-File-Temp"):
+            with self.subTest(name=name):
+                f=Fixture("rocky", package_name=name);result=f.plan()
+                self.assertEqual(result.status,"proposed_untested",result.reason)
+                self.assertEqual(len(result.changes),1)
+                change=result.changes[0]
+                self.assertEqual((change.before.name,change.after.name,change.after.source),(name,name,name))
+                value=json.loads(f.simulation)
+                value["rpms"][0]["nevra"]=value["rpms"][0]["nevra"].replace(name,name.lower(),1)
+                f.simulation=raw(value)
+                self.assertEqual(f.plan().reason,"simulation-candidate-not-authenticated")
+
+    def test_name_syntax_remains_distribution_specific_and_rejects_injection(self):
+        for family in ("debian","rocky"):
+            distro=R.Distribution(family,"13" if family=="debian" else "10.2")
+            arch="amd64" if family=="debian" else "x86_64"
+            for name in ("../pkg", "pkg/name", "pkg name", "pkg\n", "-pkg", "pkg;id", "pkg$(id)", "p\u0430ckage", "a"*161):
+                for field in ("name","source"):
+                    with self.subTest(family=family,name=name,field=field):
+                        value=pkg("package","1.0-1",arch);value[field]=name
+                        with self.assertRaisesRegex(R.PlanningUnavailable,"invalid-package"):
+                            R.package(value,distro)
+        with self.assertRaisesRegex(R.PlanningUnavailable,"invalid-package"):
+            Fixture("debian",package_name="NetworkManager")
 
     def test_dependency_addition_change_and_removal_all_exposed(self):
         for family in ("debian","rocky"):
