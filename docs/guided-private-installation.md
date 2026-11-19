@@ -166,11 +166,17 @@ host effects remain modeled. They do not qualify a real signed installation,
 reboot, public startup or later private-phase continuation.
 The guided entry's emitted size bound is now 40 KiB; the template and embedded
 lock inputs retain their 32 KiB bounds, the whole package retains 4 MiB and the
-native worker retains 2 MiB. The measured candidate entry is 35,526 bytes. This accommodates readable handoff/recovery guidance;
+native worker retains 2 MiB. This accommodates readable handoff/recovery guidance;
 no record format or historical authority changes. New emitted bytes have new
 independently delivered hashes, and cannot adopt an old package's guided intent.
 
-Remaining work includes base-VM prerequisites and native qualification of authenticated delivery placement;
+On November 19, 2026, targeted delivery-placement qualification passed 35 Linux
+component cases with no skips. An earlier run passed its cases but failed the
+final parent-mount guard; that failed run remains retained and its cause is
+unresolved. The later pass qualifies this component only, not full installation,
+public startup, reboot, failed-unlock recovery or the supported OS matrix.
+
+Remaining work includes base-VM prerequisites;
 genuine signed-VM reconciliation and foundation recovery; signed package and image
 qualification; fresh security feeds and runtime advisory coverage; public service
 startup; owner browser password/TOTP enrollment; first backup and isolated
