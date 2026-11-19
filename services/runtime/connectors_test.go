@@ -42,7 +42,7 @@ func connectorManifestFixture(t *testing.T) connectorTemplate {
 }
 
 func TestConnectorScopeNeedsExactOwnerMFAReadonlyReviewAndExpiry(t *testing.T) {
-	if validConnectorName(strings.Repeat("Äƒ", 121)) || !validConnectorName(strings.Repeat("Äƒ", 120)) {
+	if validConnectorName(strings.Repeat("\u0103", 121)) || !validConnectorName(strings.Repeat("\u0103", 120)) {
 		t.Fatal("UTF8 byte limit differs from the sealed adapter scope")
 	}
 	now := time.Now().UTC()
