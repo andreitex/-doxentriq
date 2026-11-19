@@ -41,7 +41,7 @@ Everyday application management belongs in the administration website.
 | Install from a public release | `scripts/install.sh` delegates to `/opt/autosoft-company/bootstrap/company-install.sh`. A checkout does not supply that trusted installed entry. Publish a verified bootstrap and signed source/image bundle with a documented trust fingerprint. |
 | Qualified host packages | The [foundation and configuration consumers](company-foundation-entry.md) now accept a company schema2 catalog captured in an independently authenticated worker. Missing catalogs, altered packages, signature-check failures and changed installed files are refused. Qualification hashes remain trusted company assertions; no production catalog or actual RPM installation is qualified by the component tests. Company Debian execution remains unavailable. |
 | Complete platform setup | `deploy/installer/company-install.sh` accepts only `--foundation-only`. `scripts/install.sh` explicitly stops the retained full-install function before service deployment. Experimental companions cover [configuration and placement](native-configuration-stage.md), [repository seeding](native-repository-seed.md), [runtime initialization](native-runtime-pair.md), [retained-source startup inspection](native-stored-startup.md) and [native rendering](native-rendering.md). The [private initializer](native-private-initialization.md) connects retention, rendering, five private services and independent initial identity-policy verification under one live parent. Its combined [quota companion](native-private-quota.md) adds the restricted quota unit, dependency and independent process verification. Actual signed execution on an encrypted VM, public service startup, owner browser MFA, backups and recovery still need one complete accepted installer. |
-| Safe rerun and interruption recovery | Read-only `--status` reports retained stages and missing confirmation. Preparation and [private-session recovery](private-session-recovery.md) reattach the same unfinished request/session and verify recorded execution before continuing. Private recovery also binds the original worker and six/seven-stage scope. Pending mutations are never replayed; missing execution, partial verification and uncertain identity workspaces stay blocked for IT inspection. Component checks passed, but genuine signed-VM reconciliation and complete installation resume remain open. |
+| Safe rerun and interruption recovery | Read-only `--status` reports retained stages and missing confirmation. The [guided private installer](guided-private-installation.md) can continue after a completed foundation or preparation by independently verifying its current effects under a new session. Preparation and [private-session recovery](private-session-recovery.md) reattach unfinished sessions and verify recorded execution before continuing. Pending mutations are never replayed; missing execution, partial verification and uncertain identity workspaces stay blocked for IT inspection. Genuine signed-VM reconciliation, later private-phase continuation and complete installation resume remain open. |
 | Clean-install OS matrix | Debian 12/13 and Rocky Linux 9/10 are source targets. Retained Rocky 10.2 foundation and reboot reports cover a limited earlier configuration. They do not establish complete clean-install, rerun, or failed-unlock recovery on any of the four targets. |
 | Usable first sign-in | A new installation must reach the admin URL, force owner password change and TOTP enrollment, and explain how to recover access. Test real DNS/certificate configuration, including the identity hostname and application subdomains, without trial-only browser mappings. |
 | Routine operations | [Quota startup controls](quota-service-startup.md) now order Docker after the ready quota service and bounded build mount, preserve the socket directory and drain admitted requests during shutdown. Linux helper tests and systemd syntax/dependency validation passed; actual installation and reboot remain unqualified. Demonstrate certificate renewal, fresh security feeds, scheduled backups and isolated restoration using the released installer. |
@@ -76,6 +76,40 @@ After this passes, repeat the same artifact on the other three OS targets. Do
 not replace a failing safety check with a bypass to complete this milestone.
 
 ## Checks run during this review
+
+The completed-preparation continuation passed 72 distinct Linux component
+cases across retained runs: 63 earlier cases plus nine cases after a fixture-only
+correction. The failed run is preserved. Tests cover current configuration, Git
+seed and runtime-pair checks, genuine new Bash parent admission, preserved old
+records, no replay and guidance for the actual unfinished phase. Signed-source
+acquisition and host effects remain modeled; no VM installation, reboot or public
+startup is qualified by these cases.
+
+The guided foundation continuation passed 43 distinct Linux component cases.
+The checks exercise genuine Bash parent handling and the original record and
+effect readers; signed-source acquisition and host effects are modeled. They
+do not install packages, create encrypted storage or qualify recovery on the VM.
+
+[Source-scan coverage](source-scanner-coverage.md) now checks the exact immutable
+dependency lock and scanner report structure instead of treating an empty
+report as sufficient evidence. It passed 69 meaningful component cases plus
+one process helper, including the intended UID/GID 10001 filesystem permissions.
+Live Trivy, sandbox and SELinux acceptance remain open. Combined reports now
+require a consistent feed snapshot, with passing Go, Python and control API
+component tests. Feed refresh remains disabled pending bounded acquisition,
+safe activation and live scanner compatibility checks.
+
+The administration interface passed type checking, 116 distinct UI cases and a
+local build. One case was rerun successfully outside a restricted Windows
+temporary directory after a filesystem permission failure, without a code
+change. A subsequent loopback browser check used the actual control service and
+built interface with fresh development data and no configured model credentials
+or runtime broker. It confirmed the first-request setup pause and progress after
+reload. It also found and corrected welcome-screen scrolling, access-error
+guidance and a telemetry text encoding issue. The updated source passed type
+checking, a build, 25 affected regression cases and browser checks of all three
+fixes. These Node 22.19 development checks do not establish Node 24 production
+acceptance, real owner sign-in, first-time user acceptance or live deployment.
 
 A fresh Rocky Linux 10.2 VM passed 42 network-control tests (162 including
 subtests), 11 native installer-source cases and five shell syntax checks. Three

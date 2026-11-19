@@ -29,7 +29,7 @@ export default function Telemetry({ data, budget, apps = [], loading, error, bud
   const disk = measuredUsage(host?.diskTotalBytes, host?.diskFreeBytes);
   const loads = host?.loadAverage?.length === 3 && host.loadAverage.every(value => Number.isFinite(value) && value >= 0) ? host.loadAverage as [number, number, number] : undefined;
   const usage = budget && budget.monthlyLimitUsd > 0 ? Math.min(100, Math.max(0, (budget.spentUsd + budget.reservedUsd) / budget.monthlyLimitUsd * 100)) : 0;
-  return <section className="workspace-page"><div className="page-heading"><div><p className="eyebrow">WORKSPACE TELEMETRY</p><h1>Know whatâ€™s happening.</h1><p>Live workload, service availability, and model spend from your deployment.</p></div><button className="button button-secondary" onClick={onRetry} disabled={loading}><RefreshCw size={16} className={loading ? 'spin' : ''} />Refresh</button></div>
+  return <section className="workspace-page"><div className="page-heading"><div><p className="eyebrow">WORKSPACE TELEMETRY</p><h1>Know what is happening.</h1><p>Live workload, service availability, and model spend from your deployment.</p></div><button className="button button-secondary" onClick={onRetry} disabled={loading}><RefreshCw size={16} className={loading ? 'spin' : ''} />Refresh</button></div>
     {error && <ErrorBanner message={error} onRetry={onRetry} />}
     {loading && !data ? <Loading label="Loading workspace telemetryâ€¦" /> : data ? <>
       <div className="metric-grid">{[

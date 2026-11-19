@@ -43,6 +43,20 @@ def stable_ast_bytes(value):
 def stable_ast_sha(value):return hashlib.sha256(stable_ast_bytes(value)).hexdigest()
 
 
+def prior_report_scope_source(source):
+    """Invert only exact reviewed report-scope additions for the old invariant test."""
+    begin=source.index(b'class SecurityFeedScope:\n');end=source.index(b'class MaintenanceScanner:',begin)
+    if hashlib.sha256(source[begin:end]).hexdigest() != '6ea2661f6402c8fee6df61bfd43e257b1240de55fa75bce015ae9304bed49e4d':
+        raise AssertionError('Reviewed report scope fragment changed')
+    source=source[:begin]+source[end:]
+    for addition in (b"_SECURITY_REPORT_SCOPE = ContextVar('maintenance_security_report_scope', default=None)\n", b'        self.updated_at = None\n', b"        self.updated_at = feed_metadata(metadata_records[0][0], version=2, now_ns=terminal)['UpdatedAt']\n", b'            scope = _SECURITY_REPORT_SCOPE.get()\n            if scope is not None:\n                scope.observe(feed)\n'):
+        if source.count(addition)!=1:raise AssertionError('Reviewed report scope integration changed')
+        source=source.replace(addition,b'')
+    if hashlib.sha256(source).hexdigest() != '8af98daa08a33049770890a534f72c187ced4a02fff11c086b3e582d6c5d16bb':
+        raise AssertionError('Other feed reader source changed')
+    return source
+
+
 class Classification(unittest.TestCase):
     def test_known_failure_categories_are_exact_constants(self):
         cases=(('scanner-process-timeout','process_timeout'),
@@ -295,8 +309,8 @@ class OriginalSecurityBoundaries(unittest.TestCase):
 
     def test_reviewed_suite_and_preserved_security_functions(self):
         self.assertEqual(hashlib.sha256((HERE/'test-maintenance-scanner.py').read_bytes()).hexdigest(),
-                         '99b7dcd65e6a40aa770f1351ba448ecbbd43ae072f86686b3d2e80379536736c')
-        tree=ast.parse(T.prior_feed_boundary_source((HERE/'maintenance_scanner.py').read_bytes()))
+                         '78111f0351194429d5416102b8df0ea04b37a7af3e636f37255f81648855ecf1')
+        tree=ast.parse(T.prior_feed_boundary_source(prior_report_scope_source((HERE/'maintenance_scanner.py').read_bytes())))
         nodes={}
         for node in tree.body:
             if isinstance(node,ast.FunctionDef):nodes[node.name]=node

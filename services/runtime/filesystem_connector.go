@@ -339,10 +339,13 @@ func (s *server) provisionFilesystem(w http.ResponseWriter, r *http.Request) {
 		rejectDeployment(w, 409, errors.New("Connection identity belongs to a different adapter"))
 		return
 	}
-	if _, e = cachedFeed(); e != nil {
+	securityContext, cancelFeed, e := s.beginSecurityFeedScope(r.Context())
+	if e != nil {
 		rejectDeployment(w, 409, e)
 		return
 	}
+	defer cancelFeed()
+	r = r.WithContext(securityContext)
 	findings, e := s.scanImage(r.Context(), template.Image)
 	if e != nil {
 		rejectDeployment(w, 409, e)
@@ -360,6 +363,10 @@ func (s *server) provisionFilesystem(w http.ResponseWriter, r *http.Request) {
 	}
 	if _, fresh, e := currentFilesystemScope(in.Scope); e != nil || !reflect.DeepEqual(fresh, template) {
 		rejectDeployment(w, 409, errors.New("Filesystem source or company qualification changed during scanning"))
+		return
+	}
+	if _, e = checkSecurityFeedScope(r.Context()); e != nil {
+		rejectDeployment(w, 409, e)
 		return
 	}
 	if e = writeEncrypted(file, filesystemConnectorState{in, in.ArtifactHash, template, time.Now().UTC().Format(time.RFC3339)}); e != nil {
@@ -529,7 +536,12 @@ func (s *server) ensureFilesystemConnector(ctx context.Context, m AppManifest, v
 	if e != nil || json.Unmarshal([]byte(out), &network) != nil || network.Name != v.Network || network.Driver != "bridge" || !network.Internal {
 		return nil, errors.New("Filesystem adapters require the exact isolated internal application network")
 	}
-	feed, e := cachedFeed()
+	ctx, cancelFeed, e := s.beginSecurityFeedScope(ctx)
+	if e != nil {
+		return nil, e
+	}
+	defer cancelFeed()
+	feed, e := securityFeedScopeUpdatedAt(ctx)
 	if e != nil {
 		return nil, e
 	}
@@ -607,6 +619,9 @@ func (s *server) ensureFilesystemConnector(ctx context.Context, m AppManifest, v
 	if checked, checkError := validateFilesystemContainer([]byte(out), expected); checkError != nil || checked != immutable {
 		return nil, errors.New("Filesystem immutable candidate changed after probe")
 	}
+	if _, e = checkSecurityFeedScope(ctx); e != nil {
+		return nil, e
+	}
 	receipt := map[string]any{"appId": m.ID, "resourceId": v.AppID, "connectionId": id, "scopeHash": state.ScopeHash, "image": state.Template.Image, "sourceHash": state.Template.SourceHash, "adapter": expected.Name, "containerId": immutable, "checkedAt": time.Now().UTC().Format(time.RFC3339), "feedUpdatedAt": feed, "expiresAt": state.Input.Scope.AccessExpiresAt, "status": "passed"}
 	if e = atomicJSON(filepath.Join(s.data, "connectors", "filesystem-live", v.AppID, id+".json"), receipt); e != nil {
 		return nil, e
@@ -677,9 +692,17 @@ func (s *server) scanFilesystemConnector(ctx context.Context, m AppManifest, id 
 	if e != nil {
 		return nil, e
 	}
+	ctx, cancelFeed, e := s.beginSecurityFeedScope(ctx)
+	if e != nil {
+		return nil, e
+	}
+	defer cancelFeed()
 	findings, e := s.scanImage(ctx, state.Template.Image)
 	if e != nil {
 		return nil, fmt.Errorf("Filesystem adapter image coverage unavailable: %w", e)
+	}
+	if _, e = checkSecurityFeedScope(ctx); e != nil {
+		return findings, e
 	}
 	return findings, nil
 }

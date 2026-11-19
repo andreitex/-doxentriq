@@ -24,7 +24,7 @@ from recovery_catalog import RecoveryCatalog, C as catalog_records
 from recovery_services import check_cold_services, ColdStoreCleanupUncertain
 from host_kernel_security import check_running_kernel
 from host_package_inventory import snapshot_host_packages
-from maintenance_scanner import run_scanner, scanner_input_directory, ScannerUnavailable
+from maintenance_scanner import run_scanner, scanner_input_directory, ScannerUnavailable, SecurityFeedScope
 from maintenance_image_export import export_image
 from maintenance_broker_security import read_daily_security
 
@@ -497,48 +497,57 @@ class Maintenance:
                       else scanner_coverage_detail(error,"Feed download or 24-hour freshness validation failed. No clean security claim is possible."))
             coverage.append(dict(name="vulnerability-feed", status="unavailable", detail=detail))
         if feed != EPOCH:
-            manifest = json.loads((self.data / "config/runtime-manifest.json").read_text())
-            targets = set(self.images.values()) | {manifest["scannerImage"]}
-            mirrors = {entry['targetImage']: entry['sourceImage'] for entry in json.loads((self.data / 'config/approved-mirrors.json').read_text())}
-            for template in manifest["templates"].values():
-                targets.update((template["runtimeImage"], template["toolchainImage"]))
-            for image in sorted(targets):
-                image = mirrors.get(image, image)
-                name = "image:" + image.split("@", 1)[0]
-                try:
-                    run(["docker", "pull", image], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                    report = self.scan_image(image)
-                    detected = self.findings(report)
-                    findings.extend(detected)
-                    unknown = any(v.get("Severity") not in {"LOW", "MEDIUM", "HIGH", "CRITICAL"} for r in report.get("Results", []) for v in (r.get("Vulnerabilities") or []))
-                    incomplete = unknown or report.get("Metadata", {}).get("OS", {}).get("EOSL") or not report.get("Results")
-                    coverage.append(dict(name=name[:100], status="failed" if detected else "unavailable" if incomplete else "passed", detail=f"Immutable image package scan: {len(detected)} Medium or higher findings." + (" Advisory severity/OS/package coverage is incomplete." if incomplete else "")))
-                except Exception as error:
-                    coverage.append(dict(name=name[:100], status="unavailable", detail=scanner_coverage_detail(error,"Image fetch or vulnerability scan failed. The image has not passed.")))
-            host_report = None
+            feed_coverage = dict(name="vulnerability-feed", status="unavailable", detail="The advisory snapshot could not be verified across this report; earlier findings are retained.")
+            coverage.append(feed_coverage)
             try:
-                host_report = self.scan_host_packages()
-                os_info = host_report.get("Metadata", {}).get("OS", {})
-                if os_info.get("Family") not in {"debian", "rocky"} or os_info.get("EOSL") or not host_report.get("Results"):
-                    raise ValueError("Host OS advisory coverage unavailable")
-                detected = self.findings(host_report)
-                findings.extend(detected)
-                unclassified = any(v.get("Severity") not in {"LOW", "MEDIUM", "HIGH", "CRITICAL"} for r in host_report["Results"] for v in (r.get("Vulnerabilities") or []))
-                coverage.append(dict(name="host-os-packages", status="failed" if detected else "unavailable" if unclassified else "passed", detail="Installed distribution package inventory matched to vendor advisories, including installed kernel packages." + (" Advisory severity is unclassified; no clean host package claim is possible." if unclassified else "")))
-            except Exception as error:
-                coverage.append(dict(name="host-os-packages", status="unavailable", detail=scanner_coverage_detail(error,"This OS version/package inventory is unsupported or its package scan failed.")))
-            kernel = check_running_kernel(host_report, feed, self.scan_kernel_source)
-            coverage.append(kernel["coverage"])
-            known = {(finding["id"], finding["package"], finding["installedVersion"]) for finding in findings}
-            for finding in kernel["findings"]:
-                key = (finding["id"], finding["package"], finding["installedVersion"])
-                if key not in known:
-                    findings.append(finding)
-                    known.add(key)
-            write(self.data / "security/history" / ("running-kernel-" + uuid.uuid4().hex + ".json"), dict(checkedAt=checked, feedUpdatedAt=feed, **kernel))
-            # gVisor and vendor Docker/containerd packages are not promised covered by distro advisories.
-            coverage.append(dict(name="host-third-party-advisories", status="unavailable", detail="gVisor release advisories and Docker CE/containerd vendor advisories require company review; distribution feed coverage alone is insufficient."))
-            coverage.append(dict(name="host-livepatch-and-configuration", status="unavailable", detail="Running-kernel package evidence does not attest loaded binary bytes, live patch state, SSH policy, firmware, or complete host hardening."))
+                with SecurityFeedScope(self.data / "security-cache") as scope:
+                    feed = scope.updated_at
+                    manifest = json.loads((self.data / "config/runtime-manifest.json").read_text())
+                    targets = set(self.images.values()) | {manifest["scannerImage"]}
+                    mirrors = {entry['targetImage']: entry['sourceImage'] for entry in json.loads((self.data / 'config/approved-mirrors.json').read_text())}
+                    for template in manifest["templates"].values():
+                        targets.update((template["runtimeImage"], template["toolchainImage"]))
+                    for image in sorted(targets):
+                        image = mirrors.get(image, image)
+                        name = "image:" + image.split("@", 1)[0]
+                        try:
+                            run(["docker", "pull", image], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                            report = self.scan_image(image)
+                            detected = self.findings(report)
+                            findings.extend(detected)
+                            unknown = any(v.get("Severity") not in {"LOW", "MEDIUM", "HIGH", "CRITICAL"} for r in report.get("Results", []) for v in (r.get("Vulnerabilities") or []))
+                            incomplete = unknown or report.get("Metadata", {}).get("OS", {}).get("EOSL") or not report.get("Results")
+                            coverage.append(dict(name=name[:100], status="failed" if detected else "unavailable" if incomplete else "passed", detail=f"Immutable image package scan: {len(detected)} Medium or higher findings." + (" Advisory severity/OS/package coverage is incomplete." if incomplete else "")))
+                        except Exception as error:
+                            coverage.append(dict(name=name[:100], status="unavailable", detail=scanner_coverage_detail(error,"Image fetch or vulnerability scan failed. The image has not passed.")))
+                    host_report = None
+                    try:
+                        host_report = self.scan_host_packages()
+                        os_info = host_report.get("Metadata", {}).get("OS", {})
+                        if os_info.get("Family") not in {"debian", "rocky"} or os_info.get("EOSL") or not host_report.get("Results"):
+                            raise ValueError("Host OS advisory coverage unavailable")
+                        detected = self.findings(host_report)
+                        findings.extend(detected)
+                        unclassified = any(v.get("Severity") not in {"LOW", "MEDIUM", "HIGH", "CRITICAL"} for r in host_report["Results"] for v in (r.get("Vulnerabilities") or []))
+                        coverage.append(dict(name="host-os-packages", status="failed" if detected else "unavailable" if unclassified else "passed", detail="Installed distribution package inventory matched to vendor advisories, including installed kernel packages." + (" Advisory severity is unclassified; no clean host package claim is possible." if unclassified else "")))
+                    except Exception as error:
+                        coverage.append(dict(name="host-os-packages", status="unavailable", detail=scanner_coverage_detail(error,"This OS version/package inventory is unsupported or its package scan failed.")))
+                    kernel = check_running_kernel(host_report, feed, self.scan_kernel_source)
+                    coverage.append(kernel["coverage"])
+                    known = {(finding["id"], finding["package"], finding["installedVersion"]) for finding in findings}
+                    for finding in kernel["findings"]:
+                        key = (finding["id"], finding["package"], finding["installedVersion"])
+                        if key not in known:
+                            findings.append(finding)
+                            known.add(key)
+                    write(self.data / "security/history" / ("running-kernel-" + uuid.uuid4().hex + ".json"), dict(checkedAt=checked, feedUpdatedAt=feed, **kernel))
+                    # gVisor and vendor Docker/containerd packages are not promised covered by distro advisories.
+                    coverage.append(dict(name="host-third-party-advisories", status="unavailable", detail="gVisor release advisories and Docker CE/containerd vendor advisories require company review; distribution feed coverage alone is insufficient."))
+                    coverage.append(dict(name="host-livepatch-and-configuration", status="unavailable", detail="Running-kernel package evidence does not attest loaded binary bytes, live patch state, SSH policy, firmware, or complete host hardening."))
+                feed_coverage.update(status="passed", detail="Every scanner used the same fresh advisory snapshot through report completion.")
+            except Exception:
+                # Partial findings remain useful; incomplete coverage cannot clear them.
+                feed_coverage.update(status="unavailable")
         if not gate:
             try:
                 rows = self.mysql("SELECT payload FROM platform.platform_records WHERE collection='releases'").splitlines()

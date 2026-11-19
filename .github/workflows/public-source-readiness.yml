@@ -75,6 +75,27 @@ jobs:
           python3 -I -B scripts/test-host-network.py
           python3 -I -B scripts/test-host-remediation.py
           python3 -I -B scripts/test-maintenance-scanner-coverage.py
+      - name: Check native security feed reader coordination
+        shell: bash
+        run: |
+          set -euo pipefail
+          DOXENTRIQ_FEED_TEST_ROOT=$(sudo mktemp -d /srv/doxentriq-feed-readers.XXXXXX)
+          for suite in test-security-feed-lease test-maintenance-scanner test-maintenance-scanner-diagnostics; do
+            sudo env DOXENTRIQ_FEED_TEST_ROOT="$DOXENTRIQ_FEED_TEST_ROOT" \
+              python3 -I -B "scripts/$suite.py" -v 2>&1 | tee "$RUNNER_TEMP/$suite.log"
+          done
+          python3 - "$RUNNER_TEMP" <<'PY'
+          import pathlib, re, sys
+          root = pathlib.Path(sys.argv[1])
+          minimum = {"test-security-feed-lease": 15, "test-maintenance-scanner": 54,
+                     "test-maintenance-scanner-diagnostics": 19}
+          for suite, cases in minimum.items():
+              text = (root / (suite + ".log")).read_text()
+              count = re.findall(r"^Ran (\d+) tests? in [0-9.]+s$", text, re.M)
+              assert len(count) == 1 and int(count[0]) >= cases, suite + ": incomplete native suite"
+              assert re.search(r"^OK$", text, re.M), suite + ": native tests must pass without skips"
+              assert not re.search(r"(?im)^(?:FAILED|OK \(skipped=)|\.\.\. skipped", text), suite + ": skipped or failed native test"
+          PY
       - name: Check installer records and read-only root compatibility
         run: |
           AUTOSOFT_TEST_ARTIFACT_ROOT="$(mktemp -d "${RUNNER_TEMP}/doxentriq-records.XXXXXX")"
@@ -154,6 +175,55 @@ jobs:
           sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
             python3 -I -B tests/test_storage_fault_harness.py
           sudo python3 -I -B tests/test_storage_recovery_entry.py
+      - name: Check guided private installer trust and interruption handling
+        shell: bash
+        run: |
+          set -euo pipefail
+          DOXENTRIQ_NATIVE_TEST_ROOT=$(sudo mktemp -d /srv/doxentriq-guided.XXXXXX)
+          for suite in test_company_guided_package test_company_guided_entry_native test_company_foundation_handoff test_company_guided_handoff_native test_company_preparation_handoff test_company_preparation_configuration_native test_company_guided_preparation_handoff_native test_company_request_intake test_company_request_intake_native test_company_guided_placement test_company_guided_placement_native; do
+            sudo env DOXENTRIQ_NATIVE_TEST_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" AUTOSOFT_TEST_ARTIFACT_ROOT="$DOXENTRIQ_NATIVE_TEST_ROOT" \
+              python3 -I -B "tests/$suite.py" -v 2>&1 | tee "$RUNNER_TEMP/$suite.log"
+          done
+          python3 - "$RUNNER_TEMP" <<'PY'
+          import pathlib, re, sys
+          required = {'test_company_guided_package': ['test_actual_producers_emit_original_children_and_common_native_worker', 'test_changed_source_during_real_assembly_refuses', 'test_component_set_cannot_add_a_command_or_omit_status', 'test_entry_binds_every_exact_emitted_file_and_status_source', 'test_missing_or_mixed_catalogs_refuse_before_assembly'], 'test_company_guided_entry_native': ['test_changed_entry_refuses_before_any_child', 'test_changed_worker_refuses_before_any_child', 'test_existing_unfinished_admission_is_reported_before_any_child', 'test_foundation_failure_never_starts_preparation', 'test_fresh_three_original_children_finish_eleven_confirmations_without_nested_lock', 'test_full_installation_mode_stays_refused_without_child', 'test_interrupted_preparation_reports_original_exact_recovery_without_replay', 'test_mismatched_request_refuses_before_any_child', 'test_noncanonical_request_refuses_before_any_child', 'test_private_identity_verification_failure_never_starts_quota', 'test_request_changed_after_preparation_cannot_start_private_phase', 'test_retained_guided_intent_is_preserved_without_replay', 'test_status_changed_by_failed_child_is_never_executed_as_recovery_guidance'], 'test_company_foundation_handoff': ['test_actual_completed_record_parser_rejects_each_old_binding_change', 'test_actual_measurement_and_output_parser_run_without_writing_old_evidence', 'test_actual_output_guard_rejects_changed_signed_installed_bytes', 'test_changed_worker_request_package_and_old_session_refuse', 'test_missing_completion_extra_stage_and_partial_configuration_are_refused', 'test_old_record_inode_drift_during_measurement_refuses', 'test_previous_full_or_handoff_session_is_never_replayed', 'test_real_mount_runtime_and_journal_observation_drift_refuses', 'test_same_request_or_noncanonical_old_result_is_refused', 'test_source_or_parent_close_failure_never_returns_confirmation'], 'test_company_guided_handoff_native': ['test_changed_full_request_is_refused_without_new_session', 'test_changed_guided_intent_is_refused_without_new_session', 'test_changed_worker_is_refused_without_new_session', 'test_completed_foundation_uses_new_parent_real_verifiers_then_original_children', 'test_missing_completion_is_preserved_without_new_session', 'test_partial_preparation_is_preserved_without_new_session', 'test_runtime_drift_stops_at_read_only_handoff', 'test_source_drift_stops_at_read_only_handoff', 'test_wrong_completed_session_is_refused_without_new_session'], 'test_company_preparation_handoff': ['test_changed_git_tool_is_rejected_by_original_seed_intent', 'test_changed_result_or_confirmation_is_not_an_execution_receipt', 'test_changed_worker_session_request_and_package_are_not_adopted', 'test_foreign_foundation_session_does_not_grant_or_block_full_request', 'test_gate_record_replacement_changes_saved_aggregate', 'test_guided_emitted_limit_is_exact_and_input_bounds_are_unchanged', 'test_historical_parent_change_fails_at_original_intent_comparison', 'test_missing_confirmation_or_completion_refuses_without_writing', 'test_modified_seed_bytes_are_rejected_by_original_output_reader', 'test_modified_seed_evidence_is_not_adopted', 'test_new_parent_is_allowed_but_previous_handoff_is_never_replayed', 'test_original_final_and_sorted_manifest_must_both_match', 'test_original_pair_and_startup_readers_preserve_effects_and_parent_records', 'test_original_sorted_manifest_and_three_stage_result_bindings', 'test_original_storage_git_and_output_checks_preserve_seed', 'test_partial_or_completed_private_work_and_extra_inventory_refuse', 'test_partial_pair_is_preserved_and_never_reinitialized', 'test_real_guided_producer_keeps_original_bound_and_captures_handoff', 'test_real_worker_dispatch_binds_predecessor_package_and_original_catalog', 'test_resealed_result_still_must_match_original_action_request_session_and_worker', 'test_uncertain_gate_operation_refuses_current_pair', 'test_world_writable_or_replaced_old_record_changes_binding'], 'test_company_preparation_configuration_native': ['test_actual_repository_owner_change_refuses_original_layout_reader', 'test_changed_signed_catalog_refuses_at_configuration_binding', 'test_populated_retention_parent_refuses_without_deleting_its_file', 'test_real_configuration_secret_layout_and_retention_readers_preserve_populated_repository', 'test_real_secret_change_cannot_match_previous_configuration_outcome'], 'test_company_guided_preparation_handoff_native': ['test_changed_guided_binding_refuses_before_new_session', 'test_changed_worker_refuses_before_new_session', 'test_completed_preparation_uses_new_parent_without_replaying_any_stage', 'test_each_current_effect_mismatch_stops_before_private_child', 'test_missing_completed_record_refuses_before_new_session', 'test_mixed_completed_history_only_guides_the_actual_unfinished_private_session', 'test_partial_private_work_refuses_before_new_session', 'test_source_close_failure_cannot_confirm_new_handoff', 'test_wrong_predecessor_refuses_before_new_session'], 'test_company_request_intake': ['test_actual_delivery_producer_binds_exact_helper_defaults_key_and_entry', 'test_company_defaults_cannot_select_code_or_ambiguous_release_fields', 'test_generated_pair_passes_both_actual_original_validators', 'test_legacy_producer_profile_does_not_enable_unconfigured_intake', 'test_original_key_parser_rejects_another_company_identity', 'test_original_validators_reject_invalid_storage_capacity_and_extra_answers', 'test_receipt_has_closed_names_and_bounded_exact_member_bytes', 'test_saved_pair_is_bound_to_delivery_defaults_and_exact_shared_fields', 'test_storage_prompt_rejects_out_of_range_capacity_before_request_creation'], 'test_company_request_intake_native': ['test_actual_package_creates_valid_pair_and_complete_rerun_has_no_prompts', 'test_changed_output_during_readback_is_not_confirmed', 'test_concurrent_intake_has_one_exclusive_winner_and_no_duplicate_pair', 'test_directory_replacement_between_writes_stops_and_preserves_old_intent', 'test_interrupt_after_both_requests_does_not_invent_completion', 'test_interrupt_after_durable_completion_redisplays_exact_original_pair', 'test_interrupt_after_first_request_preserves_it_without_creating_second', 'test_interrupt_after_intent_preserves_missing_pair_and_refuses_replay', 'test_interrupt_before_intent_preserves_empty_namespace_and_refuses_replay', 'test_missing_python_has_actionable_refusal_before_prompts_or_writes', 'test_partial_intent_write_is_preserved_without_requests_or_completion', 'test_receipt_helper_entry_and_defaults_tamper_refuse_before_request_writes']}
+          required.update({
+              'test_company_guided_placement': [
+                  'test_actual_producer_binds_all_original_members_and_receipt',
+                  'test_duplicate_or_missing_template_marker_refuses',
+                  'test_legacy_single_output_is_unchanged_without_pair_preflight',
+                  'test_main_missing_placement_parent_refuses_before_either_output',
+                  'test_main_unsafe_placement_parents_refuse_before_either_output',
+                  'test_main_valid_pair_emits_both_and_preserves_receipt_summary',
+                  'test_missing_extra_and_legacy_members_refuse',
+                  'test_original_member_limit_is_enforced_before_emission',
+                  'test_payload_change_cannot_reuse_original_receipt',
+                  'test_removing_pair_preflight_reproduces_partial_output',
+                  'test_source_change_during_assembly_refuses',
+              ],
+              'test_company_guided_placement_native': [
+                  'test_actual_placement_and_completed_rerun_preserve_fixed_package',
+                  'test_child_directory_replacement_refuses_and_preserves_partial_file',
+                  'test_completed_package_tamper_refuses_and_is_preserved',
+                  'test_concurrent_contender_refuses_without_changing_winning_placement',
+                  'test_final_boundary_replacement_refuses_before_completion_record',
+                  'test_interrupted_copy_preserves_partial_package_and_refuses_replay',
+                  'test_predecessor_reproduces_invalid_completion_at_same_race_boundary',
+                  'test_readonly_status_does_not_create_destination',
+                  'test_tampered_delivery_refuses_without_destination',
+                  'test_wrong_independent_receipt_refuses_without_destination',
+              ],
+          })
+          assert sum(len(names) for names in required.values()) == 115, "guided required-case count changed"
+          assert all(len(names) == len(set(names)) for names in required.values()), "duplicate required case"
+          root = pathlib.Path(sys.argv[1])
+          for suite, names in required.items():
+              text = (root / (suite + ".log")).read_text()
+              passed = set(re.findall(r"^(test_\w+) \([^\n]+\) \.\.\. ok$", text, re.M))
+              assert set(names) <= passed, suite + ": required cases did not pass"
+              assert re.search(r"^OK$", text, re.M), suite + ": skipped or failed native suite"
+              assert not re.search(r"(?im)^(?:FAILED|OK \(skipped=)|\.\.\. skipped", text), suite + ": skipped or failed case"
+          PY
       - name: Check private infrastructure, identity and quota composition
         shell: bash
         run: |
@@ -216,3 +286,78 @@ jobs:
         run: |
           go test ./...
           go vet ./...
+      - name: Check native runtime feed readers with real protected locks
+        working-directory: services/runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Ordinary go test cannot create genuine root-owned feed locks.
+          # Compile as the runner user, then exercise only the native fixtures.
+          go test -c -vet=off -o "$RUNNER_TEMP/feed-reader.test" .
+          sudo env GOMAXPROCS=2 "$RUNNER_TEMP/feed-reader.test" \
+            -test.v -test.count=1 -test.timeout=90s \
+            '-test.run=^(TestSecurityFeedScope.*|TestFeed.*|TestSourceScanner.*|TestScannerJournalV1ExactBytesRemainCompatible|TestRuntimeImageScannerFeedBindsBytesMappingAndLimits|TestDailySecurityBindsSourceAndImageToTheIndependentRelease|TestConnectorApprovalCannotExpireWhileQueuedOrScanning)$' \
+            2>&1 | tee "$RUNNER_TEMP/feed-reader.log"
+          python3 - "$RUNNER_TEMP/feed-reader.log" <<'PY'
+          import pathlib, re, sys
+          text = pathlib.Path(sys.argv[1]).read_text()
+          assert not re.search(r"--- (?:SKIP|FAIL):", text), "Native reader fixtures must run without skips"
+          required = {
+              "TestConnectorApprovalCannotExpireWhileQueuedOrScanning",
+              "TestRuntimeImageScannerFeedBindsBytesMappingAndLimits",
+              "TestSecurityFeedScopeConnectorApprovalRechecksAfterScanning",
+              "TestSecurityFeedScopeDailyReportKeepsSourceFindingOnLaterUnavailableImage",
+              "TestSecurityFeedScopeDeploymentRejectsPromotionBeforeOperationAcceptance",
+              "TestSecurityFeedScopeFinalCloseFailureClearsAcceptance",
+              "TestSecurityFeedScopeRejectsIdentityMembershipExpiryAndCancellation",
+              "TestSecurityFeedScopeSeparatesReportsAndRejectsMixedBytes",
+              "TestSecurityFeedScopeSourceAndImageReadersCannotMixSnapshots",
+              "TestSecurityFeedScopeSourceRefusalBeforeAnyContainer",
+              "TestFeedLeaseCoordinatesActualPythonWriter",
+              "TestFeedLeaseRejectsLockReplacementAndTerminalExpiry",
+              "TestFeedLeaseRejectsMissingUnsafeAndLinkedLocks",
+              "TestSourceScannerLeaseIsHeldThroughDetachedCleanupAndFinalRead",
+              "TestFeedMetadataExactExpiryAndAge",
+              "TestFeedMetadataRejectsAmbiguousAndOversizedJSON",
+              "TestDailySecurityBindsSourceAndImageToTheIndependentRelease",
+              "TestSourceScannerKeepsMachineOutputAndBlockingFindings",
+              "TestSourceScannerLifecycleCancellationAndUnknownOutcomes",
+              "TestSourceScannerFixedProfileAndAuthorizedPaths",
+              "TestSourceScannerNetworkRefusesEgressAndProfileChanges",
+              "TestScannerJournalV1ExactBytesRemainCompatible",
+              "TestSourceScannerJournalBindsExplicitTarget",
+              "TestSourceScannerWorkspacePreservationKeepsOwnedFailure",
+              "TestSourceScannerCallerPanicPreservesOwnedWorkspace",
+              "TestSourceScannerCoverageRejectsMissingOrAmbiguousEvidence",
+              "TestSourceScannerCoverageZeroDependenciesAreExplicit",
+              "TestSourceScannerCoverageRetainsBlockingFindings",
+              "TestSourceScannerNpmInventoryIncludesDevAndTransitivePackages",
+              "TestSourceScannerNpmInventoryAcceptsMaintainedDMSLock",
+              "TestSourceScannerPipInventoryKeepsHashPinnedRequirements",
+              "TestSourceScannerCoverageRejectsLockDriftBeforeEffects",
+              "TestSourceScannerCoverageProtectsHistoricalPermissions",
+              "TestSourceScannerCoverageRejectsDriftAfterScannerCleanup",
+              "TestSourceScannerCoverageUnknownLocksAreUnavailable",
+              "TestSourceScannerCoveragePreservesFindingsFromAdditionalKnownTargets",
+          }
+          passed = set(re.findall(r"^--- PASS: ([A-Za-z0-9_]+) \(", text, re.M))
+          assert required <= passed, "Missing required native cases: " + repr(sorted(required - passed))
+          assert "\nPASS\n" in "\n" + text, "Native Go test process did not pass"
+          PY
+      - name: Check source permissions with the intended runtime identity
+        working-directory: services/runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo setpriv --reuid=10001 --regid=10001 --clear-groups \
+            --inh-caps=-all --ambient-caps=-all --bounding-set=-all --no-new-privs \
+            env GOMAXPROCS=2 "$RUNNER_TEMP/feed-reader.test" \
+            -test.v -test.count=1 -test.timeout=30s \
+            '-test.run=^TestSourceCoverageIntendedRuntimeIdentity$' \
+            2>&1 | tee "$RUNNER_TEMP/source-identity.log"
+          python3 - "$RUNNER_TEMP/source-identity.log" <<'PY'
+          import pathlib, re, sys
+          text = pathlib.Path(sys.argv[1]).read_text()
+          assert re.findall(r"^--- PASS: ([A-Za-z0-9_]+) \(", text, re.M) == ["TestSourceCoverageIntendedRuntimeIdentity"]
+          assert "--- SKIP:" not in text and "--- FAIL:" not in text and "\nPASS\n" in "\n" + text
+          PY

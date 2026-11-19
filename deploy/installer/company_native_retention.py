@@ -44,7 +44,7 @@ def load_package(package=PACKAGE):
         captured[name] = raw
     require(set(captured) == {'cli', 'delivery', 'record', 'store', 'crypto', 'station', 'request', 'records',
                               'configuration', 'configuration_worker', 'repository_io', 'repository_worker',
-                              'runtime_pair_parent', 'runtime_pair_worker', 'stored_startup', 'startup_worker',
+                              'runtime_pair_parent', 'runtime_pair_worker', 'stored_startup', 'startup_worker', 'preparation_handoff',
                               'render_io', 'render_commands', 'render_verify', 'render_worker',
                               'host_tool_profiles', 'host_packages', 'host_package_runtime', 'foundation_worker',
                               'engine_packages', 'engine_native', 'engine_elf', 'infrastructure_host', 'infrastructure_policy', 'infrastructure_io', 'infrastructure_transport', 'infrastructure_probe', 'infrastructure_commands', 'infrastructure_evidence', 'infrastructure_verify', 'infrastructure_predecessor', 'infrastructure_worker', 'identity_io', 'identity_commands', 'identity_evidence', 'identity_split', 'identity_worker', 'identity_predecessor', 'quota_units', 'quota_service', 'quota_worker'})
@@ -129,6 +129,7 @@ def main(argv=None):
         'configuration-action', 'configure-foundation', 'verify-configuration',
         'repository-action', 'seed-repository', 'verify-repository',
         'runtime-pair-action', 'initialize-runtime-pair', 'verify-runtime-pair',
+        'preparation-handoff-action', 'verify-completed-preparation',
         'continuation-ready', 'startup-action', 'inspect-stored-startup', 'verify-stored-startup',
         'render-action', 'render-ready', 'render-configuration', 'verify-render',
         'infrastructure-action','infrastructure-ready','initialize-private-infrastructure','verify-private-infrastructure',
@@ -137,6 +138,8 @@ def main(argv=None):
     p.add_argument('--request', required=True)
     p.add_argument('--stage', choices=STAGES)
     p.add_argument('--parent', nargs=7)
+    p.add_argument('--predecessor')
+    p.add_argument('--guided-package-sha')
     p.add_argument('--persist', action='store_true')
     a = p.parse_args(argv)
     require(type(PACKAGE) is dict, 'company-packaged-worker-required')
@@ -147,6 +150,13 @@ def main(argv=None):
     request_raw = S.read_protected(a.request, 4096)
     request = modules['request'].validate_request(request_raw, request_sha256=sha(request_raw))
     require(Path(a.request).stem == request['operationId'] and request['operationId'] != '0'*32)
+    if a.command in modules['preparation_handoff'].COMMANDS:
+        require(a.stage is None and not a.persist and a.predecessor is not None and a.guided_package_sha is not None)
+        worker_raw=S.read_protected(Path(__file__),2*1024**2)
+        modules['preparation_handoff'].run(a.command,modules,delivery,auth,request,request_raw,sha(worker_raw),
+            a.parent,a.predecessor,a.guided_package_sha,host_catalogs=host_catalogs())
+        return
+    require(a.predecessor is None and a.guided_package_sha is None)
     for label in ('infrastructure_worker','identity_worker','quota_worker'):
         if a.command in modules[label].COMMANDS:
             require(a.stage is None and not a.persist)

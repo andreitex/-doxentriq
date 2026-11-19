@@ -566,10 +566,111 @@ def versioned_result(measured,package_readback):
     return dict(measured,schemaVersion=2,hostPackages=package_readback)
 
 
+def completed_foundation(state, P, request, worker_sha, predecessor, full_sha, *, current_session=None):
+    """Read the exact old completion and effects; never reopen its parent scope."""
+    require(type(predecessor) is str and P.SESSION.fullmatch(predecessor) is not None)
+    require(type(worker_sha) is str and P.DIGEST.fullmatch(worker_sha) is not None)
+    require(type(full_sha) is str and P.DIGEST.fullmatch(full_sha) is not None)
+    request_sha=sha(canonical(request));require(full_sha!=request_sha)
+    require(current_session is None or (P.SESSION.fullmatch(current_session) is not None and current_session!=predecessor))
+    admission=Path(P.BASE);session=admission/'sessions'/predecessor
+    snapshot={}
+    def record(p):
+        before=state.protected(p);P.protected(P.Metadata.of(before))
+        raw=state.read(p,P.RECORD_MAX)
+        require(identity(state.protected(p))==identity(before))
+        snapshot[str(p)]=dict(identity=identity(before),sha256=sha(raw))
+        return raw
+    before=state.observe_directory(session);P.protected(P.Metadata.of(before),directory=True)
+    binding=record(admission/'binding')
+    raw=record(session/'intent')
+    saved=P.record(raw,'install-session-v1',('session','request','binding','directory','closed'))
+    require(saved['session']==predecessor and saved['request']==request_sha and saved['binding']==sha(binding) and saved['closed']=='true')
+    P.shell_metadata(saved['directory'],P.Metadata.of(before),directory=True)
+    names=state.names(session)
+    basic=['complete','foundation.confirmed','foundation.intent','intent']
+    require(names==basic or names==sorted(basic+['prerequisites.intent','prerequisites.confirmed']))
+    manifest=b'';outcome=None
+    for stage in ('foundation','prerequisites'):
+        if stage+'.intent' not in names:continue
+        action=sha((('foundation-v1:'+request_sha+':'+worker_sha)if stage=='foundation'else 'prerequisites-v1:'+request_sha).encode())
+        require(record(session/(stage+'.intent'))==f'install-stage-v1\nsession={predecessor}\nstage={stage}\naction={action}\nclosed=true\n'.encode())
+        confirmation=record(session/(stage+'.confirmed'))
+        value=P.record(confirmation,'install-stage-confirmed-v1',('session','stage','action','outcome','independently_confirmed'))
+        require(value['session']==predecessor and value['stage']==stage and value['action']==action
+            and P.DIGEST.fullmatch(value['outcome']) is not None and value['independently_confirmed']=='true')
+        if stage=='foundation':outcome=value['outcome']
+        manifest+=confirmation
+    require(record(session/'complete')==f'install-complete-v1\nsession={predecessor}\nrequest={request_sha}\nmanifest={sha(manifest)}\nfinal={outcome}\nindependently_confirmed=true\n'.encode())
+    require(state.names(session)==names and identity(state.observe_directory(session))==identity(before))
+    snapshot[str(session)]=dict(identity=identity(before),names=names)
+    # Only the original foundation and this new live handoff may use either
+    # exact request. Preparation or any earlier handoff cannot be replayed.
+    sessions=state.names(admission/'sessions');require(len(sessions)<=P.SESSION_MAX)
+    for name in sessions:
+        require(P.SESSION.fullmatch(name) is not None)
+        if name in (predecessor,current_session):continue
+        value=P.record(state.read(admission/'sessions'/name/'intent',P.RECORD_MAX),'install-session-v1',('session','request','binding','directory','closed'))
+        require(value['request'] not in (request_sha,full_sha))
+    evidence=BASE/'evidence'/request['operationId']
+    require(state.names(evidence)==['intent.json','result.json','verified'])
+    retained={};evidence_snapshot={}
+    for name in ('intent.json','result.json','verified'):
+        before_record=state.protected(evidence/name)
+        require(stat.S_IMODE(before_record.st_mode)==0o600)
+        retained[name]=state.read(evidence/name,32768)
+        require(identity(state.protected(evidence/name))==identity(before_record))
+        evidence_snapshot[name]=dict(identity=identity(before_record),sha256=sha(retained[name]))
+    require(retained['intent.json']==canonical(request) and sha(retained['result.json'])==outcome)
+    result=json.loads(retained['result.json']);require(canonical(result)==retained['result.json'] and result.get('schemaVersion')==2)
+    require(retained['verified']==f"foundation-verified-v1\noperation={request['operationId']}\noutcome={outcome}\n".encode())
+    snapshot['foundationEvidence']=evidence_snapshot
+    return sha(canonical(snapshot)),outcome
+
+
+def handoff_action(request, worker_sha, predecessor, full_sha, package_sha, snapshot):
+    require(all(type(value) is str and re.fullmatch('[a-f0-9]{64}',value) is not None
+        for value in (worker_sha,full_sha,package_sha,snapshot)))
+    require(type(predecessor) is str and re.fullmatch('s-[A-Za-z0-9]{12}',predecessor) is not None)
+    return sha(f'foundation-handoff-v1:{sha(canonical(request))}:{full_sha}:{worker_sha}:{package_sha}:{predecessor}:{snapshot}'.encode())
+
+
 class Worker:
     def __init__(self,modules,state,runner,*,output_guard=persisted_output,host_catalogs=HOST_CATALOGS):
         self.modules,self.state,self.runner,self.output_guard=modules,state,runner,output_guard
         self.host_catalogs=host_catalogs
+    def verified_measurement(self, request, final_root, held, package, tools, check):
+        """The original read-only verification, shared without its marker write."""
+        H,S,M=(self.modules[name]for name in ('company_host_package_runtime.py','company_native_station.py','installer_materialize.py'))
+        evidence=BASE/'evidence'/request['operationId']
+        with self.output_guard(held,final_root,M) as output:
+            output.recheck();retained=json.loads(self.state.read(evidence/'result.json'))
+            current=H.readback(package,tools,station=S,runner=self.runner,check_authority=check,**engine_components(self.modules))
+            measured=versioned_result(measure(self.state,self.runner,request,final_root,held,output=output),current)
+            H.verify_evidence(retained.get('hostPackages'),package,tools,current=current,engine_native=self.modules.get('company_engine_native.py'))
+            require(retained==measured);check();output.recheck()
+        return measured
+    def inspect_completed(self, request, parent_input, worker_sha, predecessor, full_sha, package_sha):
+        request=validate(request,COMPANY_FINGERPRINT);_,_,final_root,_=roots(request)
+        P,V=(self.modules[name]for name in ('installer_parent.py','verify-release.py'))
+        require(parent_input.stage=='foundation-handoff' and parent_input.request==sha(canonical(request)))
+        with P.hold_parent(parent_input) as parent:
+            original=completed_foundation(self.state,P,request,worker_sha,predecessor,full_sha,current_session=parent_input.session)
+            require(parent_input.action==handoff_action(request,worker_sha,predecessor,full_sha,package_sha,original[0]))
+            with V.authenticated_deployment(request['bundleRoot'],request['keyPath'],COMPANY_FINGERPRINT,
+                    expected_architecture='x86_64',source_root=request['sourceRoot']) as held:
+                require(held.metadata['releaseSha256']==request['releaseSha256'])
+                S=self.modules['company_native_station.py']
+                def check():
+                    require(not UNKNOWN and not S.UNRELEASED);parent.check();held.recheck()
+                    require(completed_foundation(self.state,P,request,worker_sha,predecessor,full_sha,current_session=parent_input.session)==original)
+                package,tools=host_bindings(self.modules,self.host_catalogs);check()
+                measured=self.verified_measurement(request,final_root,held,package,tools,check)
+                require(sha(canonical(measured))==original[1]);check()
+            parent.check()
+            require(completed_foundation(self.state,P,request,worker_sha,predecessor,full_sha,current_session=parent_input.session)==original)
+        require(not UNKNOWN)
+        return measured
     def run(self,request,parent_input,*,verify=False):
         request=validate(request,COMPANY_FINGERPRINT);stage_parent,final_parent,final_root,evidence=roots(request)
         P=self.modules['installer_parent.py'];V=self.modules['verify-release.py'];M=self.modules['installer_materialize.py']
@@ -581,12 +682,7 @@ class Worker:
             package,tools=host_bindings(self.modules,self.host_catalogs)
             check()
             if verify:
-                with self.output_guard(held,final_root,M) as output:
-                    output.recheck();retained=json.loads(self.state.read(evidence/'result.json'))
-                    current=H.readback(package,tools,station=S,runner=self.runner,check_authority=check,**engine_components(self.modules))
-                    measured=versioned_result(measure(self.state,self.runner,request,final_root,held,output=output),current)
-                    H.verify_evidence(retained.get('hostPackages'),package,tools,current=current,engine_native=self.modules.get('company_engine_native.py'))
-                    require(retained == measured);check();output.recheck()
+                measured=self.verified_measurement(request,final_root,held,package,tools,check)
             else:
                 for name in ('installation.intent.json','installation.json','installation.pending.json','storage.key'):
                     require(not self.state.exists(Path('/etc/autosoft')/name))
@@ -619,11 +715,24 @@ def main(argv=None):
     require(os.name == 'posix' and os.geteuid() == os.getegid() == 0 and sys.flags.isolated == 1 and sys.dont_write_bytecode)
     parser=argparse.ArgumentParser(description=__doc__)
     choice=parser.add_mutually_exclusive_group(required=True);choice.add_argument('--foundation-only',action='store_true');choice.add_argument('--verify',action='store_true');choice.add_argument('--describe',action='store_true')
+    choice.add_argument('--handoff-action',action='store_true');choice.add_argument('--inspect-completed',action='store_true')
+    parser.add_argument('--predecessor');parser.add_argument('--full-request-sha');parser.add_argument('--guided-package-sha')
     parser.add_argument('--request',required=True);parser.add_argument('--worker-sha',required=True);parser.add_argument('--parent',nargs=7)
     args=parser.parse_args(argv);state=NativeState()
     require(type(args.worker_sha) is str and re.fullmatch('[a-f0-9]{64}',args.worker_sha) is not None and sha(state.read(Path(__file__),524288)) == args.worker_sha)
     raw=state.read(path(args.request),4096);request=validate(json.loads(raw),COMPANY_FINGERPRINT);require(canonical(request) == raw)
     modules=load_trusted()
+    if args.handoff_action or args.inspect_completed:
+        require(args.predecessor is not None and args.full_request_sha is not None and args.guided_package_sha is not None)
+        P=modules['installer_parent.py']
+        if args.handoff_action:
+            require(args.parent is None)
+            prior=completed_foundation(state,P,request,args.worker_sha,args.predecessor,args.full_request_sha)
+            print(handoff_action(request,args.worker_sha,args.predecessor,args.full_request_sha,args.guided_package_sha,prior[0]));return
+        parent=P.ParentInput.from_argv(args.parent)
+        result=Worker(modules,state,NativeRunner()).inspect_completed(request,parent,args.worker_sha,args.predecessor,args.full_request_sha,args.guided_package_sha)
+        print(sha(canonical(result)));return
+    require(args.predecessor is None and args.full_request_sha is None and args.guided_package_sha is None)
     if args.describe:
         require(args.parent is None)
         package,tools=host_bindings(modules)

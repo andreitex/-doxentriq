@@ -601,8 +601,8 @@ func scannerFixtureFeed(t *testing.T) (string, string) {
 	if err := os.Mkdir(root, 0700); err != nil {
 		t.Fatal(err)
 	}
-	now := time.Now()
-	if err := atomicJSON(filepath.Join(cache, "trivy", "db", "metadata.json"), map[string]any{"Version": 2, "UpdatedAt": now, "NextUpdate": now.Add(24 * time.Hour)}); err != nil {
+	now := time.Now().UTC()
+	if err := atomicJSON(filepath.Join(cache, "trivy", "db", "metadata.json"), map[string]any{"Version": 2, "UpdatedAt": now, "NextUpdate": now.Add(24 * time.Hour), "DownloadedAt": now}); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(cache, "trivy", "db", "trivy.db"), []byte("synthetic-database"), 0644); err != nil {
@@ -638,23 +638,23 @@ func TestRuntimeImageScannerFeedBindsBytesMappingAndLimits(t *testing.T) {
 				}
 				return // Size policy only; no multi-GiB fixture or stream is created.
 			case "wrong_schema", "stale":
-				now := time.Now()
+				now := time.Now().UTC()
 				version := 2
 				if variant == "wrong_schema" {
 					version = 1
 				} else {
 					now = now.Add(-25 * time.Hour)
 				}
-				if atomicJSON(filepath.Join(cache, "trivy", "db", "metadata.json"), map[string]any{"Version": version, "UpdatedAt": now, "NextUpdate": time.Now().Add(time.Hour)}) != nil {
+				if atomicJSON(filepath.Join(cache, "trivy", "db", "metadata.json"), map[string]any{"Version": version, "UpdatedAt": now, "NextUpdate": time.Now().UTC().Add(time.Hour), "DownloadedAt": now}) != nil {
 					t.Fatal("fixture metadata failed")
 				}
 			case "elapsed_schedule", "invalid_schedule":
-				updated := time.Now().Add(-10 * time.Hour)
+				updated := time.Now().UTC().Add(-10 * time.Hour)
 				next := updated.Add(6 * time.Hour)
 				if variant == "invalid_schedule" {
 					next = updated.Add(-time.Hour)
 				}
-				if atomicJSON(filepath.Join(cache, "trivy", "db", "metadata.json"), map[string]any{"Version": 2, "UpdatedAt": updated, "NextUpdate": next}) != nil {
+				if atomicJSON(filepath.Join(cache, "trivy", "db", "metadata.json"), map[string]any{"Version": 2, "UpdatedAt": updated, "NextUpdate": next, "DownloadedAt": updated}) != nil {
 					t.Fatal("schedule fixture failed")
 				}
 			case "partial_java":
@@ -673,10 +673,10 @@ func TestRuntimeImageScannerFeedBindsBytesMappingAndLimits(t *testing.T) {
 			if variant == "same_timestamp_changed_bytes" && (err != nil || before.UpdatedAt != after.UpdatedAt || accessHash(before) == accessHash(after)) {
 				t.Fatal("timestamp substituted for byte evidence")
 			}
-			if variant == "elapsed_schedule" && err != nil {
-				t.Fatal("publisher schedule silently shortened 24-hour feed freshness")
+			if variant == "elapsed_schedule" && err == nil {
+				t.Fatal("expired publisher NextUpdate must refuse even within the 24-hour maximum age")
 			}
-			if variant != "valid" && variant != "elapsed_schedule" && variant != "same_timestamp_changed_bytes" && err == nil {
+			if variant != "valid" && variant != "same_timestamp_changed_bytes" && err == nil {
 				t.Fatal("unsupported feed admitted")
 			}
 		})

@@ -356,9 +356,11 @@ func (s *server) verify(w http.ResponseWriter, r *http.Request) {
 	// The trusted snapshot is immutable; generated stages only receive the distinct build workspace.
 	source := filepath.Join(s.data, "sources", in.AttemptID)
 	build := filepath.Join(s.data, "builds", in.AttemptID)
+	hostBuild := filepath.Join(s.hostRuntime, "builds", in.AttemptID)
+	var sourceScanError error
 	sourceHash, buildOwned, e := createVerificationSnapshots(workspace, source, build, in)
 	if buildOwned {
-		defer os.RemoveAll(build)
+		defer func() { cleanupVerificationBuild(build, hostBuild, sourceScanError) }()
 	}
 	if e != nil {
 		fail(w, 400, e)
@@ -380,10 +382,6 @@ func (s *server) verify(w http.ResponseWriter, r *http.Request) {
 	}
 	t := s.manifest.Templates[in.Pipeline.Template]
 	v := Verification{Evidence: Evidence{Status: "failed", CheckedAt: time.Now().UTC().Format(time.RFC3339), FeedUpdatedAt: "", Findings: []Finding{}, Checks: []Check{}}, Images: []string{}, Migrations: []Migration{}, AppID: in.AppID, AttemptID: in.AttemptID, FilesHash: in.FilesHash, InputSourceHash: sourceHash, SourceBindingVersion: sourceBindingVersion, PipelineHash: pipelineDefinitionHash(in.Pipeline), SourceHash: sourceHash, Template: in.Pipeline.Template, Schema: 1, SchemaMin: 1, SchemaMax: 1}
-	if feed, e := cachedFeed(); e == nil {
-		v.Evidence.FeedUpdatedAt = feed
-	}
-	hostBuild := filepath.Join(s.hostRuntime, "builds", in.AttemptID)
 	abort := func(stage string, e error) {
 		v.Evidence.Checks = append(v.Evidence.Checks, Check{stage, false, e.Error()})
 		_ = atomicJSON(receipt, v)
@@ -420,6 +418,11 @@ func (s *server) verify(w http.ResponseWriter, r *http.Request) {
 			abort("dependencies", e)
 			return
 		}
+	}
+	expectedSourceHash, e := sourceDigest(source)
+	if e != nil {
+		abort("dependencies", errors.New("Locked source inventory is unavailable"))
+		return
 	}
 	for _, name := range []string{"build", "application_tests"} {
 		stageDetail := "Offline gVisor stage completed within enforced limits"
@@ -485,7 +488,15 @@ func (s *server) verify(w http.ResponseWriter, r *http.Request) {
 		}
 		v.Evidence.Checks = append(v.Evidence.Checks, Check{name, true, stageDetail})
 	}
-	findings, feed, e := s.scan(r.Context(), hostBuild)
+	securityContext, cancelFeed, e := s.beginSecurityFeedScope(r.Context())
+	if e != nil {
+		v.Evidence.Status = "unavailable"
+		abort("vulnerability-feed", e)
+		return
+	}
+	defer cancelFeed()
+	r = r.WithContext(securityContext)
+	findings, feed, e := s.scanVerificationSource(r.Context(), hostBuild, sourceScannerInput{in.Pipeline.Template, expectedSourceHash, in.SourceBindingVersion}, &sourceScanError)
 	v.Evidence.Findings = findings
 	if feed != "" {
 		v.Evidence.FeedUpdatedAt = feed
@@ -504,7 +515,7 @@ func (s *server) verify(w http.ResponseWriter, r *http.Request) {
 		abort("security", e)
 		return
 	}
-	v.Evidence.Checks = append(v.Evidence.Checks, Check{"security", true, "Dependencies, configuration, secrets and high-risk source patterns scanned; fresh advisory database verified"})
+	v.Evidence.Checks = append(v.Evidence.Checks, Check{"security", true, "Exact supported dependency inventory, including development packages, matched; source secret rules, recognized configuration checks and high-risk source policy completed with fresh advisories"})
 	artifact := filepath.Join(s.data, "artifacts", in.AttemptID)
 	if _, e = copyTree(build, artifact, 512<<20, 100000); e != nil {
 		abort("image_packaging", e)
@@ -603,6 +614,13 @@ func (s *server) verify(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	v.Evidence.Checks = append(v.Evidence.Checks, Check{"acceptance", true, "Custom acceptance commands executed offline with read-only artifacts; tests, healthy preview, image digest and migration rehearsal are recorded"})
+	feed, e = checkSecurityFeedScope(r.Context())
+	if e != nil {
+		v.Evidence.Status = "unavailable"
+		abort("vulnerability-feed", e)
+		return
+	}
+	v.Evidence.FeedUpdatedAt = feed
 	v.Evidence.Status = "passed"
 	v.Evidence.CheckedAt = time.Now().UTC().Format(time.RFC3339)
 	if e = atomicJSON(receipt, v); e != nil {
@@ -626,18 +644,24 @@ func diagnosticOutput(output string) string {
 	return regexp.MustCompile(`(?i)(password|api[_-]?key|client[_-]?secret|access[_-]?token)\s*[:=]\s*("[^"\r\n]*"|'[^'\r\n]*'|[^\s,;]+)`).ReplaceAllString(output, "$1=[REDACTED]")
 }
 
-func cachedFeed() (string, error) {
-	b, e := os.ReadFile(filepath.Join(env("SECURITY_CACHE_DIR", "/data/security-cache"), "trivy", "db", "metadata.json"))
-	if e != nil {
-		return "", errors.New("Vulnerability feed is unavailable")
+func cachedFeed() (updated string, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	cache := env("SECURITY_CACHE_DIR", "/data/security-cache")
+	lease, err := holdSecurityFeed(ctx, filepath.Join(filepath.Dir(cache), "runtime"), cache)
+	if err != nil {
+		return "", imageScannerUnavailable
 	}
-	var m struct {
-		Updated time.Time `json:"UpdatedAt"`
+	defer func() {
+		if lease.Close() != nil {
+			updated, err = "", imageScannerUnavailable
+		}
+	}()
+	after, err := lease.Check(ctx)
+	if err != nil {
+		return "", imageScannerUnavailable
 	}
-	if json.Unmarshal(b, &m) != nil || m.Updated.IsZero() || time.Since(m.Updated) > 24*time.Hour || m.Updated.After(time.Now().Add(time.Minute)) {
-		return "", errors.New("Vulnerability feed is stale")
-	}
-	return m.Updated.UTC().Format(time.RFC3339), nil
+	return after.UpdatedAt, nil
 }
 func staticPolicy(root string) error {
 	return filepath.WalkDir(root, func(p string, d fs.DirEntry, e error) error {
@@ -662,68 +686,10 @@ func staticPolicy(root string) error {
 		return nil
 	})
 }
-func (s *server) scan(ctx context.Context, hostBuild string) ([]Finding, string, error) {
-	if !digestImage.MatchString(s.manifest.ScannerImage) {
-		return nil, "", errors.New("Pinned scanner is unavailable")
-	}
-	cache := env("HOST_SECURITY_CACHE_DIR", filepath.Join(env("HOST_DATA_DIR", ""), "security-cache"))
-	localCache := env("SECURITY_CACHE_DIR", "/data/security-cache")
-	b, e := os.ReadFile(filepath.Join(localCache, "trivy", "db", "metadata.json"))
-	if e != nil {
-		return nil, "", errors.New("Vulnerability feed unavailable; release is blocked")
-	}
-	var metadata struct {
-		UpdatedAt time.Time `json:"UpdatedAt"`
-	}
-	if json.Unmarshal(b, &metadata) != nil || time.Since(metadata.UpdatedAt) > 24*time.Hour || metadata.UpdatedAt.After(time.Now().Add(time.Minute)) {
-		return nil, "", errors.New("Vulnerability feed is stale or invalid")
-	}
-	// The bounded trusted runner combines stdout and stderr. Suppress scanner
-	// progress/log messages so only its JSON report reaches the protocol parser.
-	out, e := s.runner(ctx, "docker", "run", "--rm", "--runtime", env("RUNSC_RUNTIME", "runsc"), "--network", "none", "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--user", "10001:10001", "--memory", "1g", "--pids-limit", "128", "--tmpfs", "/tmp:size=128m,mode=1777", "--mount", "type=bind,src="+hostBuild+",dst=/workspace,readonly", "--mount", "type=bind,src="+cache+",dst=/cache,readonly", s.manifest.ScannerImage, "fs", "--quiet", "--config=", "--ignorefile=", "--cache-dir", "/cache/trivy", "--skip-db-update", "--skip-java-db-update", "--offline-scan", "--scanners", "vuln,misconfig,secret", "--format", "json", "/workspace")
-	if e != nil {
-		return nil, "", errors.New("Security scanner failed; publication is blocked")
-	}
-	var report struct {
-		SchemaVersion int `json:"SchemaVersion"`
-		Results       []struct {
-			Vulnerabilities []struct {
-				ID        string `json:"VulnerabilityID"`
-				Severity  string
-				Pkg       string `json:"PkgName"`
-				Installed string `json:"InstalledVersion"`
-				Fixed     string `json:"FixedVersion"`
-				Title     string
-			} `json:"Vulnerabilities"`
-			Misconfigurations []struct {
-				ID       string
-				Severity string
-				Title    string
-			} `json:"Misconfigurations"`
-			Secrets []struct {
-				ID       string `json:"RuleID"`
-				Severity string
-				Title    string
-			} `json:"Secrets"`
-		} `json:"Results"`
-	}
-	if json.Unmarshal([]byte(out), &report) != nil || report.SchemaVersion < 2 {
-		return nil, "", errors.New("Scanner returned invalid evidence")
-	}
-	findings := []Finding{}
-	for _, result := range report.Results {
-		for _, f := range result.Vulnerabilities {
-			findings = append(findings, Finding{f.ID, f.Severity, f.Pkg, f.Installed, f.Fixed, "trivy", f.Title})
-		}
-		for _, f := range result.Misconfigurations {
-			findings = append(findings, Finding{ID: f.ID, Severity: f.Severity, Source: "trivy-config", Description: f.Title})
-		}
-		for _, f := range result.Secrets {
-			findings = append(findings, Finding{ID: f.ID, Severity: f.Severity, Source: "trivy-secret", Description: f.Title})
-		}
-	}
-	return findings, metadata.UpdatedAt.UTC().Format(time.RFC3339), nil
+func (s *server) scan(ctx context.Context, hostBuild string, input sourceScannerInput) ([]Finding, string, error) {
+	return s.scanSourceSafely(ctx, hostBuild, input)
 }
+
 func readMigrations(root string) ([]Migration, error) {
 	b, e := os.ReadFile(filepath.Join(root, "migrations.json"))
 	if os.IsNotExist(e) {

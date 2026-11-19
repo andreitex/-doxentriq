@@ -200,10 +200,13 @@ func (s *server) provisionConnectorWithClock(w http.ResponseWriter, r *http.Requ
 		rejectDeployment(w, 409, errors.New("Protected connector state could not be verified"))
 		return
 	}
-	if _, e = cachedFeed(); e != nil {
+	securityContext, cancelFeed, e := s.beginSecurityFeedScope(r.Context())
+	if e != nil {
 		rejectDeployment(w, 409, e)
 		return
 	}
+	defer cancelFeed()
+	r = r.WithContext(securityContext)
 	findings, e := s.scanImage(r.Context(), template.Image)
 	if e != nil {
 		rejectDeployment(w, 409, e)
@@ -216,6 +219,10 @@ func (s *server) provisionConnectorWithClock(w http.ResponseWriter, r *http.Requ
 		}
 	}
 	if e = validateConnectorProvision(in, now(), os.Getenv("OWNER_SUBJECT")); e != nil {
+		rejectDeployment(w, 409, e)
+		return
+	}
+	if _, e = checkSecurityFeedScope(r.Context()); e != nil {
 		rejectDeployment(w, 409, e)
 		return
 	}
@@ -647,7 +654,12 @@ func (s *server) ensureAppConnectors(ctx context.Context, m AppManifest, v resou
 	if e != nil {
 		return e
 	}
-	feed, e := cachedFeed()
+	ctx, cancelFeed, e := s.beginSecurityFeedScope(ctx)
+	if e != nil {
+		return e
+	}
+	defer cancelFeed()
+	feed, e := securityFeedScopeUpdatedAt(ctx)
 	if e != nil {
 		return e
 	}
@@ -773,6 +785,9 @@ func (s *server) ensureAppConnectors(ctx context.Context, m AppManifest, v resou
 		if e != nil || strings.TrimSpace(out) != "share-verified" {
 			return errors.New("Approved share connectivity/permissions were not independently verified; app deployment remains blocked")
 		}
+		if _, e = checkSecurityFeedScope(ctx); e != nil {
+			return e
+		}
 		receipt := connectorLiveReceipt{m.ID, v.AppID, id, state.ScopeHash, state.Template.Image, adapterName, "as-connector-" + key + "-relay", time.Now().UTC().Format(time.RFC3339), feed, state.Input.ExpiresAt, "passed"}
 		if e = atomicJSON(filepath.Join(s.data, "connectors", "live", v.AppID, id+".json"), receipt); e != nil {
 			return e
@@ -780,6 +795,9 @@ func (s *server) ensureAppConnectors(ctx context.Context, m AppManifest, v resou
 		connections = append(connections, map[string]any{"id": id, "type": "samba", "reviewStatus": "approved", "appIds": []string{m.ID}, "roots": []string{state.Input.Root}, "capabilities": []string{"files.list", "files.read"}, "adapterUrl": "https://" + adapterAlias + ":8443"})
 	}
 	registry["connections"] = connections
+	if _, e = checkSecurityFeedScope(ctx); e != nil {
+		return e
+	}
 	data, _ := json.Marshal(registry)
 	if e = atomicTLSFile(filepath.Join(v.Secrets, "connector-registry.json"), data); e != nil {
 		return e
@@ -959,6 +977,14 @@ func (s *server) scanAppConnectors(ctx context.Context, m AppManifest) ([]Findin
 	if e := s.validateConnectorRefs(m); e != nil {
 		return nil, e
 	}
+	if len(m.Connections) == 0 {
+		return []Finding{}, nil
+	}
+	ctx, cancelFeed, err := s.beginSecurityFeedScope(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer cancelFeed()
 	images := map[string]bool{}
 	for _, id := range m.Connections {
 		filesystem, err := s.filesystemConnection(m.ID, id)
@@ -987,10 +1013,13 @@ func (s *server) scanAppConnectors(ctx context.Context, m AppManifest) ([]Findin
 	findings := []Finding{}
 	for _, image := range ordered {
 		value, e := s.scanImage(ctx, image)
-		if e != nil {
-			return nil, fmt.Errorf("Connector image security coverage unavailable: %w", e)
-		}
 		findings = append(findings, value...)
+		if e != nil {
+			return findings, fmt.Errorf("Connector image security coverage unavailable: %w", e)
+		}
+	}
+	if _, err := checkSecurityFeedScope(ctx); err != nil {
+		return findings, err
 	}
 	return findings, nil
 }

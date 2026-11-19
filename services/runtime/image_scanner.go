@@ -106,6 +106,10 @@ type imageScannerRecord struct {
 	FeedHash         string
 	CleanupConfirmed bool
 	CheckedAt        string
+	// Omitted on v1 image records: their retained JSON hashes stay unchanged.
+	ScanKind        string `json:"scanKind,omitempty"`
+	SourceWorkspace string `json:"sourceWorkspace,omitempty"`
+	NetworkMode     string `json:"networkMode,omitempty"`
 }
 
 const imageScannerFeedLimit = 512 << 20
@@ -145,7 +149,7 @@ func imageScannerFeed(ctx context.Context, runtimeRoot, localCache string) (imag
 	if !filepath.IsAbs(runtimeRoot) || filepath.Clean(runtimeRoot) != runtimeRoot || localCache != filepath.Join(base, "security-cache") || withdrawalAncestors(base, filepath.Join(localCache, "trivy", "db"), false) != nil {
 		return evidence, imageScannerUnavailable
 	}
-	var metadata []byte
+	metadata := map[string][]byte{}
 	for _, relative := range []string{"trivy/db/metadata.json", "trivy/db/trivy.db", "trivy/java-db/metadata.json", "trivy/java-db/trivy-java.db"} {
 		path := filepath.Join(localCache, filepath.FromSlash(relative))
 		if withdrawalAncestors(base, filepath.Dir(path), false) != nil || ctx.Err() != nil {
@@ -188,7 +192,7 @@ func imageScannerFeed(ctx context.Context, runtimeRoot, localCache string) (imag
 				break
 			}
 			_, _ = hash.Write(buffer[:n])
-			if relative == "trivy/db/metadata.json" {
+			if strings.HasSuffix(relative, "/metadata.json") {
 				_, _ = small.Write(buffer[:n])
 			}
 			if readErr == io.EOF {
@@ -205,24 +209,26 @@ func imageScannerFeed(ctx context.Context, runtimeRoot, localCache string) (imag
 			return evidence, imageScannerUnavailable
 		}
 		evidence.Files[relative], evidence.Sizes[relative] = hex.EncodeToString(hash.Sum(nil)), total
-		if relative == "trivy/db/metadata.json" {
-			metadata = small.Bytes()
+		if strings.HasSuffix(relative, "/metadata.json") {
+			metadata[relative] = small.Bytes()
 		}
 	}
 	if (evidence.Files["trivy/java-db/metadata.json"] == "absent") != (evidence.Files["trivy/java-db/trivy-java.db"] == "absent") {
 		return evidence, imageScannerUnavailable
 	}
-	m, err := imageScannerJSON(metadata)
-	if err != nil || !scannerNumber(m["Version"], 2) {
-		return evidence, imageScannerUnavailable
+	for path, raw := range metadata {
+		version := 2
+		if path == "trivy/java-db/metadata.json" {
+			version = 1
+		}
+		updated, err := securityFeedMetadata(raw, version, time.Now())
+		if err != nil {
+			return evidence, imageScannerUnavailable
+		}
+		if version == 2 {
+			evidence.UpdatedAt = updated
+		}
 	}
-	updated, err := time.Parse(time.RFC3339Nano, scannerString(m["UpdatedAt"]))
-	next, nextErr := time.Parse(time.RFC3339Nano, scannerString(m["NextUpdate"]))
-	now := time.Now()
-	if err != nil || nextErr != nil || updated.IsZero() || now.Sub(updated) > 24*time.Hour || updated.After(now.Add(time.Minute)) || !next.After(updated) {
-		return evidence, imageScannerUnavailable
-	}
-	evidence.UpdatedAt = updated.UTC().Format(time.RFC3339Nano)
 	return evidence, nil
 }
 
@@ -256,6 +262,7 @@ type imageScannerExecution struct {
 }
 type imageScannerSpec struct {
 	name, image, runtime, network, cache, ca, envFile string
+	workspace                                         string
 	command, environment, hosts                       []string
 	imageConfig                                       map[string]any
 	descriptor                                        map[string]any
@@ -315,7 +322,7 @@ func imageScannerPriorClear(root string) error {
 	}
 	var record imageScannerRecord
 	file = filepath.Join(directory, active.OperationID, "state.enc")
-	if withdrawalAncestors(root, filepath.Dir(file), false) != nil || readImageScannerPrivate(file, &record) != nil || record.Version != 1 || record.OperationID != active.OperationID || !record.CleanupConfirmed || !exactDockerID.MatchString(record.ContainerID) || !exactDockerID.MatchString(record.NetworkID) || !exactDockerID.MatchString(record.FeedHash) || !exactDockerID.MatchString(record.ProfileHash) || !exactDockerID.MatchString(record.RawPrestartHash) || !digestImage.MatchString(record.Image) || !digestImage.MatchString(record.Scanner) || (record.Status != "completed" && record.Status != "unavailable") || accessHash(record) != active.RecordHash {
+	if withdrawalAncestors(root, filepath.Dir(file), false) != nil || readImageScannerPrivate(file, &record) != nil || !scannerRecordTargetValid(record) || record.OperationID != active.OperationID || !record.CleanupConfirmed || !exactDockerID.MatchString(record.ContainerID) || !exactDockerID.MatchString(record.NetworkID) || !exactDockerID.MatchString(record.FeedHash) || !exactDockerID.MatchString(record.ProfileHash) || !exactDockerID.MatchString(record.RawPrestartHash) || !digestImage.MatchString(record.Scanner) || (record.Status != "completed" && record.Status != "unavailable") || accessHash(record) != active.RecordHash {
 		return imageScannerUnavailable
 	}
 	return nil
@@ -629,6 +636,9 @@ func scannerEnvironment(base any, supplied []string) (map[string]string, error) 
 }
 
 func (s imageScannerSpec) create() []string {
+	if s.workspace != "" {
+		return s.sourceCreate()
+	}
 	args := []string{"create", "--name", s.name, "--hostname", s.name, "--label", "io.autosoft.runtime-image-scan=" + strings.TrimPrefix(s.name, "as-image-scan-"), "--runtime", s.runtime, "--network", s.network, "--read-only", "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--user", "10001:10001", "--workdir", "/", "--cpus", "1", "--memory", "3g", "--memory-swap", "3g", "--pids-limit", "128", "--restart", "no", "--log-driver", "none", "--no-healthcheck", "--stop-signal", "SIGTERM", "--tmpfs", "/tmp:size=128m,mode=1777", "--mount", "type=bind,src=" + s.cache + ",dst=/cache,readonly", "--mount", "type=bind,src=" + s.ca + ",dst=/etc/autosoft/ca.crt,readonly"}
 	for _, host := range s.hosts {
 		args = append(args, host)
@@ -709,7 +719,12 @@ func (x *imageScannerExecution) inspect(ctx context.Context) (map[string]any, st
 	for k, v := range scannerMap(x.spec.imageConfig["Labels"]) {
 		expected[k] = v
 	}
-	expected["io.autosoft.runtime-image-scan"] = x.r.OperationID
+	label := "io.autosoft.runtime-image-scan"
+	memory := int64(3 << 30)
+	if x.spec.workspace != "" {
+		label, memory = "io.autosoft.runtime-source-scan", 1<<30
+	}
+	expected[label] = x.r.OperationID
 	base, e := scannerEnvironment(x.spec.imageConfig["Env"], x.spec.environment)
 	actual, ae := scannerEnvironment(c["Env"], nil)
 	if e != nil || ae != nil || !reflect.DeepEqual(base, actual) || accessHash(labels) != accessHash(expected) {
@@ -723,7 +738,7 @@ func (x *imageScannerExecution) inspect(ctx context.Context) (map[string]any, st
 			return nil, "", imageScannerUnavailable
 		}
 	}
-	if h["Runtime"] != x.spec.runtime || h["NetworkMode"] != x.spec.network || !scannerBool(h["ReadonlyRootfs"], true) || !scannerBool(h["Privileged"], false) || !scannerBool(h["AutoRemove"], false) || !scannerNumber(h["NanoCpus"], 1000000000) || !scannerNumber(h["Memory"], 3<<30) || !scannerNumber(h["MemorySwap"], 3<<30) || !scannerNumber(h["PidsLimit"], 128) || !scannerEmpty(h["CapAdd"]) || accessHash(h["CapDrop"]) != accessHash([]string{"ALL"}) || !scannerEmpty(h["PortBindings"]) || !scannerEmpty(h["Devices"]) || !scannerEmpty(h["DeviceRequests"]) || h["PidMode"] != "" || h["UTSMode"] != "" || h["IpcMode"] != "private" || h["UsernsMode"] != "" || accessHash(h["Tmpfs"]) != accessHash(map[string]string{"/tmp": "size=128m,mode=1777"}) || scannerMap(h["LogConfig"])["Type"] != "none" || scannerMap(h["RestartPolicy"])["Name"] != "no" {
+	if h["Runtime"] != x.spec.runtime || h["NetworkMode"] != x.spec.network || !scannerBool(h["ReadonlyRootfs"], true) || !scannerBool(h["Privileged"], false) || !scannerBool(h["AutoRemove"], false) || !scannerNumber(h["NanoCpus"], 1000000000) || !scannerNumber(h["Memory"], memory) || !scannerNumber(h["MemorySwap"], memory) || !scannerNumber(h["PidsLimit"], 128) || !scannerEmpty(h["CapAdd"]) || accessHash(h["CapDrop"]) != accessHash([]string{"ALL"}) || !scannerEmpty(h["PortBindings"]) || !scannerEmpty(h["Devices"]) || !scannerEmpty(h["DeviceRequests"]) || h["PidMode"] != "" || h["UTSMode"] != "" || h["IpcMode"] != "private" || h["UsernsMode"] != "" || accessHash(h["Tmpfs"]) != accessHash(map[string]string{"/tmp": "size=128m,mode=1777"}) || scannerMap(h["LogConfig"])["Type"] != "none" || scannerMap(h["RestartPolicy"])["Name"] != "no" {
 		return nil, "", imageScannerUnavailable
 	}
 	security, e := scannerStrings(h["SecurityOpt"])
@@ -752,8 +767,10 @@ func (x *imageScannerExecution) inspect(ctx context.Context) (map[string]any, st
 		source := ""
 		if dst == "/cache" {
 			source = x.spec.cache
-		} else if dst == "/etc/autosoft/ca.crt" {
+		} else if dst == "/etc/autosoft/ca.crt" && x.spec.workspace == "" {
 			source = x.spec.ca
+		} else if dst == "/workspace" && x.spec.workspace != "" {
+			source = x.spec.workspace
 		} else {
 			return nil, "", imageScannerUnavailable
 		}
@@ -770,7 +787,11 @@ func (x *imageScannerExecution) inspect(ctx context.Context) (map[string]any, st
 		return nil, "", imageScannerUnavailable
 	}
 	networks := scannerMap(scannerMap(m["NetworkSettings"])["Networks"])
-	if !imageScannerNetworkState(networks, state, x.spec.network) {
+	if x.spec.workspace != "" {
+		if !sourceScannerNetworkState(networks, state, x.r.NetworkID) || !scannerEmpty(scannerMap(m["NetworkSettings"])["Ports"]) || !scannerEmpty(c["ExposedPorts"]) {
+			return nil, "", imageScannerUnavailable
+		}
+	} else if !imageScannerNetworkState(networks, state, x.spec.network) {
 		return nil, "", imageScannerUnavailable
 	}
 	// Actual Docker29 lifecycle evidence permits only present null/false here.
@@ -788,6 +809,9 @@ func (x *imageScannerExecution) inspect(ctx context.Context) (map[string]any, st
 		profile[key] = v
 	}
 	profile["networkAuthority"] = map[string]string{"name": "autosoft_artifact", "id": x.spec.network}
+	if x.spec.workspace != "" {
+		profile["networkAuthority"] = map[string]string{"name": "none", "id": x.r.NetworkID}
+	}
 	hash := accessHash(profile)
 	if x.r.ProfileHash != "" && hash != x.r.ProfileHash {
 		return nil, "", imageScannerUnavailable
@@ -875,7 +899,7 @@ func (x *imageScannerExecution) cleanup() bool {
 
 func (x *imageScannerExecution) execute(ctx context.Context) (out []byte, err error) {
 	err = imageScannerUnavailable
-	if len(x.spec.hosts)%2 != 0 {
+	if len(x.spec.hosts)%2 != 0 || x.spec.workspace != "" && !x.sourceProfileValid() {
 		return nil, err
 	}
 	if x.retain() != nil || x.image(ctx) != nil {
@@ -976,10 +1000,16 @@ func (s *server) scanImageSafely(ctx context.Context, image string) (findings []
 	if env("HOST_SECURITY_CACHE_DIR", filepath.Join(hostData, "security-cache")) != filepath.Join(hostData, "security-cache") {
 		return nil, imageScannerUnavailable
 	}
-	feed, e := imageScannerFeed(ctx, s.data, localCache)
+	feedLease, e := holdSecurityFeed(ctx, s.data, localCache)
 	if e != nil {
 		return nil, imageScannerUnavailable
 	}
+	defer func() {
+		if feedLease.Close() != nil {
+			findings, err = nil, imageScannerUnavailable
+		}
+	}()
+	feed := feedLease.before
 	op := randomSecret()[:32]
 	dir := filepath.Join(s.data, "security", "runtime-image-scans", op)
 	docker := s.imageScannerDocker
@@ -1061,7 +1091,7 @@ func (s *server) scanImageSafely(ctx context.Context, image string) (findings []
 	if e != nil {
 		return nil, imageScannerUnavailable
 	}
-	after, e := imageScannerFeed(ctx, s.data, localCache)
+	after, e := feedLease.Check(ctx)
 	if e != nil || accessHash(after) != accessHash(feed) || x.d.retain(filepath.Join(dir, "feed-after.enc"), after) != nil {
 		return nil, imageScannerUnavailable
 	}

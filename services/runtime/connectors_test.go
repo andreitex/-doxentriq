@@ -42,10 +42,10 @@ func connectorManifestFixture(t *testing.T) connectorTemplate {
 }
 
 func TestConnectorScopeNeedsExactOwnerMFAReadonlyReviewAndExpiry(t *testing.T) {
-	if validConnectorName(strings.Repeat("ă", 121)) || !validConnectorName(strings.Repeat("ă", 120)) {
+	if validConnectorName(strings.Repeat("Äƒ", 121)) || !validConnectorName(strings.Repeat("Äƒ", 120)) {
 		t.Fatal("UTF8 byte limit differs from the sealed adapter scope")
 	}
-	now := time.Now()
+	now := time.Now().UTC()
 	valid := connectorApprovalFixture(now)
 	if e := validateConnectorProvision(valid, now, "permanent-owner"); e != nil {
 		t.Fatal(e)
@@ -65,7 +65,7 @@ func TestConnectorScopeNeedsExactOwnerMFAReadonlyReviewAndExpiry(t *testing.T) {
 }
 
 func TestConnectorDestinationCannotUseDNSPortsOrSpecialAddresses(t *testing.T) {
-	now := time.Now()
+	now := time.Now().UTC()
 	for _, target := range []string{"localhost", "share.example", "127.0.0.1", "169.254.169.254", "0.0.0.0", "224.0.0.1", "255.255.255.255", "::1", "10.23.23.99:445", "010.23.23.99", "240.0.0.1"} {
 		in := connectorApprovalFixture(now)
 		in.ServerIP = target
@@ -229,14 +229,17 @@ func TestConnectorApprovalCannotExpireWhileQueuedOrScanning(t *testing.T) {
 			t.Setenv("HOST_DATA_DIR", base)
 			t.Setenv("SECURITY_CACHE_DIR", filepath.Join(base, "security-cache"))
 			t.Setenv("BROKER_VAULT_KEY", base64.StdEncoding.EncodeToString(bytes.Repeat([]byte{7}, 32)))
-			if e := atomicJSON(filepath.Join(base, "security-cache", "trivy/db/metadata.json"), map[string]any{"Version": 2, "UpdatedAt": now, "NextUpdate": now.Add(24 * time.Hour)}); e != nil {
+			if e := atomicJSON(filepath.Join(base, "security-cache", "trivy/db/metadata.json"), map[string]any{"Version": 2, "UpdatedAt": now, "NextUpdate": now.Add(24 * time.Hour), "DownloadedAt": now}); e != nil {
 				t.Fatal(e)
 			}
 			if os.WriteFile(filepath.Join(base, "security-cache", "trivy/db/trivy.db"), []byte("synthetic-db"), 0644) != nil {
 				t.Fatal("fixture feed unavailable")
 			}
+			fixtureProtectedFeedLocks(t, filepath.Join(base, "security-cache"))
 			credentials := filepath.Join(data, "registry.json")
-			_ = os.WriteFile(credentials, []byte(`{"username":"fixture","password":"fixture"}`), 0600)
+			if err := os.WriteFile(credentials, []byte(`{"username":"fixture","password":"fixture"}`), 0600); err != nil {
+				t.Fatal(err)
+			}
 			t.Setenv("REGISTRY_CREDENTIALS_FILE", credentials)
 			calls := 0
 			key := bytes.Repeat([]byte{3}, 32)

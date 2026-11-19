@@ -1,5 +1,12 @@
 # Doxentriq website accuracy audit
 
+Homepage rechecked **19 November 2026** over certificate-verified HTTPS: HTTP
+200, 63,199 bytes, and the same SHA-256 as the 6 November capture below. The
+previously identified homepage claims and prepared corrections remain applicable;
+the live homepage has not incorporated them. This follow-up checked only the
+homepage, not the policy pages, hosting headers, public repository history or
+company operational practices. No website changes were published.
+
 Reviewed **6 November 2026** (Europe/Bucharest) against public source commit
 `1ff9302f1a67582568514088882fd89fa195df13`, the current administrator and
 installation guides, and retained trial verification. This is a factual product

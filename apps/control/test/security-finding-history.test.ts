@@ -311,3 +311,27 @@ test('saved legacy report hashes are recovered or held unavailable on equal-time
     }
   } finally { await c.close(); }
 });
+
+test('failed mixed-feed app reports retain earlier findings until coherent complete coverage', async () => {
+  const c = await setup(); try {
+    const { app, release } = fixture(); app.activeReleaseId = null; release.status = 'ready';
+    await c.store.transaction(state => { state.apps[app.id] = app; state.releases[release.id] = release; });
+    const scope = { subject: 'app' as const, appId: app.id, releaseId: release.id };
+    const coverage = ['vulnerability-feed', 'immutable-source', 'source-dependencies-configuration-secrets', 'source-security-policy', 'image-packages', 'scoped-connectors'].map(name => ({ name, status: 'passed' as const, detail: 'Synthetic coherent reader evidence' }));
+    await c.ingest(report(0, { ...scope, coverage }));
+    const second = finding('MEDIUM', { id: 'CVE-NEW-SOURCE', package: 'new-library' });
+    await c.ingest(report(1, { ...scope, status: 'failed', findings: [second], coverage: coverage.map(item => item.name === 'vulnerability-feed' ? { ...item, status: 'unavailable' as const, detail: 'Snapshot changed between readers; earlier findings retained' } : item) }));
+    const saved = await c.store.read(state => securityFindingSnapshot(state, scope));
+    assert.deepEqual(saved.findings.map(item => item.id).sort(), ['CVE-HISTORY', 'CVE-NEW-SOURCE']);
+    assert.equal(saved.resolvedThrough, timestamp(0));
+    assert.equal((await c.notifications()).filter(item => item.title.includes('finding resolved')).length, 0);
+    const review = await c.server.inject({ method: 'POST', url: `/api/v1/releases/${release.id}/approval`, headers: c.admin, payload: {} });
+    assert.equal(review.statusCode, 200, review.body);
+    const approval = review.json().approval;
+    const approve = await c.server.inject({ method: 'POST', url: `/api/v1/approvals/${approval.id}/approve`, headers: c.admin, payload: { artifactHash: approval.artifactHash } });
+    assert.equal(approve.statusCode, 409, approve.body); assert.equal(c.deployments(), 0);
+    await c.ingest(report(2, { ...scope, status: 'failed', findings: [second], coverage }));
+    assert.deepEqual((await c.store.read(state => securityFindingSnapshot(state, scope))).findings.map(item => item.id), ['CVE-NEW-SOURCE']);
+    assert.equal((await c.notifications()).filter(item => item.title.includes('finding resolved')).length, 1);
+  } finally { await c.close(); }
+});

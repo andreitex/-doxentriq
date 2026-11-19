@@ -282,10 +282,13 @@ func (s *server) executeDeployment(w http.ResponseWriter, r *http.Request, in de
 		fail(w, 409, errors.New("Authorized application manifest unavailable"))
 		return
 	}
-	if _, e = cachedFeed(); e != nil {
+	securityContext, cancelFeed, e := s.beginSecurityFeedScope(r.Context())
+	if e != nil {
 		rejectDeployment(w, 409, e)
 		return
 	}
+	defer cancelFeed()
+	r = r.WithContext(securityContext)
 	findings, e := s.scanImage(r.Context(), in.Release.Images[0])
 	if e != nil {
 		rejectDeployment(w, 409, e)
@@ -321,17 +324,21 @@ func (s *server) executeDeployment(w http.ResponseWriter, r *http.Request, in de
 			return
 		}
 	}
-	if in.RecoveryGrant != nil {
-		if e = atomicJSON(filepath.Join(s.data, "recovery-grants", in.RecoveryGrant.ID+".json"), in.RecoveryGrant); e != nil {
-			fail(w, 500, e)
-			return
-		}
-	}
 	var previousRuntime *pinnedRuntime
 	if current != nil {
 		previousRuntime, e = s.pinPublishedRuntime(r.Context(), in.App.ID, current)
 		if e != nil {
 			rejectDeployment(w, 409, e)
+			return
+		}
+	}
+	if _, e = checkSecurityFeedScope(r.Context()); e != nil {
+		rejectDeployment(w, 409, e)
+		return
+	}
+	if in.RecoveryGrant != nil {
+		if e = atomicJSON(filepath.Join(s.data, "recovery-grants", in.RecoveryGrant.ID+".json"), in.RecoveryGrant); e != nil {
+			fail(w, 500, e)
 			return
 		}
 	}
@@ -379,6 +386,10 @@ func (s *server) executeDeployment(w http.ResponseWriter, r *http.Request, in de
 		return
 	}
 	if e = s.checkRetirableAppConnectors(r.Context(), in.App.ID, resources.AppID, container); e != nil {
+		fail(w, 409, e)
+		return
+	}
+	if _, e = checkSecurityFeedScope(r.Context()); e != nil {
 		fail(w, 409, e)
 		return
 	}

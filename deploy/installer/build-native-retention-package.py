@@ -31,6 +31,7 @@ PROGRAMS = {
     'runtime_pair_worker': 'deploy/installer/company_runtime_pair_worker.py',
     'stored_startup': 'deploy/installer/company_stored_startup.py',
     'startup_worker': 'deploy/installer/company_startup_worker.py',
+    'preparation_handoff': 'deploy/installer/company_preparation_handoff.py',
     'render_io': 'deploy/installer/company_render_io.py',
     'render_commands': 'deploy/installer/company_render_commands.py',
     'render_verify': 'deploy/installer/company_render_verify.py',

@@ -113,7 +113,14 @@ class ActualSecurityCaller(unittest.TestCase):
             return types.SimpleNamespace(returncode=0)
         def kernel(host,feed,query):
             return dict(coverage=dict(name='host-running-kernel-vendor-advisories',status='passed',detail='Synthetic kernel coverage'),findings=[])
-        return task,records,calls,dict(write=write,run=run,check_running_kernel=kernel)
+        # This harness tests caller diagnostics only. Actual lock/byte binding is
+        # exercised separately by NativeLease with the real SecurityFeedScope.
+        class DiagnosticScope:
+            updated_at = '2026-10-11T00:00:00Z'
+            def __init__(self, cache): self.cache = cache
+            def __enter__(self): return self
+            def __exit__(self, *args): return False
+        return task,records,calls,dict(write=write,run=run,check_running_kernel=kernel,SecurityFeedScope=DiagnosticScope)
 
     @staticmethod
     def raise_error(error):
@@ -126,6 +133,44 @@ class ActualSecurityCaller(unittest.TestCase):
         with patch.dict(C.Maintenance.security.__globals__,functions),patch('builtins.print'),self.assertRaisesRegex(ValueError,'Initial security gate failed'):
             task.security('--gate')
         return records['security/latest-host.json'],calls
+
+    def test_final_scope_failure_preserves_findings_and_apps_run_after_scope_exit(self):
+        with tempfile.TemporaryDirectory() as temp:
+            task,records,calls,functions=self.fixture(temp)
+            task.scan_image=lambda image:dict(Results=[dict(Vulnerabilities=[dict(VulnerabilityID='CVE-fixture',Severity='MEDIUM',PkgName='fixture')])])
+            state={'active':False}
+            class FailedScope:
+                updated_at='2026-10-11T00:00:00Z'
+                def __init__(self, cache): pass
+                def __enter__(self):state['active']=True;return self
+                def __exit__(self, *args):
+                    state['active']=False
+                    raise S.ScannerUnavailable('security-report-feed-changed')
+            functions['SecurityFeedScope']=FailedScope
+            task.mysql=lambda query:json.dumps(dict(id='release1',appId='app1'))
+            def app(release):
+                self.assertFalse(state['active'])
+                return dict(subject='app',appId='app1',releaseId='release1',status='unavailable')
+            task.app_security=app
+            with patch.dict(C.Maintenance.security.__globals__,functions),patch('builtins.print'):
+                task.security('--daily')
+            report=records['security/latest-host.json']
+            self.assertEqual(report['status'],'failed')
+            self.assertEqual([v['id'] for v in report['findings']],['CVE-fixture'])
+            feed=[v for v in report['coverage'] if v['name']=='vulnerability-feed']
+            self.assertEqual(len(feed),1);self.assertEqual(feed[0]['status'],'unavailable')
+            self.assertEqual(report['feedUpdatedAt'],FailedScope.updated_at)
+
+    def test_scope_acquisition_failure_cannot_dispatch_scans(self):
+        with tempfile.TemporaryDirectory() as temp:
+            task,records,calls,functions=self.fixture(temp)
+            def unavailable(cache):raise S.ScannerUnavailable('security-report-feed-changed')
+            functions['SecurityFeedScope']=unavailable
+            with patch.dict(C.Maintenance.security.__globals__,functions),patch('builtins.print'),self.assertRaisesRegex(ValueError,'Initial security gate failed'):
+                task.security('--gate')
+            report=records['security/latest-host.json']
+            self.assertEqual(calls,[]);self.assertEqual(report['findings'],[])
+            self.assertEqual(report['coverage'][0]['status'],'unavailable')
 
     def test_actual_image_failure_presents_fixed_diagnostic_and_remains_a_gate_blocker(self):
         with tempfile.TemporaryDirectory() as temp:

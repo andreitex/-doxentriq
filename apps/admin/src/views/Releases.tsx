@@ -8,7 +8,7 @@ export default function Releases({ app, releases, loading, error, onRetry, onRev
   app?: AppRecord; releases: ReleaseRecord[]; loading: boolean; error?: string; onRetry: () => void; principal?: Principal | null;
   onReview: (release: ReleaseRecord, action: ReleaseAction) => void;
 }) {
-  if (!app) return <EmptyState icon={Layers3} title="A home for every version">Select or create an application to see its previews, verified releases, and publishing history.</EmptyState>;
+  if (!app) return <EmptyState icon={Layers3} title="Choose an application">Select an app in the sidebar, or choose New application. Its previews and published versions will appear here.</EmptyState>;
   const previewUrl = safeUrl(app.previewUrl) ? `/api/v1/apps/${encodeURIComponent(app.id)}/preview-launch` : undefined;
   const appUrl = safeUrl(app.url);
   return <section className="workspace-page">
@@ -16,7 +16,7 @@ export default function Releases({ app, releases, loading, error, onRetry, onRev
     <div className="info-strip"><ShieldCheck size={19} /><p>Publishing is tied to the exact release you approve. Rollback compatibility and data safety are checked before deployment.</p></div>
     <details className="release-details"><summary>How to release an app safely</summary><div className="release-detail-content"><ol><li>Open the current preview and try the tasks your team will use.</li><li>Choose <strong>Review &amp; publish</strong>, read the changes and their data impact, then approve if they match your request.</li><li>Wait for <strong>Live version</strong>. Use <strong>Open application</strong> to share the app link, and manage its users in <strong>Access</strong>.</li></ol><p>App accounts are separate from platform administration. Local users need an invitation even when you are signed in as the platform owner.</p><p>A code rollback returns to a compatible app version. Restoring older data is a separate operation and can lose newer records.</p></div></details>
     {error && <ErrorBanner message={error} onRetry={onRetry} />}
-    {loading && releases.length === 0 ? <Loading label="Loading releases…" /> : releases.length === 0 ? <EmptyState icon={History} title="Your first release starts with a conversation">Describe your application in the chat. A release will appear here when the build produces a version you can review.</EmptyState> : <div className="release-list">{releases.map(release => {
+    {loading && releases.length === 0 ? <Loading label="Loading releases…" /> : releases.length === 0 ? !error && <EmptyState icon={History} title="Your first release starts with a conversation">Choose Conversation and describe what the app should do. Its first version will appear here when it is ready for review.</EmptyState> : <div className="release-list">{releases.map(release => {
       const active = app.activeReleaseId === release.id;
       const currentPreview = app.previewReleaseId === release.id;
       const passed = release.evidence.status === 'passed';
