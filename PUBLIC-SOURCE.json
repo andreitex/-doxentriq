@@ -745,8 +745,8 @@
     },
     {
       "path": "apps/control/test/integration-research.test.ts",
-      "sourceSha256": "4bf1c692cfad477f9444b669121900f36a07072b700f5eb3634a273ad3d99d94",
-      "exportSha256": "4bf1c692cfad477f9444b669121900f36a07072b700f5eb3634a273ad3d99d94",
+      "sourceSha256": "05fb8a73c2b6be7742b009ba0046b1637d0b9dc8dcfdd0c225cb56f67dc20ee2",
+      "exportSha256": "05fb8a73c2b6be7742b009ba0046b1637d0b9dc8dcfdd0c225cb56f67dc20ee2",
       "transformations": []
     },
     {
@@ -2775,8 +2775,8 @@
     },
     {
       "path": "scripts/public-release-reviewed-fixtures.json",
-      "sourceSha256": "ee53312f4bca1da132948a83c3e2d55f2e64b5582e8be64ab3af902d8ea95980",
-      "exportSha256": "ee53312f4bca1da132948a83c3e2d55f2e64b5582e8be64ab3af902d8ea95980",
+      "sourceSha256": "e7a6a4238fe1df64a73349d2771dbf44dacd7e8d730e821bfe6e135b6f2d492c",
+      "exportSha256": "e7a6a4238fe1df64a73349d2771dbf44dacd7e8d730e821bfe6e135b6f2d492c",
       "transformations": []
     },
     {
@@ -4889,8 +4889,8 @@
     },
     {
       "path": "tools/rehearse-dms-update.test.ts",
-      "sourceSha256": "1ec58aa13afcbfbb2f37a12dbbee32d4f8d4cf85e909e8b86d15e5dd44d163f3",
-      "exportSha256": "1ec58aa13afcbfbb2f37a12dbbee32d4f8d4cf85e909e8b86d15e5dd44d163f3",
+      "sourceSha256": "304deaea04e5f8759786bc278b1ddd228c4626ea5a4d7e4dc8b925b73d8c45b4",
+      "exportSha256": "304deaea04e5f8759786bc278b1ddd228c4626ea5a4d7e4dc8b925b73d8c45b4",
       "transformations": []
     },
     {

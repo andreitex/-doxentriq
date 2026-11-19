@@ -31,7 +31,7 @@
   },
   {
     "path": "apps/control/test/integration-research.test.ts",
-    "sha256": "4bf1c692cfad477f9444b669121900f36a07072b700f5eb3634a273ad3d99d94",
+    "sha256": "05fb8a73c2b6be7742b009ba0046b1637d0b9dc8dcfdd0c225cb56f67dc20ee2",
     "code": "credential_url",
     "reason": "Synthetic credential-bearing URL used only in a rejection/redaction test; reviewed source contains no production credential."
   },

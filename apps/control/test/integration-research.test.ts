@@ -9,12 +9,12 @@ import { join } from 'node:path';
 import { JsonStore } from '../src/store.ts';
 import { WorkflowEngine } from '../src/engine.ts';
 import { BudgetManager } from '../src/budget.ts';
-import { createIntegrationResearch, createResearchFetcher, publicResearchAddress, pinnedResearchHttps, validateIntegrationCatalog, IntegrationResearchUnavailable, type IntegrationCatalog, type ResearchInput } from '../src/integration-research.ts';
+import { createIntegrationResearch, createResearchFetcher, publicResearchAddress, pinnedResearchHttps, integrationCatalogSchema, validateIntegrationCatalog, IntegrationResearchUnavailable, type IntegrationCatalog, type ResearchInput } from '../src/integration-research.ts';
 import type { AppRecord, JobRecord } from '../../../packages/core/src/types.ts';
 
 const at = Date.now(), atText = new Date(at).toISOString();
-function catalog(): IntegrationCatalog {
-  const metadata = { publisher: 'Stripe', provenance: 'Official publisher documentation and SDK repository', license: 'MIT candidate; documentation terms apply separately', maintenance: 'Publisher repository as-of review; version/security/protocol qualification pending', reviewedBy: 'Company source review', reviewedAt: atText, reviewStatus: 'reviewed' as const, qualification: 'pending_dependency_and_protocol_checks' as const };
+function catalog(reviewedAt = atText): IntegrationCatalog {
+  const metadata = { publisher: 'Stripe', provenance: 'Official publisher documentation and SDK repository', license: 'MIT candidate; documentation terms apply separately', maintenance: 'Publisher repository as-of review; version/security/protocol qualification pending', reviewedBy: 'Company source review', reviewedAt, reviewStatus: 'reviewed' as const, qualification: 'pending_dependency_and_protocol_checks' as const };
   const sdkCandidate = { packageName: 'stripe', repository: 'https://github.com/stripe/stripe-node', version: 'not_selected' as const };
   return { schemaVersion: 1, integrations: [{ id: 'stripe', aliases: ['stripe'], sources: [
     { url: 'https://docs.stripe.com/api', purpose: 'documentation', sdkCandidate: null, metadata },
@@ -75,8 +75,8 @@ test('real transport policy uses pinned lookup, verified TLS and credential-free
   await assert.rejects(createResearchFetcher({ timeoutMs: 5, resolve: async () => [pin], transport: () => new Promise(() => {}) })(url.href), /timeout/);
 });
 
-test('company review requires fresh sourced provenance, exact SDK identity and license; catalog supports six recognized integrations', async () => {
-  validateIntegrationCatalog(catalog());
+test('company review requires sourced provenance, exact SDK identity and license', () => {
+  validateIntegrationCatalog(catalog(), at);
   for (const mutate of [
     (value: IntegrationCatalog) => { value.integrations[0]!.sources[0]!.metadata.license = 'unknown'; },
     (value: IntegrationCatalog) => { value.integrations[0]!.sources[0]!.metadata.provenance = 'unreviewed'; },
@@ -84,10 +84,23 @@ test('company review requires fresh sourced provenance, exact SDK identity and l
     (value: IntegrationCatalog) => { value.integrations[0]!.sources.pop(); },
     (value: IntegrationCatalog) => { value.integrations[0]!.sources[1]!.sdkCandidate = null; },
     (value: IntegrationCatalog) => { value.integrations[0]!.sources[0]!.url = 'https://user:password@docs.stripe.com/api'; }
-  ]) { const value = catalog(); mutate(value); assert.throws(() => validateIntegrationCatalog(value)); }
-  const installed = validateIntegrationCatalog(JSON.parse(await readFile('models/integrations.json', 'utf8'))); assert.deepEqual(installed.integrations.map(item => item.id), ['filesystem','samba','stripe','microsoft','google','efactura']);
+  ]) { const value = catalog(); mutate(value); assert.throws(() => validateIntegrationCatalog(value, at)); }
+});
+
+test('company source reviews enforce the exact 30-day expiry and one-minute future tolerance', () => {
+  const reviewedAt = '2026-01-15T12:00:00.000Z', reviewedTime = Date.parse(reviewedAt), lifetime = 30 * 86400000;
+  for (const elapsed of [lifetime - 1, lifetime, -59999, -60000]) assert.doesNotThrow(() => validateIntegrationCatalog(catalog(reviewedAt), reviewedTime + elapsed), `elapsed ${elapsed}`);
+  for (const elapsed of [lifetime + 1, -60001]) assert.throws(() => validateIntegrationCatalog(catalog(reviewedAt), reviewedTime + elapsed), /Company source provenance, license or maintenance review is missing or stale/, `elapsed ${elapsed}`);
+});
+
+test('checked-in integration catalog has six supported structures at its recorded review time, not current eligibility', async () => {
+  const recorded = integrationCatalogSchema.parse(JSON.parse(await readFile('models/integrations.json', 'utf8')));
+  const reviewedTime = Math.max(...recorded.integrations.flatMap(item => item.sources.map(source => Date.parse(source.metadata.reviewedAt))));
+  // This historical source check does not renew provenance or bypass the runtime freshness gate.
+  const installed = validateIntegrationCatalog(recorded, reviewedTime); assert.deepEqual(installed.integrations.map(item => item.id), ['filesystem','samba','stripe','microsoft','google','efactura']);
   assert.equal(installed.integrations.find(item => item.id === 'efactura')!.sources.some(source => source.sdkCandidate), false);
   const filesystem = installed.integrations.find(item => item.id === 'filesystem')!; assert.equal(filesystem.sources.some(source => source.purpose === 'license'), true); assert.ok(filesystem.sources.every(source => source.sdkCandidate === null));
+  assert.throws(() => validateIntegrationCatalog(recorded, reviewedTime + 30 * 86400000 + 1), /missing or stale/);
 });
 
 test('research persists separate bounded evidence, redacts credentials/scripts, and resume reuses only matching fresh context/catalog', async () => {
