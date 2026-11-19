@@ -349,12 +349,22 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          sudo setpriv --reuid=10001 --regid=10001 --clear-groups \
-            --inh-caps=-all --ambient-caps=-all --bounding-set=-all --no-new-privs \
-            env GOMAXPROCS=2 "$RUNNER_TEMP/feed-reader.test" \
-            -test.v -test.count=1 -test.timeout=30s \
-            '-test.run=^TestSourceCoverageIntendedRuntimeIdentity$' \
-            2>&1 | tee "$RUNNER_TEMP/source-identity.log"
+          # UID10001 must not depend on access through private runner directories.
+          DOXENTRIQ_IDENTITY_ROOT=$(sudo mktemp -d /srv/doxentriq-source-identity.XXXXXX)
+          sudo install -o root -g root -m 0555 "$RUNNER_TEMP/feed-reader.test" \
+            "$DOXENTRIQ_IDENTITY_ROOT/feed-reader.test"
+          sudo install -d -o 10001 -g 10001 -m 0700 "$DOXENTRIQ_IDENTITY_ROOT/tmp"
+          sudo chmod 0755 "$DOXENTRIQ_IDENTITY_ROOT"
+          cmp -- "$RUNNER_TEMP/feed-reader.test" "$DOXENTRIQ_IDENTITY_ROOT/feed-reader.test"
+          (
+            cd "$DOXENTRIQ_IDENTITY_ROOT"
+            sudo setpriv --reuid=10001 --regid=10001 --clear-groups \
+              --inh-caps=-all --ambient-caps=-all --bounding-set=-all --no-new-privs \
+              env GOMAXPROCS=2 TMPDIR="$DOXENTRIQ_IDENTITY_ROOT/tmp" \
+              "$DOXENTRIQ_IDENTITY_ROOT/feed-reader.test" \
+              -test.v -test.count=1 -test.timeout=30s \
+              '-test.run=^TestSourceCoverageIntendedRuntimeIdentity$'
+          ) 2>&1 | tee "$RUNNER_TEMP/source-identity.log"
           python3 - "$RUNNER_TEMP/source-identity.log" <<'PY'
           import pathlib, re, sys
           text = pathlib.Path(sys.argv[1]).read_text()
