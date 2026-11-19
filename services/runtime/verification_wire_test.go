@@ -3,11 +3,8 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 )
 
 func TestFailedVerificationWirePreservesActualChecks(t *testing.T) {
@@ -46,29 +43,20 @@ func TestFailedVerificationWirePreservesActualChecks(t *testing.T) {
 	}
 }
 
-func TestSourceScannerKeepsCombinedOutputMachineReadable(t *testing.T) {
-	cache := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(cache, "trivy", "db"), 0700); err != nil {
-		t.Fatal(err)
+func TestSourceScannerKeepsMachineOutputAndBlockingFindings(t *testing.T) {
+	s, f, workspace := sourceScannerServerFixture(t)
+	findings, feed, err := s.scan(context.Background(), workspace, sourceScannerFixtureInput(t, s))
+	if err != nil || feed == "" || len(findings) != 1 || !blockedSeverity(findings[0].Severity) || !f.removed {
+		t.Fatalf("Machine output must preserve Medium findings only after confirmed cleanup: %v", err)
 	}
-	metadata, _ := json.Marshal(map[string]string{"UpdatedAt": time.Now().UTC().Format(time.RFC3339)})
-	if err := os.WriteFile(filepath.Join(cache, "trivy", "db", "metadata.json"), metadata, 0600); err != nil {
-		t.Fatal(err)
-	}
-	t.Setenv("HOST_SECURITY_CACHE_DIR", cache)
-	t.Setenv("SECURITY_CACHE_DIR", cache)
-	s := server{manifest: testManifest(), runner: func(_ context.Context, _ string, args ...string) (string, error) {
-		flags := " " + strings.Join(args, " ") + " "
-		for _, flag := range []string{" --quiet ", " --config= ", " --ignorefile= "} {
-			if !strings.Contains(flags, flag) {
-				t.Fatalf("Missing scanner protocol control %s", flag)
+	for _, command := range f.calls {
+		if command[0] == "create" {
+			flags := " " + strings.Join(command, " ") + " "
+			for _, flag := range []string{" --quiet ", " --config= ", " --ignorefile= "} {
+				if !strings.Contains(flags, flag) {
+					t.Fatalf("missing protocol control %s", flag)
+				}
 			}
 		}
-		return `{"SchemaVersion":2,"Results":[{"Vulnerabilities":[{"VulnerabilityID":"CVE-fixture","Severity":"MEDIUM","PkgName":"fixture","InstalledVersion":"1"}]}]}`, nil
-	}}
-	s.manifest.ScannerImage = "registry:5000/scanner@sha256:" + strings.Repeat("c", 64)
-	findings, feed, err := s.scan(context.Background(), "/fixture")
-	if err != nil || feed == "" || len(findings) != 1 || !blockedSeverity(findings[0].Severity) {
-		t.Fatalf("Quiet machine output must preserve the blocking Medium finding: error=%v feed=%q findings=%d", err, feed, len(findings))
 	}
 }

@@ -21,6 +21,7 @@ UNITS=('autosoft.service','autosoft-quota.service','autosoft-security.service','
  'autosoft-restore-verify.service','autosoft-security.timer','autosoft-certificates.timer','autosoft-log-retention.timer',
  'autosoft-logs.timer','autosoft-backup.timer','autosoft-incremental.timer','autosoft-restore-verify.timer')
 PROPERTIES=('ActiveState','SubState','MainPID','ControlPID','ControlGroup','LoadState')
+TIMER_PROPERTIES=('ActiveState','SubState','LoadState')
 ENV=dict(PATH='/usr/bin:/bin',HOME='/nonexistent',LANG='C',LC_ALL='C',TZ='UTC',
  GIT_CONFIG_NOSYSTEM='1',GIT_CONFIG_SYSTEM='/dev/null',GIT_CONFIG_GLOBAL='/dev/null',
  GIT_NO_REPLACE_OBJECTS='1',GIT_OPTIONAL_LOCKS='0',GIT_TERMINAL_PROMPT='0')
@@ -339,12 +340,16 @@ class SeedRunner:
    and stdin is None and type(maximum) is int and maximum==CHUNK and type(timeout) is int and timeout==CALL_SECONDS
    and tool is None and type(environment) is dict and environment==ENV and all(type(k) is str and type(v) is str for k,v in environment.items()))
   args=tuple(argv);systemctl=('/usr/bin/systemctl','show',*('--property='+v for v in PROPERTIES),'--')
+  timer=('/usr/bin/systemctl','show',*('--property='+v for v in TIMER_PROPERTIES),'--')
   fixed=(('/usr/bin/docker','ps','-aq','--no-trunc'),('/usr/sbin/cryptsetup','luksUUID',self.storage),
    ('/usr/sbin/cryptsetup','status','autosoft-data'),('/usr/bin/findmnt','-n','-o','TARGET,SOURCE,FSTYPE,OPTIONS','--target',self.data),
+   ('/usr/bin/findmnt','-n','-o','TARGET,FSTYPE,OPTIONS,SIZE','--bytes','--target',self.data+'/runtime/builds'),
    ('/usr/bin/findmnt','-n','-o','SOURCE,FSTYPE,OPTIONS','--target',self.data),('/usr/sbin/xfs_quota','-x','-c','state -p',self.data))
   loop=(len(args)==6 and args[:5]==('/usr/sbin/losetup','--noheadings','--output','BACK-FILE','--')
         and re.fullmatch('/dev/loop[0-9]{1,10}',args[5]) is not None)
-  require(args in fixed or args[:len(systemctl)]==systemctl and len(args)==len(systemctl)+1 and args[-1] in UNITS or loop)
+  service_query=args[:len(systemctl)]==systemctl and len(args)==len(systemctl)+1 and args[-1] in UNITS and args[-1].endswith('.service')
+  timer_query=args[:len(timer)]==timer and len(args)==len(timer)+1 and args[-1] in UNITS and args[-1].endswith('.timer')
+  require(args in fixed or service_query or timer_query or loop)
   return args
  def read_tool(self,fd,size,offset):
   require(type(size) is int and 0<size<=CHUNK and type(offset) is int and offset>=0 and self.tool_read+size<=self.budget['toolReadBytes'])

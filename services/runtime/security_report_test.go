@@ -32,27 +32,31 @@ func TestDailySecurityBindsSourceAndImageToTheIndependentRelease(t *testing.T) {
 	if e := atomicJSON(filepath.Join(source, "app.manifest.json"), manifest); e != nil {
 		t.Fatal(e)
 	}
+	sourceScannerFixtureLocks(t, source, true)
 	hash, e := sourceDigest(source)
 	if e != nil {
 		t.Fatal(e)
 	}
 	image := "registry:5000/apps/app1@sha256:" + strings.Repeat("a", 64)
-	v := Verification{AppID: "app1", AttemptID: "attempt1", Template: manifest.Template, Commit: strings.Repeat("b", 40), Images: []string{image}, SourceHash: hash, Evidence: Evidence{Status: "passed"}}
+	v := Verification{AppID: "app1", AttemptID: "attempt1", Template: manifest.Template, Commit: strings.Repeat("b", 40), Images: []string{image}, SourceHash: hash, SourceBindingVersion: sourceBindingVersion, Evidence: Evidence{Status: "passed"}}
 	if e := atomicJSON(filepath.Join(data, "receipts", "attempt1.json"), v); e != nil {
 		t.Fatal(e)
 	}
 	cache := filepath.Join(base, "security-cache")
-	now := time.Now()
-	if e := atomicJSON(filepath.Join(cache, "trivy", "db", "metadata.json"), map[string]any{"Version": 2, "UpdatedAt": now, "NextUpdate": now.Add(24 * time.Hour)}); e != nil {
+	now := time.Now().UTC()
+	if e := atomicJSON(filepath.Join(cache, "trivy", "db", "metadata.json"), map[string]any{"Version": 2, "UpdatedAt": now, "NextUpdate": now.Add(24 * time.Hour), "DownloadedAt": now}); e != nil {
 		t.Fatal(e)
 	}
 	if e := os.WriteFile(filepath.Join(cache, "trivy", "db", "trivy.db"), []byte("synthetic-db"), 0644); e != nil {
 		t.Fatal(e)
 	}
+	fixtureProtectedFeedLocks(t, cache)
 	t.Setenv("SECURITY_CACHE_DIR", cache)
 	t.Setenv("HOST_DATA_DIR", base)
 	credentials := filepath.Join(data, "registry.json")
-	_ = os.WriteFile(credentials, []byte(`{"username":"fixture","password":"fixture"}`), 0600)
+	if err := os.WriteFile(credentials, []byte(`{"username":"fixture","password":"fixture"}`), 0600); err != nil {
+		t.Fatal(err)
+	}
 	t.Setenv("REGISTRY_CREDENTIALS_FILE", credentials)
 	scans := 0
 	s := &server{data: data, hostRuntime: data, manifest: RuntimeManifest{ScannerImage: "registry:5000/scanner@sha256:" + strings.Repeat("c", 64)}, runner: func(_ context.Context, _ string, args ...string) (string, error) {
@@ -68,6 +72,7 @@ func TestDailySecurityBindsSourceAndImageToTheIndependentRelease(t *testing.T) {
 	}}
 	installTrustedServiceTestFixture(t, s, "autosoft_artifact", "registry")
 	scanner := installImageScannerServerFixture(t, s, base, "MEDIUM")
+	sourceScanner := installSourceScannerServerFixture(t, s, base)
 	t.Setenv("BROKER_VAULT_KEY_FILE", "")
 	t.Setenv("BROKER_VAULT_KEY", base64.StdEncoding.EncodeToString([]byte(strings.Repeat("\x07", 32))))
 	if key, err := vaultKey(); err != nil || len(key) != 32 {
@@ -79,11 +84,11 @@ func TestDailySecurityBindsSourceAndImageToTheIndependentRelease(t *testing.T) {
 	response := httptest.NewRecorder()
 	s.releaseSecurity(response, request)
 	var report releaseSecurityReport
-	if response.Code != 200 || json.Unmarshal(response.Body.Bytes(), &report) != nil || report.ReleaseID != "release1" || scans != 1 {
+	if response.Code != 200 || json.Unmarshal(response.Body.Bytes(), &report) != nil || report.ReleaseID != "release1" || scans != 0 {
 		t.Fatalf("Daily result invalid: %s; scans%d", response.Body.String(), scans)
 	}
 	if runtime.GOOS == "linux" {
-		if report.Status != "failed" || len(report.Findings) != 1 || scanner.count("start") != 1 || !scanner.removed {
+		if report.Status != "failed" || len(report.Findings) != 2 || scanner.count("start") != 1 || !scanner.removed || sourceScanner.count("start") != 1 || !sourceScanner.removed {
 			t.Fatalf("Native scanner lifecycle result invalid: %s", response.Body.String())
 		}
 	} else if report.Status != "unavailable" || len(report.Findings) != 0 || scanner.created {
@@ -94,10 +99,12 @@ func TestDailySecurityBindsSourceAndImageToTheIndependentRelease(t *testing.T) {
 	if _, e = s.securityReceipt(wrong); e == nil {
 		t.Fatal("Another image's security evidence was reused")
 	}
-	_ = os.WriteFile(filepath.Join(source, "server.mjs"), []byte("changed"), 0600)
+	if err := os.WriteFile(filepath.Join(source, "server.mjs"), []byte("changed"), 0600); err != nil {
+		t.Fatal(err)
+	}
 	response = httptest.NewRecorder()
 	s.releaseSecurity(response, httptest.NewRequest("POST", "/v1/security", strings.NewReader(string(body))))
-	if json.Unmarshal(response.Body.Bytes(), &report) != nil || report.Status != "unavailable" || scans != 1 {
+	if json.Unmarshal(response.Body.Bytes(), &report) != nil || report.Status != "unavailable" || scans != 0 || sourceScanner.count("start") != 1 || scanner.count("start") != 1 {
 		t.Fatal("Tampered source obtained daily security coverage")
 	}
 }

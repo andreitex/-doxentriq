@@ -94,7 +94,8 @@ class FullPlanControls(unittest.TestCase):
         with patch('subprocess.Popen', side_effect=AssertionError('native child')):
             with self.context() as (plan, entry, held, assembly, inputs):
                 self.assertIs(type(plan.files), MappingProxyType)
-                self.assertEqual(len(plan.files), 63)
+                self.assertEqual(len(plan.files), 64)
+                self.assertEqual(plan.files['scripts/installation-status.py'], held.files['scripts/installation-status.py'])
                 self.assertNotIn('company-release/platform-sources.tar.gz', plan.files)
                 self.assertIs(plan._held, held); self.assertIs(plan._assembly, assembly)
                 self.assertIs(plan._verifier, entry.modules[F.VERIFIER])

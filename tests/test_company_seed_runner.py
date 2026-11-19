@@ -168,16 +168,19 @@ class RunnerControls(unittest.TestCase):
   argv,kw=h.starts[0];self.assertIs(kw['close_fds'],True);self.assertEqual(len(kw['pass_fds']),1)
   self.assertTrue(kw['executable'].startswith('/proc/self/fd/'));self.assertIs(kw['shell'],False)
   self.assertEqual(kw['env'],R.ENV);self.assertEqual(kw['cwd'],'/');self.assertEqual(kw['bufsize'],0)
- def test_exact_twenty_three_query_vectors_admitted_and_mutation_refused(self):
+ def test_exact_twenty_four_query_vectors_admitted_and_mutation_refused(self):
   h=self.harness();runner=h.make();prefix=['/usr/bin/systemctl','show',*('--property='+x for x in R.PROPERTIES),'--']
-  queries=[prefix+[u] for u in R.UNITS]+[['/usr/bin/docker','ps','-aq','--no-trunc'],
+  timer=['/usr/bin/systemctl','show',*('--property='+x for x in R.TIMER_PROPERTIES),'--']
+  queries=[(timer if u.endswith('.timer') else prefix)+[u] for u in R.UNITS]+[['/usr/bin/docker','ps','-aq','--no-trunc'],
    ['/usr/sbin/cryptsetup','luksUUID',BACKING],['/usr/sbin/cryptsetup','status','autosoft-data'],
    ['/usr/sbin/losetup','--noheadings','--output','BACK-FILE','--','/dev/loop123'],
    ['/usr/bin/findmnt','-n','-o','TARGET,SOURCE,FSTYPE,OPTIONS','--target',DATA],
+   ['/usr/bin/findmnt','-n','-o','TARGET,FSTYPE,OPTIONS,SIZE','--bytes','--target',DATA+'/runtime/builds'],
    ['/usr/bin/findmnt','-n','-o','SOURCE,FSTYPE,OPTIONS','--target',DATA],['/usr/sbin/xfs_quota','-x','-c','state -p',DATA]]
-  self.assertEqual(len(queries),23)
+  self.assertEqual(len(queries),24)
   for query in queries:self.assertEqual(runner.request(query,None,65536,60,None,dict(R.ENV)),tuple(query))
   for query in (['/bin/bash','-c','true'],['/usr/bin/docker','run'],['/usr/bin/systemctl','start','autosoft.service'],
+                prefix+['autosoft-security.timer'],timer+['autosoft.service'],
                 ['/usr/sbin/xfs_quota','-x','-c','limit -p bhard=1m 1',DATA],['/usr/bin/git','--version']):
    with self.assertRaises(ValueError):runner.request(query,None,65536,60,None,dict(R.ENV))
   self.assertEqual(h.starts,[]);self.assertEqual(h.fds,{})
@@ -185,6 +188,7 @@ class RunnerControls(unittest.TestCase):
   for args,changes in ((['/usr/sbin/cryptsetup','luksUUID','/other'],{}),
    (['/usr/sbin/losetup','--noheadings','--output','BACK-FILE','--','/dev/loop-1'],{}),
    (['/usr/bin/findmnt','-n','-o','SOURCE,FSTYPE,OPTIONS','--target','/other'],{}),
+   (['/usr/bin/findmnt','-n','-o','TARGET,FSTYPE,OPTIONS,SIZE','--bytes','--target','/other/builds'],{}),
    (None,{'stdin':b'command'}),(None,{'tool':object()}),(None,{'maximum':True}),(None,{'timeout':59}),
    (None,{'environment':dict(R.ENV,LD_PRELOAD='evil')})):
    h=self.harness();runner=h.make()

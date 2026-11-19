@@ -1,0 +1,206 @@
+#!/usr/bin/env bash
+# TEMPLATE: independently authenticated company delivery placement, before Python.
+set -Eeuo pipefail
+set +x +v
+umask 077
+PATH=/usr/sbin:/usr/bin:/sbin:/bin; export PATH
+LC_ALL=C LANG=C TZ=UTC; export LC_ALL LANG TZ
+# @EMBED_INSTALL_LOCK@
+BP_RECEIPT='@BOOTSTRAP_RECEIPT_SHA256@'
+BP_BYTES=@BOOTSTRAP_TOTAL_BYTES@
+BP_BASE=/opt/autosoft-company
+BP_PHASE=preflight
+
+_bp_files() {
+# @BOOTSTRAP_FILE_TABLE@
+}
+
+_bp_require_tools() {
+  _il_root; _il_utilities
+  local name
+  for name in head df uname; do
+    [[ -x "/usr/bin/$name" || -x "/bin/$name" ]] || _il_fail bootstrap_missing_base_utility
+  done
+  [[ $(uname -s) = Linux && $(uname -m) = x86_64 ]] || _il_fail bootstrap_linux_amd64_required
+}
+
+_bp_file_identity() {
+  local path=$1 size=$2 before dev ino bits uid gid mode links bytes modified changed
+  _il_path "$path"; _il_ancestors "$path"
+  [[ -f "$path" && ! -L "$path" ]] || _il_fail bootstrap_regular_file_required
+  before=$(_il_metadata "$path")
+  IFS=: read -r dev ino bits uid gid mode links bytes modified changed <<< "$before"
+  [[ "$uid:$gid:$mode:$links:$bytes" = "0:0:400:1:$size" ]] || _il_fail bootstrap_file_profile
+  printf '%s' "$before"
+}
+
+_bp_hash() {
+  # One byte beyond the approved size detects growth without unbounded copying.
+  local path=$1 size=$2 digest
+  digest=$(_il_tool head -c "$((size+1))" -- "$path" | _il_tool sha256sum)
+  [[ "$digest" =~ ^[a-f0-9]{64}[[:space:]] ]] || _il_fail bootstrap_hash_unavailable
+  printf '%s' "${digest%% *}"
+}
+
+_bp_source_file() {
+  local name=$1 size=$2 digest=$3 path="$BP_SOURCE/$1" before
+  before=$(_bp_file_identity "$path" "$size")
+  [[ $(_bp_hash "$path" "$size") = "$digest" && $(_bp_file_identity "$path" "$size") = "$before" ]] || _il_fail bootstrap_source_changed
+  BP_SOURCE_FILES["$name"]=$before
+}
+
+_bp_inventory() {
+  local directory=$1 path name count=0
+  [[ -d "$directory" && ! -L "$directory" ]] || _il_fail bootstrap_directory_required
+  [[ $(stat -c '%u:%g:%a' -- "$directory") = 0:0:700 ]] || _il_fail bootstrap_directory_profile
+  for path in "$directory"/* "$directory"/.[!.]* "$directory"/..?*; do
+    [[ -e "$path" || -L "$path" ]] || continue
+    ((count+=1)); ((count<=11)) || _il_fail bootstrap_extra_member
+    name=${path##*/}
+    [[ "$name" =~ ^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$ ]] || _il_fail bootstrap_unknown_member
+    [[ ${BP_SOURCE_FILES[$name]+present} = present ]] || _il_fail bootstrap_unknown_member
+  done
+  ((count==11)) || _il_fail bootstrap_missing_member
+}
+
+_bp_source_recheck() {
+  [[ $(_il_metadata "$BP_SOURCE") = "$BP_SOURCE_ID" ]] || _il_fail bootstrap_source_directory_changed
+  _il_ancestors "$BP_SOURCE/placeholder"
+}
+
+_bp_destination_recheck() {
+  [[ $(_il_identity "$BP_BASE" directory) = "$BP_BASE_ID" && $(_il_fd_identity "$BP_BASE_FD" directory) = "$BP_BASE_ID" ]] || _il_fail bootstrap_destination_replaced
+  if [[ -n ${BP_PACKAGE_FD:-} ]]; then
+    [[ $(_il_identity "$BP_BASE/bootstrap" directory) = "$BP_PACKAGE_ID" && $(_il_fd_identity "$BP_PACKAGE_FD" directory) = "$BP_PACKAGE_ID" ]] || _il_fail bootstrap_package_directory_replaced
+  fi
+}
+
+_bp_target_file() {
+  local name=$1 size=$2 digest=$3 path="$BP_BASE/bootstrap/$1" before
+  _bp_destination_recheck
+  before=$(_bp_file_identity "$path" "$size")
+  [[ $(_bp_hash "$path" "$size") = "$digest" && $(_bp_file_identity "$path" "$size") = "$before" ]] || _il_fail bootstrap_target_changed
+  _bp_destination_recheck
+}
+
+_bp_copy_file() {
+  local name=$1 size=$2 digest=$3 source="$BP_SOURCE/$1" target="$BP_BASE/bootstrap/$1" before descriptor
+  _bp_source_recheck; _bp_destination_recheck
+  before=$(_bp_file_identity "$source" "$size")
+  [[ "$before" = "${BP_SOURCE_FILES[$name]}" ]] || _il_fail bootstrap_source_changed
+  exec {descriptor}<"$source" || _il_fail bootstrap_source_open_unavailable
+  [[ $(_il_fd_identity "$descriptor" file) = "$before" ]] || _il_fail bootstrap_source_replaced
+  [[ ! -e "$target" && ! -L "$target" ]] || _il_fail bootstrap_existing_target
+  (set -o noclobber; _il_tool head -c "$((size+1))" <&"$descriptor" > "$target") || _il_fail bootstrap_copy_unresolved
+  [[ $(_bp_file_identity "$source" "$size") = "$before" && $(_il_fd_identity "$descriptor" file) = "$before" ]] || _il_fail bootstrap_source_changed
+  exec {descriptor}<&- || _il_fail bootstrap_source_close_unavailable
+  _il_tool chmod 0400 -- "$target"
+  _il_tool sync -f -- "$target"; _il_tool sync -f -- "$BP_BASE/bootstrap"
+  _bp_target_file "$name" "$size" "$digest"
+  _bp_source_recheck
+}
+
+_bp_intent() {
+  printf -v BP_INTENT 'company-guided-placement-v1\nreceipt=%s\nsource=%s\n' "$BP_RECEIPT" "$BP_SOURCE"
+  printf -v BP_COMPLETE 'company-guided-placement-complete-v1\nreceipt=%s\nfiles=11\n' "$BP_RECEIPT"
+}
+
+_bp_open_destination() {
+  BP_BASE_ID=$(_il_identity "$BP_BASE" directory)
+  exec {BP_BASE_FD}<"$BP_BASE" || _il_fail bootstrap_destination_open_unavailable
+  _bp_destination_recheck
+}
+
+_bp_open_package() {
+  BP_PACKAGE_ID=$(_il_identity "$BP_BASE/bootstrap" directory)
+  exec {BP_PACKAGE_FD}<"$BP_BASE/bootstrap" || _il_fail bootstrap_package_directory_open_unavailable
+  _bp_destination_recheck
+}
+
+_bp_verified_destination() {
+  local name
+  _bp_destination_recheck
+  _il_read "$BP_BASE/bootstrap-placement.intent"
+  [[ "$IL_TEXT" = "$BP_INTENT" ]] || _il_fail bootstrap_prior_intent_differs
+  _il_read "$BP_BASE/bootstrap-placement.complete"
+  [[ "$IL_TEXT" = "$BP_COMPLETE" ]] || _il_fail bootstrap_completion_differs
+  for name in bootstrap incoming staging evidence requests host-packages; do
+    _il_identity "$BP_BASE/$name" directory >/dev/null
+  done
+  _bp_inventory "$BP_BASE/bootstrap"
+  _bp_files _bp_target_file
+  _bp_destination_recheck
+}
+
+_bp_next() {
+  printf '%s\n' 'Doxentriq guided delivery is placed and verified.' \
+    'Next, IT must provide the signed foundation/platform source bundles and approved host-package files.' \
+    'The setup input wizard also needs Python 3. The original foundation prerequisite stage has not run.' \
+    'This placement command has not installed the platform or started services.'
+}
+
+company_place_guided_entry() {
+  if [[ $# = 1 && $1 = --help ]]; then
+    printf '%s\n' 'Doxentriq authenticated delivery placement: development preview.' \
+      'Usage: --place PROTECTED_DELIVERY_DIRECTORY INDEPENDENT_RECEIPT_SHA256' \
+      'Read-only check: --status PROTECTED_DELIVERY_DIRECTORY INDEPENDENT_RECEIPT_SHA256' \
+      'The company entry itself must be authenticated independently before execution.' \
+      'Existing or incomplete placement is preserved. No package or service is installed.'
+    return
+  fi
+  [[ $# = 3 && ( $1 = --place || $1 = --status ) ]] || _il_fail bootstrap_arguments
+  _bp_require_tools; IL_OWNER=$BASHPID
+  BP_SOURCE=$2
+  [[ "$3" = "$BP_RECEIPT" ]] || _il_fail bootstrap_independent_receipt_mismatch
+  (( ${#BP_SOURCE} <= 1024 )) || _il_fail bootstrap_source_path_too_long
+  _il_path "$BP_SOURCE"; _il_ancestors "$BP_SOURCE/placeholder"
+  [[ "$BP_SOURCE" != "$BP_BASE" && "$BP_SOURCE" != "$BP_BASE/"* && "$BP_BASE" != "$BP_SOURCE/"* ]] || _il_fail bootstrap_source_destination_overlap
+  [[ $(stat -c '%u:%g:%a' -- "$BP_SOURCE") = 0:0:700 && ! -L "$BP_SOURCE" ]] || _il_fail bootstrap_protected_delivery_required
+  BP_SOURCE_ID=$(_il_metadata "$BP_SOURCE")
+  declare -gA BP_SOURCE_FILES=()
+  _bp_files _bp_source_file
+  _bp_inventory "$BP_SOURCE"; _bp_source_recheck; _bp_intent
+  if [[ -e "$BP_BASE" || -L "$BP_BASE" ]]; then
+    _bp_open_destination
+    [[ -f "$BP_BASE/bootstrap-placement.complete" && ! -L "$BP_BASE/bootstrap-placement.complete" ]] || _il_fail 'Doxentriq placement is incomplete or belongs to earlier work. Preserve /opt/autosoft-company and ask IT to reconcile it.'
+    _bp_open_package
+    _bp_verified_destination
+    exec {BP_PACKAGE_FD}<&- || _il_fail bootstrap_package_directory_close_unavailable
+    exec {BP_BASE_FD}<&- || _il_fail bootstrap_destination_close_unavailable
+    printf '%s\n' 'Existing Doxentriq delivery verified; no files were copied or replaced.'
+    _bp_next; return
+  fi
+  if [[ $1 = --status ]]; then
+    printf '%s\n' 'Doxentriq delivery has not been placed. The authenticated input package is available.'
+    return
+  fi
+  _il_ancestors "$BP_BASE"
+  local status free row name
+  row=$(_il_tool df -PB1 -- /opt); row=${row##*$'\n'}
+  read -r _ _ _ free _ _ <<< "$row"
+  [[ "$free" =~ ^[0-9]+$ ]] && ((free>=BP_BYTES+8388608)) || _il_fail bootstrap_insufficient_free_space
+  trap 'status=$?; trap - EXIT; if [[ -n ${BP_PACKAGE_FD:-} ]]; then exec {BP_PACKAGE_FD}<&- || status=74; fi; if [[ -n ${BP_BASE_FD:-} ]]; then exec {BP_BASE_FD}<&- || status=74; fi; if ((status!=0)); then printf "Doxentriq placement stopped during %s. Keep /opt/autosoft-company and the original delivery for IT inspection. No retry or cleanup was attempted.\n" "$BP_PHASE" >&2; fi; exit "$status"' EXIT
+  BP_PHASE=namespace
+  _il_tool mkdir -m 0700 -- "$BP_BASE"
+  _il_tool sync -f -- "$BP_BASE"; _il_tool sync -f -- /opt
+  _bp_open_destination
+  _il_write "$BP_BASE/bootstrap-placement.intent" "$BP_INTENT"
+  BP_PHASE=directories
+  for name in bootstrap incoming staging evidence requests host-packages; do
+    _bp_destination_recheck
+    _il_tool mkdir -m 0700 -- "$BP_BASE/$name"
+    _il_tool sync -f -- "$BP_BASE/$name"; _il_tool sync -f -- "$BP_BASE"
+  done
+  BP_PHASE=copy
+  _bp_open_package
+  _bp_files _bp_copy_file
+  _bp_inventory "$BP_BASE/bootstrap"; _bp_source_recheck
+  BP_PHASE=completion
+  _il_write "$BP_BASE/bootstrap-placement.complete" "$BP_COMPLETE"
+  _bp_verified_destination
+  exec {BP_PACKAGE_FD}<&- || _il_fail bootstrap_package_directory_close_unavailable
+  exec {BP_BASE_FD}<&- || _il_fail bootstrap_destination_close_unavailable
+  trap - EXIT
+  _bp_next
+}
+company_place_guided_entry "$@"

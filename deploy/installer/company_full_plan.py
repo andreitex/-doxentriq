@@ -162,7 +162,7 @@ class FoundationPlan:
 
 @contextmanager
 def planned_foundation(entry, held, request, *, entry_module, assembly):
-    """Capture the fixed 63-leaf projection without a schema3 impersonation.
+    """Capture the fixed 64-leaf projection without a schema3 impersonation.
 
     Source authority is the original V-issued schema4 handle, and the borrowed
     fresh assembly belongs to this exact entry/source. No archive is copied;
@@ -173,7 +173,7 @@ def planned_foundation(entry, held, request, *, entry_module, assembly):
     modules, _, V = _origin(entry_module, entry, held, assembly)
     M = modules[entry_module.MATERIALIZER]
     rows, release = M.capture_platform_foundation(held, verifier=V)
-    require(release == request['releaseSha256'] and len(rows) == 63)
+    require(release == request['releaseSha256'] and len(rows) == 64)
     install = rows['scripts/install.sh']
     require(install.startswith(b'#!/usr/bin/env bash\n# Candidate phase definitions only.')
             and all(install.count(('company_' + phase + '_phase() {').encode()) == 1 for phase in PHASES))

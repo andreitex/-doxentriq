@@ -14,7 +14,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 HERE=ROOT/'deploy/installer'
 OWNER_PIN='91b14445e6891998c88bef3f98d3baf12fe559f673165104bb4440c70b8b17fa'
-FIXED_BASIS_PIN='17fe0f11df60edef119aead2896e601fce719ddec0e9471665b09ce0df362409'
+FIXED_BASIS_PIN='e5c5990f8312a3109aa957e8b35892805d44f5c90017ae462603a2b69c1362ce'
 JOIN_BASIS_PIN='056cf2d81122f1c678e8e59bc5a6d4607ad5ea046e4c82ac911e91ccd932841d'
 RETAINED=[]  # Actual unknown RAM objects remain strong; no cleanup qualification.
 

@@ -77,7 +77,7 @@ class FullPackageLoaderControls(unittest.TestCase):
                         self.assertIs(assembly._entry, entry.origin)
                         self.assertIs(plan._held, held)
                         self.assertIs(plan._assembly, assembly)
-                        self.assertEqual(len(plan.files), 63)
+                        self.assertEqual(len(plan.files), 64)
                         self.assertIs(assembly.modules[F.PARENT], entry.modules[F.PARENT])
                         self.assertEqual(plan.phase_command('activate')[6], plan.roots['finalRoot'])
                     self.assertIs(entry.modules[F.VERIFIER].require_platform_source(held), held)

@@ -31,6 +31,7 @@ INPUT_PREFIXES = ('image-','host-advisory-','kernel-advisory-')
 STAMP = lambda:datetime.now(timezone.utc).isoformat().replace('+00:00','Z')
 LOCAL_DOCKER_HOST = 'unix:///var/run/docker.sock'
 _DOCKER_CONFIGURATION = ContextVar('maintenance_scanner_docker_configuration', default=None)
+_SECURITY_REPORT_SCOPE = ContextVar('maintenance_security_report_scope', default=None)
 ROOTFS = ('rootfs', '--pkg-types', 'os', '--list-all-pkgs', '--cache-dir', '/cache/trivy',
           '--skip-db-update', '--skip-java-db-update', '--offline-scan', '--scanners', 'vuln', '--format', 'json', '/inventory')
 IMAGE = ('image', '--input', '/input/image.tar', '--cache-dir', '/cache/trivy', '--cache-backend', 'memory', '--skip-db-update',
@@ -446,6 +447,229 @@ def scanner_input_directory(data, *, prefix):
             remove_input(path,security,identity)
 
 
+_FEED_LOCKS = ('.feed-admission.lock', '.feed-readers.lock')
+_FEED_FIELDS = {'Version', 'UpdatedAt', 'NextUpdate', 'DownloadedAt'}
+_FEED_SECOND = 1_000_000_000
+
+
+def feed_timestamp(value):
+    """UTC nanoseconds; datetime alone would discard the expiry boundary."""
+    require(isinstance(value, str) and re.fullmatch(
+        r'[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,9})?Z', value),
+        'invalid-feed-timestamp')
+    whole, separator, fraction = value[:-1].partition('.')
+    try:
+        seconds = int((datetime.strptime(whole, '%Y-%m-%dT%H:%M:%S') - datetime(1970, 1, 1)).total_seconds())
+    except ValueError:
+        raise ScannerUnavailable('invalid-feed-timestamp') from None
+    return seconds * _FEED_SECOND + int(fraction.ljust(9, '0') if separator else '0')
+
+
+def feed_metadata(raw, *, version=2, now_ns=None):
+    require(isinstance(raw, bytes) and 0 < len(raw) <= 65536, 'feed-metadata-size-unavailable')
+    try:
+        value = typed_json(raw.decode('utf-8', errors='strict'))
+    except (UnicodeError, ValueError):
+        raise ScannerUnavailable('invalid-feed-metadata') from None
+    require(isinstance(value, dict) and set(value) == _FEED_FIELDS
+            and type(value['Version']) is int and value['Version'] == version, 'invalid-feed-schema')
+    updated, following, downloaded = (feed_timestamp(value[key]) for key in ('UpdatedAt', 'NextUpdate', 'DownloadedAt'))
+    now_ns = time.time_ns() if now_ns is None else now_ns
+    require(type(now_ns) is int and now_ns > 0, 'feed-clock-unavailable')
+    require(now_ns - updated <= 86400 * _FEED_SECOND and updated <= now_ns + 60 * _FEED_SECOND
+            and following > updated and following > now_ns
+            and downloaded <= now_ns + 60 * _FEED_SECOND and downloaded >= updated - 60 * _FEED_SECOND,
+            'feed-stale-or-expired')
+    return value
+
+
+def feed_identity(info):
+    return (info.st_dev, info.st_ino, info.st_mode, info.st_uid, info.st_gid,
+            info.st_nlink, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+
+
+class SecurityFeedLease:
+    """Read-only Linux lease. Missing lock files are never created or adopted.
+
+    Readers hold the admission lock only while taking the shared readers lock.
+    A future writer holds admission exclusively while draining readers; it must
+    independently prove scanner quiescence before promotion. A released flock
+    does not establish absence of a container after process failure.
+    """
+    def __init__(self, cache):
+        self.cache = Path(cache)
+        self.locks = []
+        self.before = None
+        self.updated_at = None
+
+    def lock_check(self):
+        protected(self.cache, directory=True)
+        require(len(self.locks) == 2, 'feed-locks-unavailable')
+        for path, descriptor, captured in self.locks:
+            info = os.fstat(descriptor)
+            require(feed_identity(info) == captured == feed_identity(path.lstat()), 'feed-lock-replaced')
+        return True
+
+    def snapshot(self):
+        deadline = time.monotonic() + 60
+        self.lock_check()
+        values = {}; metadata_records = []
+        now = time.time_ns()
+        for directory, version, dbname, limit in (('db', 2, 'trivy.db', 2 << 30),
+                                                ('java-db', 1, 'trivy-java.db', 512 << 20)):
+            folder = self.cache / 'trivy' / directory
+            if directory == 'java-db' and not os.path.lexists(folder):
+                values[directory] = None
+                continue
+            parents = (self.cache, self.cache / 'trivy', folder)
+            original = tuple(feed_identity(protected(path, directory=True).lstat()) for path in parents)
+            files = {}
+            for name, maximum in (('metadata.json', 65536), (dbname, limit)):
+                path = protected(folder / name, maximum=maximum)
+                info = path.lstat()
+                require(info.st_size > 0, 'empty-feed-file')
+                descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC)
+                try:
+                    captured = feed_identity(info)
+                    require(feed_identity(os.fstat(descriptor)) == captured, 'feed-file-replaced')
+                    digest = hashlib.sha256(); total = 0; metadata = bytearray()
+                    while True:
+                        require(time.monotonic() < deadline, 'feed-snapshot-deadline-exceeded')
+                        block = os.read(descriptor, 65536)
+                        if not block:
+                            break
+                        total += len(block)
+                        require(total <= maximum, 'feed-file-size-unavailable')
+                        digest.update(block)
+                        if name == 'metadata.json':
+                            metadata.extend(block)
+                    require(total == info.st_size and feed_identity(os.fstat(descriptor)) == captured
+                            == feed_identity(path.lstat()), 'feed-file-replaced')
+                    if name == 'metadata.json':
+                        feed_metadata(bytes(metadata), version=version, now_ns=now)
+                        metadata_records.append((bytes(metadata), version))
+                    files[name] = (captured, digest.hexdigest())
+                finally:
+                    os.close(descriptor)
+            require(tuple(feed_identity(path.lstat()) for path in parents) == original, 'feed-directory-replaced')
+            values[directory] = (original, files)
+        self.lock_check()
+        require(time.monotonic() < deadline, 'feed-snapshot-deadline-exceeded')
+        # Hashing a large feed can cross its expiry. Re-evaluate against the
+        # actual terminal clock, retaining nanosecond precision.
+        terminal = time.time_ns()
+        for raw, version in metadata_records:
+            feed_metadata(raw, version=version, now_ns=terminal)
+        self.updated_at = feed_metadata(metadata_records[0][0], version=2, now_ns=terminal)['UpdatedAt']
+        return values
+
+    def __enter__(self):
+        require(sys.platform == 'linux', 'feed-lease-requires-linux')
+        import fcntl
+        try:
+            protected(self.cache, directory=True)
+            for name in _FEED_LOCKS:
+                path = protected(self.cache / name, maximum=0)
+                info = path.lstat()
+                require(info.st_uid == 0 and info.st_gid == 10001 and stat.S_IMODE(info.st_mode) == 0o440
+                        and info.st_size == 0, 'feed-lock-protection-unavailable')
+                descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC)
+                self.locks.append((path, descriptor, feed_identity(info)))
+            self.lock_check()
+            fcntl.flock(self.locks[0][1], fcntl.LOCK_EX | fcntl.LOCK_NB)
+            try:
+                fcntl.flock(self.locks[1][1], fcntl.LOCK_SH | fcntl.LOCK_NB)
+                self.lock_check()
+            finally:
+                fcntl.flock(self.locks[0][1], fcntl.LOCK_UN)
+            self.before = self.snapshot()
+            return self
+        except BaseException:
+            self.close()
+            raise
+
+    def check(self):
+        require(self.before is not None and self.snapshot() == self.before, 'feed-observation-changed')
+        return True
+
+    def close(self):
+        failure = None
+        for _, descriptor, _ in reversed(self.locks):
+            try:
+                os.close(descriptor)
+            except OSError as error:
+                failure = error
+        self.locks.clear()
+        if failure is not None:
+            raise ScannerUnavailable('feed-lock-close-unavailable') from None
+
+    def __exit__(self, kind, value, traceback):
+        try:
+            if kind is None:
+                self.check()
+        finally:
+            self.close()
+
+
+class SecurityFeedScope:
+    """One VM report's expected snapshot, without an outer held reader lock.
+
+    Each scanner still owns its ordinary lease through cleanup. A writer may
+    proceed between reads; any changed snapshot prevents aggregate acceptance.
+    Application reports use independent broker scopes, outside this context.
+    """
+    def __init__(self, cache):
+        self.cache = Path(cache)
+        self.before = None
+        self.updated_at = None
+        self.token = None
+        self.deadline = None
+        self.readers = 0
+
+    def valid(self):
+        require(self.token is not None and _SECURITY_REPORT_SCOPE.get() is self
+                and time.monotonic() < self.deadline, 'security-report-scope-unavailable')
+
+    def matches(self, lease):
+        self.valid()
+        require(lease.cache == self.cache and canonical(lease.before) == self.before
+                and lease.updated_at == self.updated_at, 'security-report-feed-changed')
+
+    def observe(self, lease):
+        self.matches(lease)
+        require(self.readers < 128, 'security-report-reader-limit')
+        self.readers += 1
+
+    def __enter__(self):
+        require(threading.current_thread() is threading.main_thread()
+                and _SECURITY_REPORT_SCOPE.get() is None and self.token is None,
+                'security-report-scope-already-active')
+        self.deadline = time.monotonic() + 1800
+        with SecurityFeedLease(self.cache) as lease:
+            self.before = canonical(lease.before)
+            self.updated_at = lease.updated_at
+        require(time.monotonic() < self.deadline, 'security-report-scope-expired')
+        self.token = _SECURITY_REPORT_SCOPE.set(self)
+        return self
+
+    def check(self):
+        self.valid()
+        require(self.readers > 0, 'security-report-has-no-readers')
+        with SecurityFeedLease(self.cache) as lease:
+            self.matches(lease)
+        self.valid()
+        return True
+
+    def __exit__(self, kind, value, traceback):
+        try:
+            if kind is None:
+                self.check()
+        finally:
+            if self.token is not None:
+                _SECURITY_REPORT_SCOPE.reset(self.token)
+                self.token = None
+
+
 class MaintenanceScanner:
     def __init__(self, data, image):
         require(os.name == 'posix' and os.geteuid() == 0 and isinstance(image,str) and PIN.fullmatch(image), 'root-immutable-maintenance-scanner-only')
@@ -668,7 +892,10 @@ class MaintenanceScanner:
     def scan(self,arguments,mounts=(),network='none',writable_cache=False):
         require(threading.current_thread() is threading.main_thread(), 'maintenance-scanner-main-process-only')
         limits = policy(arguments,mounts,network,writable_cache)
-        with self.serialized():
+        with self.serialized(), SecurityFeedLease(self.cache) as feed:
+            scope = _SECURITY_REPORT_SCOPE.get()
+            if scope is not None:
+                scope.observe(feed)
             self.reconcile_pending()
             self.prune_confirmed()
             inputs = self.inputs(mounts)
@@ -759,6 +986,7 @@ class MaintenanceScanner:
                         outcome['status']='quarantined'
                     diagnostics.mark('post_cleanup_preservation',required=False)
                     checks={
+                        'feedLease':feed.check,
                         'companyImageLock':lambda:self.lock_proof()==image_lock,
                         'scannerContentIdentity':lambda:canonical(self.identity())==canonical(identity),
                         'inputBytes':lambda:{str(path):tree_hashes(path) for path,_ in inputs}==input_before,

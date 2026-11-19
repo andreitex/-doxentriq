@@ -41,24 +41,28 @@ func directoryNetworkFixture(t *testing.T, attached bool) (*serviceHostsFixture,
 	return f, connects
 }
 
-func TestDirectoryControlUsesExactQualifiedPrivateCompanyContainer(t *testing.T) {
+func TestDirectoryControlRefusesLegacyDynamicConnections(t *testing.T) {
 	t.Setenv("APP_DIRECTORY_AUTHORIZATION_ENABLED", "1")
 	for _, attached := range []bool{false, true} {
 		f, connects := directoryNetworkFixture(t, attached)
-		if err := f.server.attachDirectoryControl(context.Background(), f.network.Name); err != nil {
-			t.Fatal(err)
+		if err := f.server.attachDirectoryControl(context.Background(), f.network.Name); err == nil || *connects != 0 {
+			t.Fatal("Legacy directory network was adopted or mutated")
 		}
-		expected := 1
-		if attached {
-			expected = 0
-		}
-		if *connects != expected {
-			t.Fatal("Directory attachment was repeated or omitted")
-		}
-		hosts, err := f.server.trustedServiceHosts(context.Background(), f.network.Name, []string{"control"})
-		if err != nil || !reflect.DeepEqual(hosts, []string{"--add-host", "control:172.30.2.5"}) {
-			t.Fatal("Directory control has no verified fixed private address")
-		}
+	}
+}
+
+func TestDirectoryControlVerifiesReservedConnectionWithoutMutation(t *testing.T) {
+	f := newAssignedNetworkFixture(t)
+	if err := f.server.ensureAssignedAppNetwork(context.Background(), &f.value, f.persist); err != nil {
+		t.Fatal(err)
+	}
+	before := f.connects
+	if err := f.server.attachDirectoryControl(context.Background(), f.value.Network); err != nil || f.connects != before {
+		t.Fatal("Directory verification changed network", err)
+	}
+	delete(f.containers["control"]["NetworkSettings"].(map[string]any)["Networks"].(map[string]any), f.value.Network)
+	if err := f.server.attachDirectoryControl(context.Background(), f.value.Network); err == nil || f.connects != before {
+		t.Fatal("Missing reserved connection caused dynamic fallback")
 	}
 }
 
@@ -74,39 +78,46 @@ func TestDirectoryControlDeniesChangedOwnershipImageAndMissingReadback(t *testin
 	t.Setenv("APP_DIRECTORY_AUTHORIZATION_ENABLED", "1")
 	for _, mutation := range []string{"multiple", "short_id", "tag", "image", "owner", "stopped", "oneoff", "public_network", "missing_readback"} {
 		t.Run(mutation, func(t *testing.T) {
-			f, connects := directoryNetworkFixture(t, false)
+			f := newAssignedNetworkFixture(t)
+			if err := f.server.ensureAssignedAppNetwork(context.Background(), &f.value, f.persist); err != nil {
+				t.Fatal(err)
+			}
+			if err := f.server.attachDirectoryControl(context.Background(), f.value.Network); err != nil {
+				t.Fatal("Valid reserved fixture must pass before mutation", err)
+			}
+			before := f.connects
 			c := f.containers["control"]
 			switch mutation {
-			case "multiple":
-				f.results["control"] += "\n" + strings.Repeat("9", 64)
-			case "short_id":
-				f.results["control"] = c.ID[:12]
-			case "tag":
-				f.server.manifest.ServiceImages["control"] = "control:latest"
-			case "image":
-				c.Config.Image = f.server.manifest.ServiceImages["mysql"]
-			case "owner":
-				c.Config.Labels["com.docker.compose.project"] = "customer"
-			case "stopped":
-				c.State.Running = false
-			case "oneoff":
-				c.Config.Labels["com.docker.compose.oneoff"] = "True"
-			case "public_network":
-				f.network.Internal = false
-			case "missing_readback":
+			case "multiple", "short_id":
 				original := f.server.runner
 				f.server.runner = func(ctx context.Context, command string, args ...string) (string, error) {
-					if len(args) > 1 && args[0] == "network" && args[1] == "connect" {
-						return "", nil
+					if len(args) > 0 && args[0] == "ps" {
+						if mutation == "multiple" {
+							return c["Id"].(string) + "\n" + strings.Repeat("9", 64), nil
+						}
+						return c["Id"].(string)[:12], nil
 					}
 					return original(ctx, command, args...)
 				}
+			case "tag":
+				f.server.manifest.ServiceImages["control"] = "control:latest"
+			case "image":
+				c["Config"].(map[string]any)["Image"] = f.server.manifest.ServiceImages["mysql"]
+			case "owner":
+				c["Config"].(map[string]any)["Labels"].(map[string]string)["com.docker.compose.project"] = "customer"
+			case "stopped":
+				c["State"].(map[string]any)["Running"] = false
+			case "oneoff":
+				c["Config"].(map[string]any)["Labels"].(map[string]string)["com.docker.compose.oneoff"] = "True"
+			case "public_network":
+				f.network.Internal = false
+			case "missing_readback":
+				f.connected["control"] = false
 			}
-			f.containers["control"] = c
-			if err := f.server.attachDirectoryControl(context.Background(), f.network.Name); err == nil {
+			if err := f.server.attachDirectoryControl(context.Background(), f.value.Network); err == nil {
 				t.Fatal("Unverified directory attachment accepted")
 			}
-			if *connects != 0 {
+			if f.connects != before {
 				t.Fatal("Unverified company identity reached network mutation")
 			}
 		})

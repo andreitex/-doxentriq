@@ -30,6 +30,7 @@ def load(name, path):
 
 
 I = load('wiring_identity', ROOT / 'scripts/installation_identity.py')
+Q = load('wiring_host_runtime', ROOT / 'scripts/quota_runtime.py')
 B = load('wiring_local_files', ROOT / 'test/test_checkpoint_admission.py')
 ID = '64a2a5f8-04b9-43b5-9807-122d866db1f1'
 OTHER = '947aaf58-8ba3-4c42-b4ba-e2a1f87b0cf5'
@@ -87,6 +88,8 @@ class Fixture:
         self.generated = 0; self.commands = []; self.prompts = []; self.secret_writes = []
         self.blocked = set()
         self.ns = dict(_identity=I, Path=Path, os=os, uuid=uuid, json=json, re=re, urllib=urllib, base64=base64,
+                       _layout=SimpleNamespace(Q=SimpleNamespace(validate_fresh_network_pool=Q.validate_fresh_network_pool,
+                           host_network_snapshot=lambda: {'schema': 1, 'interfaces': [{'name': 'eth0', 'addresses': ['10.23.23.0/24']}], 'routes': []})),
                        subprocess=SimpleNamespace(check_output=forbidden, run=forbidden),
                        ask=self.ask, write=self.write)
         nodes = [node for node in TREE.body if isinstance(node, ast.FunctionDef) and node.name in SELECTED]
@@ -124,6 +127,7 @@ class Fixture:
                   'Identity HTTPS URL': 'https://auth.example.invalid',
                   'OpenAI API key (optional)': 'synthetic-local-value',
                   'Anthropic API key (optional)': '',
+                  'Unused private IPv4 pool for application networks (CIDR /16 through /24; confirm with your network administrator)': '10.44.0.0/16',
                   'Company-approved model catalog JSON path': str(self.base / 'models.json'),
                   'Company-approved runtime manifest JSON path': str(self.base / 'runtime.json')}
         return values.get(label, default)

@@ -74,10 +74,10 @@ class FreshAssemblyControls(unittest.TestCase):
             with (patch('subprocess.Popen', side_effect=AssertionError('native')),
                   patch('ctypes.CDLL', side_effect=AssertionError('physical backend'))):
                 with entry.fresh_installation_modules(held) as assembly:
-                    self.assertEqual(len(assembly.modules), 15)
+                    self.assertEqual(len(assembly.modules), 16)
                     self.assertIsNone(self.f.backend)
 
-    def test_all15_rows_admitted_before_first_operational_compile(self):
+    def test_all_rows_admitted_before_first_operational_compile(self):
         def changed(q):
             q.values['scripts/company_source_tree.py'] += b'\n# changed signed row\n'
         with self.assertRaises(ValueError), self.f.entry() as entry, self.f.fresh_source(entry, changed) as held:

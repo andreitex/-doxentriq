@@ -162,7 +162,7 @@ func (s *server) checkRecoverySource(ctx context.Context, v Verification) error 
 	if err = staticPolicy(source); err != nil {
 		return errors.New("Recovery source violates the current company security policy")
 	}
-	findings, _, err := s.scan(ctx, filepath.Join(s.hostRuntime, "sources", v.AttemptID))
+	findings, _, err := s.scan(ctx, filepath.Join(s.hostRuntime, "sources", v.AttemptID), sourceScannerInput{v.Template, v.SourceHash, v.SourceBindingVersion})
 	if err != nil {
 		return errors.New("Current recovery dependency, configuration and secret coverage is unavailable")
 	}

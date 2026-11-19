@@ -1,0 +1,731 @@
+{
+  "rpms": [
+    {
+      "action": "Install",
+      "nevra": "kernel-6.12.0-211.74.1.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Install",
+      "nevra": "kernel-core-6.12.0-211.74.1.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Install",
+      "nevra": "kernel-modules-6.12.0-211.74.1.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Install",
+      "nevra": "kernel-modules-core-6.12.0-211.74.1.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Install",
+      "nevra": "kernel-modules-extra-6.12.0-211.74.1.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "ca-certificates-2026.2.92_v9.0.319-100.3.el10_2.noarch",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "ca-certificates-2025.2.80_v9.0.305-102.el10.noarch",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "coreutils-9.5-8.el10_2.1.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "coreutils-9.5-7.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "coreutils-common-9.5-8.el10_2.1.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "coreutils-common-9.5-7.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "curl-8.12.1-4.el10_2.7.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "curl-8.12.1-4.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "dbus-broker-36-5.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "dbus-broker-36-4.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "dracut-107-9.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "dracut-107-4.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "dracut-config-rescue-107-9.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "dracut-config-rescue-107-4.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "dracut-network-107-9.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "dracut-network-107-4.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "dracut-squash-107-9.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "dracut-squash-107-4.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "expat-2.7.3-1.el10_2.7.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "expat-2.7.3-1.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "gawk-5.3.0-6.el10_2.1.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "gawk-5.3.0-6.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "glib2-2.80.4-12.el10_2.22.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "glib2-2.80.4-12.el10_2.13.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "glibc-2.39-145.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "glibc-2.39-121.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "glibc-all-langpacks-2.39-145.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "glibc-all-langpacks-2.39-121.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "glibc-common-2.39-145.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "glibc-common-2.39-121.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "glibc-gconv-extra-2.39-145.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "glibc-gconv-extra-2.39-121.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "gnutls-3.8.10-5.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "gnutls-3.8.10-3.el10_1.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "gzip-1.13-4.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "gzip-1.13-3.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "kernel-tools-6.12.0-211.74.1.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "kernel-tools-6.12.0-211.16.1.el10_2.0.1.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "kernel-tools-libs-6.12.0-211.74.1.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "kernel-tools-libs-6.12.0-211.16.1.el10_2.0.1.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "libblkid-2.40.2-18.el10_2.20.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "libblkid-2.40.2-18.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "libbrotli-1.1.0-8.el10_2.1.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "libbrotli-1.1.0-7.el10_1.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "libcurl-8.12.1-4.el10_2.7.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "libcurl-8.12.1-4.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "libevent-2.1.13-1.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "libevent-2.1.12-16.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "libfdisk-2.40.2-18.el10_2.20.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "libfdisk-2.40.2-18.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "libldb-4.23.5-111.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "libldb-4.23.5-107.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "libmount-2.40.2-18.el10_2.20.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "libmount-2.40.2-18.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "libsmartcols-2.40.2-18.el10_2.20.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "libsmartcols-2.40.2-18.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "libsss_certmap-2.12.0-3.el10_2.2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "libsss_certmap-2.12.0-3.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "libsss_idmap-2.12.0-3.el10_2.2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "libsss_idmap-2.12.0-3.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "libsss_nss_idmap-2.12.0-3.el10_2.2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "libsss_nss_idmap-2.12.0-3.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "libsss_sudo-2.12.0-3.el10_2.2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "libsss_sudo-2.12.0-3.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "libuuid-2.40.2-18.el10_2.20.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "libuuid-2.40.2-18.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "libxml2-2.12.5-10.el10_2.4.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "libxml2-2.12.5-10.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "microcode_ctl-4:20260812-0.el10_2.noarch",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "microcode_ctl-4:20260210-1.el10_2.noarch",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "openssh-9.9p1-29.el10_2.rocky.0.1.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "openssh-9.9p1-23.el10_2.rocky.0.1.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "openssh-clients-9.9p1-29.el10_2.rocky.0.1.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "openssh-clients-9.9p1-23.el10_2.rocky.0.1.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "openssh-server-9.9p1-29.el10_2.rocky.0.1.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "openssh-server-9.9p1-23.el10_2.rocky.0.1.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "openssl-libs-1:3.5.8-2.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "openssl-libs-1:3.5.5-2.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "pcre2-10.44-1.5.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "pcre2-10.44-1.el10.3.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "pcre2-syntax-10.44-1.5.el10_2.noarch",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "pcre2-syntax-10.44-1.el10.3.noarch",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "python3-3.12.15-1.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "python3-3.12.13-2.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "python3-libs-3.12.15-1.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "python3-libs-3.12.13-2.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "rpm-sequoia-1.10.2.1-1.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "rpm-sequoia-1.10.1.1-2.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "sg3_utils-1.48-7.el10_2.2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "sg3_utils-1.48-7.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "sg3_utils-libs-1.48-7.el10_2.2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "sg3_utils-libs-1.48-7.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "sssd-client-2.12.0-3.el10_2.2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "sssd-client-2.12.0-3.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "sssd-common-2.12.0-3.el10_2.2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "sssd-common-2.12.0-3.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "sssd-kcm-2.12.0-3.el10_2.2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "sssd-kcm-2.12.0-3.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "sssd-krb5-common-2.12.0-3.el10_2.2.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "sssd-krb5-common-2.12.0-3.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "sudo-1.9.17-10.p2.el10_2.7.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "sudo-1.9.17-4.p2.el10_2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "util-linux-2.40.2-18.el10_2.20.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "util-linux-2.40.2-18.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "util-linux-core-2.40.2-18.el10_2.20.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "util-linux-core-2.40.2-18.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "vim-data-2:9.1.083-9.el10_2.22.noarch",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "vim-data-2:9.1.083-9.el10_2.2.noarch",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "vim-minimal-2:9.1.083-9.el10_2.22.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "vim-minimal-2:9.1.083-9.el10_2.2.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "xz-1:5.6.2-4.el10_2.1.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "xz-1:5.6.2-4.el10_0.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "xz-libs-1:5.6.2-4.el10_2.1.x86_64",
+      "reason": "unknown",
+      "repo_id": "BaseOS"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "xz-libs-1:5.6.2-4.el10_0.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    },
+    {
+      "action": "Upgrade",
+      "nevra": "rsyslog-8.2510.0-5.el10_2.2.x86_64",
+      "reason": "unknown",
+      "repo_id": "AppStream"
+    },
+    {
+      "action": "Upgraded",
+      "nevra": "rsyslog-8.2510.0-5.el10.x86_64",
+      "reason": "unknown",
+      "repo_id": "@System"
+    }
+  ],
+  "version": "0.0"
+}

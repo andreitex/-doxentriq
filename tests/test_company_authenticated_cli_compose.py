@@ -10,7 +10,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 HERE=ROOT/'deploy/installer'
 BASIS=ROOT/'tests/test_company_authenticated_cli_inputs.py'
-BASIS_PIN='31678965fbcc4e68864103588dac2c6b9ae27543a10e54ef4af04cd90b98ec7a'
+BASIS_PIN='c6260d9c99c46e70b43eb6687d9595223e61e94d3f73a13f30bb26b8551658a9'
 
 def fixture_basis():
     raw=BASIS.read_bytes();assert hashlib.sha256(raw).hexdigest()==BASIS_PIN
@@ -61,7 +61,7 @@ class Controls(unittest.TestCase):
 
     def test_actual_original_package_delivery_and_cli_close_before_release_data(self):
         f=self.fixture();p=f.prepare();data=p.capture_delivery()
-        self.assertIs(type(data),MappingProxyType);self.assertEqual(data['signedSourceReads'],59)
+        self.assertIs(type(data),MappingProxyType);self.assertEqual(data['signedSourceReads'],61)
         self.assertEqual(data['fullPackagePin']['sha256'],T.sha(data['fullPackageRaw']))
         self.assertEqual(data['deliveryPin']['sha256'],T.sha(data['deliveryRaw']))
         self.assertEqual(data['sourceReleaseSha256'],T.sha(f.base.release_raw))

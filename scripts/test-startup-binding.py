@@ -382,6 +382,36 @@ class StartupControls(unittest.TestCase):
                 with self.assertRaises(ValueError): f.call()
                 self.assertEqual(f.files.handles, {}); self.assertEqual(f.locks.held, {})
 
+    def test_backing_time_changes_are_allowed_without_relaxing_fixed_fields(self):
+        f=Fixture()
+        def ciphertext_write(count):
+            if count==1:f.files.file_metadata[f.backing].update(st_mtime_ns=100,st_ctime_ns=200)
+        f.on_mount=ciphertext_write
+        self.assertEqual(f.call()['status'],'verified');f.assert_readonly(self)
+        self.assertNotIn(f.backing,f.files.reads)
+        for field in METADATA[:7]:
+            with self.subTest(field=field):
+                g=Fixture();before=getattr(g.files.protected(g.backing,private=True),field)
+                g.on_mount=lambda count,g=g,field=field,before=before:g.files.file_metadata[g.backing].update({field:before+1}) if count==1 else None
+                with self.assertRaises(ValueError):g.call()
+
+    def test_key_configuration_and_receipt_time_changes_remain_refused(self):
+        for target in ('key','config','receipt'):
+            with self.subTest(target=target):
+                f=Fixture();path={'key':f.host/'storage.key','config':f.data/'config/installation.json',
+                    'receipt':f.host/'installation.storage-receipt.json'}[target]
+                f.on_mount=lambda count,f=f,path=path:f.files.file_metadata.setdefault(path,{}).update(st_ctime_ns=123) if count==1 else None
+                with self.assertRaises(ValueError):f.call()
+
+    def test_backing_path_cannot_select_unlock_key_timestamp_policy(self):
+        f=Fixture();key=f.host/'storage.key'
+        f.intent['proposal']['storage_file']=str(key);f.final['storage_file']=str(key);f.receipt['storage_file']=str(key)
+        for path,value in ((f.host/S.I.INTENT,f.intent),(f.host/'installation.json',f.final),
+            (f.host/'installation.storage-receipt.json',f.receipt)):f.rewrite(path,value)
+        f.files.file_metadata[key]=dict(st_size=32*1024**3)
+        with self.assertRaisesRegex(ValueError,'alias the unlock key'):f.call()
+        self.assertEqual(f.mounts,[])
+
     def test_mount_or_layout_drift_and_insufficient_backing_size_are_blocked(self):
         f = Fixture(); f.files.file_metadata[f.backing]['st_size'] = 31 * 1024**3
         with self.assertRaises(ValueError): f.call()

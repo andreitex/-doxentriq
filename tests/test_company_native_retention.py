@@ -65,6 +65,41 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(first['storeOperationId'], second['storeOperationId'])
         self.assertIsNone(first['parent'])
 
+    def test_repository_companion_pins_exact_package_and_shared_parent(self):
+        raw = B.assemble_entry(ROOT, self.worker, reader=lambda p, n: p.read_bytes(), repository=True)
+        self.assertIn(B.pin(self.worker)['sha256'].encode(), raw)
+        self.assertIn((ROOT/'scripts/install-lock.sh').read_bytes(), raw)
+        self.assertNotIn(b'@WORKER_SHA256@', raw)
+        self.assertIn(b'--seed-repository', raw)
+        self.assertEqual(base64.b64decode(self.package['programs']['repository_io']['base64']),
+                         (ROOT/'deploy/installer/company_repository_io.py').read_bytes())
+        with self.assertRaises(ValueError):
+            B.assemble_entry(ROOT, self.worker, reader=lambda p, n: p.read_bytes(), repository=True, configuration=True)
+
+    def test_runtime_pair_companion_uses_original_parent_adapter(self):
+        raw=B.assemble_entry(ROOT,self.worker,reader=lambda p,n:p.read_bytes(),runtime_pair=True)
+        self.assertIn(B.pin(self.worker)['sha256'].encode(),raw)
+        self.assertIn((ROOT/'scripts/install-lock.sh').read_bytes(),raw)
+        self.assertIn(b'--initialize-runtime-pair',raw)
+        self.assertEqual(base64.b64decode(self.package['programs']['runtime_pair_parent']['base64']),
+            (ROOT/'deploy/installer/company_runtime_pair_parent.py').read_bytes())
+        with self.assertRaises(ValueError):
+            B.assemble_entry(ROOT,self.worker,reader=lambda p,n:p.read_bytes(),runtime_pair=True,repository=True)
+
+    def test_continuation_reuses_exact_retention_loop_before_startup_in_same_session(self):
+        raw=B.assemble_entry(ROOT,self.worker,reader=lambda p,n:p.read_bytes(),continuation=True)
+        retention=(ROOT/'deploy/installer/company-retention.sh').read_bytes().replace(b'\r\n',b'\n')
+        start=retention.index(b'  for stage in company-platform-store company-source-materialize; do\n')
+        end=retention.index(b'  done\n',start)+len(b'  done\n')
+        self.assertIn(retention[start:end],raw)
+        self.assertNotIn(b'@EMBED_',raw)
+        self.assertEqual(raw.count(b'install_lock_acquire /etc/autosoft-install-admission'),1)
+        self.assertIn(b'company-stored-startup',raw)
+        self.assertEqual(base64.b64decode(self.package['programs']['stored_startup']['base64']),
+            (ROOT/'deploy/installer/company_stored_startup.py').read_bytes())
+        with self.assertRaises(ValueError):
+            B.assemble_entry(ROOT,self.worker,reader=lambda p,n:p.read_bytes(),continuation=True,runtime_pair=True)
+
 
 NATIVE = sys.platform == 'linux' and getattr(os, 'geteuid', lambda: -1)() == 0 and bool(os.environ.get('DOXENTRIQ_NATIVE_TEST_ROOT'))
 

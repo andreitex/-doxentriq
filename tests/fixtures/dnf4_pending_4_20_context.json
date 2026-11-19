@@ -1,0 +1,3609 @@
+{
+  "candidates": [
+    {
+      "archiveSha256": "d8453df4c3a7b419847ddd7f6ad646f2384de8db92ebfe9d3703b7798591923e",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "kernel",
+        "source": "kernel",
+        "source_version": "6.12.0-211.74.1.el10_2",
+        "version": "6.12.0-211.74.1.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "861e4a7f3d669dd4597cbea1d8441fe855c1a4b380077a3aefaafc3146c5e608",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "kernel-core",
+        "source": "kernel",
+        "source_version": "6.12.0-211.74.1.el10_2",
+        "version": "6.12.0-211.74.1.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "ce6fe9201b2693fbb33c213addb48537aa77394977ebc8a68ba2a80d68cd3a26",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "kernel-modules",
+        "source": "kernel",
+        "source_version": "6.12.0-211.74.1.el10_2",
+        "version": "6.12.0-211.74.1.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "e658374563d467b6987ab684a9b6fed87f6a9d9e120bcd6f28fff2049443451b",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "kernel-modules-core",
+        "source": "kernel",
+        "source_version": "6.12.0-211.74.1.el10_2",
+        "version": "6.12.0-211.74.1.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "25d25c8be84a70121001b94f169679a54aa87c79c780fb23cda3bc1d07997b82",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "kernel-modules-extra",
+        "source": "kernel",
+        "source_version": "6.12.0-211.74.1.el10_2",
+        "version": "6.12.0-211.74.1.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "92645747b01d378de8db932103b444c80e16afb39852b628e345a4d9515b4ce6",
+      "fixes": [],
+      "package": {
+        "arch": "noarch",
+        "essential": false,
+        "name": "ca-certificates",
+        "source": "ca-certificates",
+        "source_version": "2026.2.92_v9.0.319-100.3.el10_2",
+        "version": "2026.2.92_v9.0.319-100.3.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "7895b6922d990c8863eb668871f063d32aef836bcaa1a5f27dd335fe558d7319",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "coreutils",
+        "source": "coreutils",
+        "source_version": "9.5-8.el10_2.1",
+        "version": "9.5-8.el10_2.1"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "80d03b446e7de02f4d16ab87f067f0b0c1765d01ed56f7d2b243168135100ba2",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "coreutils-common",
+        "source": "coreutils",
+        "source_version": "9.5-8.el10_2.1",
+        "version": "9.5-8.el10_2.1"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "6d0de5a38876828dc4462b660702a3be4dda25684fd2acb76137aba3c795bd64",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "curl",
+        "source": "curl",
+        "source_version": "8.12.1-4.el10_2.7",
+        "version": "8.12.1-4.el10_2.7"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "0f5b3005efceee6b35c1ec939b6ab7e6cd49a85a5ef972ab6e65d6c6da95648f",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "dbus-broker",
+        "source": "dbus-broker",
+        "source_version": "36-5.el10_2",
+        "version": "36-5.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "07eda83dbcbbe66fe462c09faea6ffd8d83bdbdec8ae7668ae5e440abd3faab2",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "dracut",
+        "source": "dracut",
+        "source_version": "107-9.el10_2",
+        "version": "107-9.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "3619aaf7f7e88e4a7b98dafc7e0598693537779c0ce50c8e6605fb4dc1848503",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "dracut-config-rescue",
+        "source": "dracut",
+        "source_version": "107-9.el10_2",
+        "version": "107-9.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "537d588757969918fc1b6b1ccc0491c92f014d04c55511fc6ed8e7530dd112ba",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "dracut-network",
+        "source": "dracut",
+        "source_version": "107-9.el10_2",
+        "version": "107-9.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "c79dba86ba3c8c34aceab1356e2f9294eda59fa76a34630ccff42a7290f2ff26",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "dracut-squash",
+        "source": "dracut",
+        "source_version": "107-9.el10_2",
+        "version": "107-9.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "3f1557134b3a24de1da9fcfcab3fd0167db89aa70b66d74d7ceb230a89d0aecd",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "expat",
+        "source": "expat",
+        "source_version": "2.7.3-1.el10_2.7",
+        "version": "2.7.3-1.el10_2.7"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "478d6d9236158172926ef4be31927083804ca57e46d12837f8da18938b054370",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "gawk",
+        "source": "gawk",
+        "source_version": "5.3.0-6.el10_2.1",
+        "version": "5.3.0-6.el10_2.1"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "a783b6c0f6cb3c9c3f335ef0f8fac5edf6cd882fd32195386838d2b0ed39b298",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "glib2",
+        "source": "glib2",
+        "source_version": "2.80.4-12.el10_2.22",
+        "version": "2.80.4-12.el10_2.22"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "fe7a4e9dcc526a1f3c5a17330b289f799a3bac63bb6ebe8c637bd1654eec8c76",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "glibc",
+        "source": "glibc",
+        "source_version": "2.39-145.el10_2",
+        "version": "2.39-145.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "b0701a4c311fdf32f15ab0cba915af1fc3fd7cd71fa5de4274fd32d55f6a1df7",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "glibc-all-langpacks",
+        "source": "glibc",
+        "source_version": "2.39-145.el10_2",
+        "version": "2.39-145.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "8d0ebce66c7889a2820d4ff2331fd4d0782a3bd56311c19dada5f5deb7f36a5a",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "glibc-common",
+        "source": "glibc",
+        "source_version": "2.39-145.el10_2",
+        "version": "2.39-145.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "3d706f8e81d36a614accbfa5d77e7022499731050c1013ca8afc02067bf4f83e",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "glibc-gconv-extra",
+        "source": "glibc",
+        "source_version": "2.39-145.el10_2",
+        "version": "2.39-145.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "ed04856c3d360928ea6a8f96225b4b429401d9d6cc7f0532afbd6e34256fde35",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "gnutls",
+        "source": "gnutls",
+        "source_version": "3.8.10-5.el10_2",
+        "version": "3.8.10-5.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "e6f4f188872e9a715a959bb51e9dc5f683be9dec9e554e5604436a3bfac58b30",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "gzip",
+        "source": "gzip",
+        "source_version": "1.13-4.el10_2",
+        "version": "1.13-4.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "85f94923b52055c2a10b249c3d3c8d687e5858322a479cfd8d1cb3119e3bf422",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "kernel-tools",
+        "source": "kernel",
+        "source_version": "6.12.0-211.74.1.el10_2",
+        "version": "6.12.0-211.74.1.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "a8b2c8829f59e79c1d919d234c02654bcf0d7029dd0602943b3ca9716b3412f7",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "kernel-tools-libs",
+        "source": "kernel",
+        "source_version": "6.12.0-211.74.1.el10_2",
+        "version": "6.12.0-211.74.1.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "1f3e59e9ade49ddcafbb4538b55515df064055781527d97a3970c698c9c95b09",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "libblkid",
+        "source": "util-linux",
+        "source_version": "2.40.2-18.el10_2.20",
+        "version": "2.40.2-18.el10_2.20"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "fd4a1eac2967a604ac975223471e6c1af73002fe9f41c367a32cbeb0bd4d9b6e",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "libbrotli",
+        "source": "brotli",
+        "source_version": "1.1.0-8.el10_2.1",
+        "version": "1.1.0-8.el10_2.1"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "0b0474ce12d61c02087b8e7ba40aeb4af128de347aee7cd7d10a70596be02eec",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "libcurl",
+        "source": "curl",
+        "source_version": "8.12.1-4.el10_2.7",
+        "version": "8.12.1-4.el10_2.7"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "2e39efb8946036a611be1d69f7c7b7cc3662a85c78f5f61547f9de2e3de862ed",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "libevent",
+        "source": "libevent",
+        "source_version": "2.1.13-1.el10_2",
+        "version": "2.1.13-1.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "93c9261db7729b68fce647e1a7413f33508127488ba4cd8861a8eea0b839c14d",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "libfdisk",
+        "source": "util-linux",
+        "source_version": "2.40.2-18.el10_2.20",
+        "version": "2.40.2-18.el10_2.20"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "2ee407e637a32629ae749d8be1cb0ad4e355c8a44ff2c3756985f7fae40023a0",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "libldb",
+        "source": "samba",
+        "source_version": "4.23.5-111.el10_2",
+        "version": "4.23.5-111.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "981342c0f2b7ceffad1f5fe88c61d3d738374fa9023fde7598cdb9eefc29abeb",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "libmount",
+        "source": "util-linux",
+        "source_version": "2.40.2-18.el10_2.20",
+        "version": "2.40.2-18.el10_2.20"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "b35d1e3ceb8db7de654aa8e1283c3d1f3872c008e4024984b7b647d8622a9b8b",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "libsmartcols",
+        "source": "util-linux",
+        "source_version": "2.40.2-18.el10_2.20",
+        "version": "2.40.2-18.el10_2.20"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "1225b492e93deb39da8dccda819022b4e90054d761b73e222a945b43951ceb85",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "libsss_certmap",
+        "source": "sssd",
+        "source_version": "2.12.0-3.el10_2.2",
+        "version": "2.12.0-3.el10_2.2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "83112269bbda9ca5a78ea30b90706b340a8fc2e12ec72280e69db5e4f1282ce2",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "libsss_idmap",
+        "source": "sssd",
+        "source_version": "2.12.0-3.el10_2.2",
+        "version": "2.12.0-3.el10_2.2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "4347e437f4703200e48b04e7e32d3582c70d2d8f1dbfd3dd95e3832e59fb4ad1",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "libsss_nss_idmap",
+        "source": "sssd",
+        "source_version": "2.12.0-3.el10_2.2",
+        "version": "2.12.0-3.el10_2.2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "1a5610ecadd426cb494715db75c5bcf8c8ae49d7ac6b429ba7aba9bf298d11e2",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "libsss_sudo",
+        "source": "sssd",
+        "source_version": "2.12.0-3.el10_2.2",
+        "version": "2.12.0-3.el10_2.2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "e78b8159771dcbb15dc7ea62e01470dcdc802682e9062b8a39f099e7d66eac5a",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "libuuid",
+        "source": "util-linux",
+        "source_version": "2.40.2-18.el10_2.20",
+        "version": "2.40.2-18.el10_2.20"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "14a31be147706e3f83434e76e4211a4f3bcb6e6f608ef6b1c1a78789c08e19ba",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "libxml2",
+        "source": "libxml2",
+        "source_version": "2.12.5-10.el10_2.4",
+        "version": "2.12.5-10.el10_2.4"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "a4011c4877a18a5167c522abc3f71c6dd609951f90513c109c3dab86b28fe6fe",
+      "fixes": [],
+      "package": {
+        "arch": "noarch",
+        "essential": false,
+        "name": "microcode_ctl",
+        "source": "microcode_ctl",
+        "source_version": "20260812-0.el10_2",
+        "version": "4:20260812-0.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "4833ad02ddeaf3ec025f34e848860adde4ca10e4d27ae80be7cd19727c2fead2",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "openssh",
+        "source": "openssh",
+        "source_version": "9.9p1-29.el10_2.rocky.0.1",
+        "version": "9.9p1-29.el10_2.rocky.0.1"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "526724cfd86ced74b5aecfb5a78794092bdbea9032e8aad1ee4afac4252a66d9",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "openssh-clients",
+        "source": "openssh",
+        "source_version": "9.9p1-29.el10_2.rocky.0.1",
+        "version": "9.9p1-29.el10_2.rocky.0.1"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "1adfd2ffe003cd7cde55ac684bfeb4621e6edc46d57e9b9b16768587a29ed4df",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "openssh-server",
+        "source": "openssh",
+        "source_version": "9.9p1-29.el10_2.rocky.0.1",
+        "version": "9.9p1-29.el10_2.rocky.0.1"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "83ae22e729c7a62857c76d0cf2cb5f34e61205062d95b99698409a1a148ce12e",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "openssl-libs",
+        "source": "openssl",
+        "source_version": "3.5.8-2.el10_2",
+        "version": "1:3.5.8-2.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "96200291403c9e4be9f5dacdbf43a59207aefd502c7bdfec0141b818dca34c9d",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "pcre2",
+        "source": "pcre2",
+        "source_version": "10.44-1.5.el10_2",
+        "version": "10.44-1.5.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "ec6817bce7cc063e6006e1b0664f00012d8152df58f617c61778f49a2820d840",
+      "fixes": [],
+      "package": {
+        "arch": "noarch",
+        "essential": false,
+        "name": "pcre2-syntax",
+        "source": "pcre2",
+        "source_version": "10.44-1.5.el10_2",
+        "version": "10.44-1.5.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "c7e7d5264022aa731b93e7dfef75b3c9c7dce5a71e737b53f4b41ad392b6dc13",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "python3",
+        "source": "python3.12",
+        "source_version": "3.12.15-1.el10_2",
+        "version": "3.12.15-1.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "41e04a5d38c53404b1c7dafd5a8bf9675a4d3474728192fdec13fc42092fcfa8",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "python3-libs",
+        "source": "python3.12",
+        "source_version": "3.12.15-1.el10_2",
+        "version": "3.12.15-1.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "e3766b36cdb16e93e69472987f016a520b09178f3beaa460d8c589c3ecad7dd1",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "rpm-sequoia",
+        "source": "rust-rpm-sequoia",
+        "source_version": "1.10.2.1-1.el10_2",
+        "version": "1.10.2.1-1.el10_2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "0c3b9adadbbcda786204e11236ba70973aad49902a059c1cd657880e7a17bd81",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "sg3_utils",
+        "source": "sg3_utils",
+        "source_version": "1.48-7.el10_2.2",
+        "version": "1.48-7.el10_2.2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "2f4156f6d1f3249ff3832725b075179abb00753a22fa78e4119586d44586e7bc",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "sg3_utils-libs",
+        "source": "sg3_utils",
+        "source_version": "1.48-7.el10_2.2",
+        "version": "1.48-7.el10_2.2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "b10c0979c3fa8cd43b6c56bdc4307fd4333d8b975dce93c21521da2f9cd0a954",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "sssd-client",
+        "source": "sssd",
+        "source_version": "2.12.0-3.el10_2.2",
+        "version": "2.12.0-3.el10_2.2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "dfb0eb894e6e8a683612a65e81c000ceb458d26b8e2e244adba4999ff6cd9750",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "sssd-common",
+        "source": "sssd",
+        "source_version": "2.12.0-3.el10_2.2",
+        "version": "2.12.0-3.el10_2.2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "1cc78bdc3a39b6fee4a8bc8aef31cc4ea3672605f295d1300f7b1f9b0865c653",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "sssd-kcm",
+        "source": "sssd",
+        "source_version": "2.12.0-3.el10_2.2",
+        "version": "2.12.0-3.el10_2.2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "584377ef0dcb10c7ae3cc7da6cddec228ba54598609d8ed8edc471875fecc108",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "sssd-krb5-common",
+        "source": "sssd",
+        "source_version": "2.12.0-3.el10_2.2",
+        "version": "2.12.0-3.el10_2.2"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "13595d5f8dfad96e3fd4633492c34f80ea54cce9d0ed9949dfbcbec3b9fbbb26",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "sudo",
+        "source": "sudo",
+        "source_version": "1.9.17-10.p2.el10_2.7",
+        "version": "1.9.17-10.p2.el10_2.7"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "145365e63745b245537bd57e6d14863d972b3261b2537f291f14778c00ba358b",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "util-linux",
+        "source": "util-linux",
+        "source_version": "2.40.2-18.el10_2.20",
+        "version": "2.40.2-18.el10_2.20"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "40fead6dea569116d139ca1adc1d0a82f4cb727d0baac837509318376f887f96",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "util-linux-core",
+        "source": "util-linux",
+        "source_version": "2.40.2-18.el10_2.20",
+        "version": "2.40.2-18.el10_2.20"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "b4dfcd2d35be5c22c93ada2fa51a2df684c0a68ad1b4ddc6e219548ee7c66977",
+      "fixes": [],
+      "package": {
+        "arch": "noarch",
+        "essential": false,
+        "name": "vim-data",
+        "source": "vim",
+        "source_version": "9.1.083-9.el10_2.22",
+        "version": "2:9.1.083-9.el10_2.22"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "9293757b6170b02068fe0f85cba5778c0d82482d98dfb0da68eaf6d723f39262",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "vim-minimal",
+        "source": "vim",
+        "source_version": "9.1.083-9.el10_2.22",
+        "version": "2:9.1.083-9.el10_2.22"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "1b60376a972ce09f418c0cc859103b47b1da66be1bd0363df7bbc096b6f97c37",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "xz",
+        "source": "xz",
+        "source_version": "5.6.2-4.el10_2.1",
+        "version": "1:5.6.2-4.el10_2.1"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "944ffc0ff663b2391598b8c7880603db386c19a84459814228335fb0010b5b75",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "xz-libs",
+        "source": "xz",
+        "source_version": "5.6.2-4.el10_2.1",
+        "version": "1:5.6.2-4.el10_2.1"
+      },
+      "repository": "BaseOS"
+    },
+    {
+      "archiveSha256": "dd1c4444cd2b26fb53d4d172ce99f8274c7a195e1280378d06def5c0e664bb77",
+      "fixes": [],
+      "package": {
+        "arch": "x86_64",
+        "essential": false,
+        "name": "rsyslog",
+        "source": "rsyslog",
+        "source_version": "8.2510.0-5.el10_2.2",
+        "version": "8.2510.0-5.el10_2.2"
+      },
+      "repository": "AppStream"
+    }
+  ],
+  "capturedAt": "2026-11-08T15:53:55.485506+00:00",
+  "checkedAt": "2026-11-08T15:54:11.500855+00:00",
+  "distribution": {
+    "family": "rocky",
+    "version": "10.2"
+  },
+  "durationMillis": 23,
+  "evidence": {
+    "api_contract_sha256": "a9517278189decdb3f65a98ef739d9245f58ecbab78a810e70d2c82a0538ffae",
+    "contract": "dnf4-4.20.0-pending-0.0",
+    "install_only": [
+      "kernel-6.12.0-211.74.1.el10_2.x86_64",
+      "kernel-core-6.12.0-211.74.1.el10_2.x86_64",
+      "kernel-modules-6.12.0-211.74.1.el10_2.x86_64",
+      "kernel-modules-core-6.12.0-211.74.1.el10_2.x86_64",
+      "kernel-modules-extra-6.12.0-211.74.1.el10_2.x86_64"
+    ],
+    "native_document_sha256": "c63494e71d957485d7bad55733a2c6fb7a809bea04cb0b73a6488abb46ef52f8",
+    "native_items_sha256": "9d29e4203c6005b0e658e8b2340777e511ec011ab5c4374d1cb6b116088f2364",
+    "native_receipt_sha256": "d5541c10a8a9599b3033d9254d12cc47c0e080ee53ebc895acfa0d19e8e9f136",
+    "verified_upgrade_pairs": [
+      [
+        "ca-certificates-2025.2.80_v9.0.305-102.el10.noarch",
+        "ca-certificates-2026.2.92_v9.0.319-100.3.el10_2.noarch"
+      ],
+      [
+        "coreutils-9.5-7.el10.x86_64",
+        "coreutils-9.5-8.el10_2.1.x86_64"
+      ],
+      [
+        "coreutils-common-9.5-7.el10.x86_64",
+        "coreutils-common-9.5-8.el10_2.1.x86_64"
+      ],
+      [
+        "curl-8.12.1-4.el10.x86_64",
+        "curl-8.12.1-4.el10_2.7.x86_64"
+      ],
+      [
+        "dbus-broker-36-4.el10.x86_64",
+        "dbus-broker-36-5.el10_2.x86_64"
+      ],
+      [
+        "dracut-107-4.el10.x86_64",
+        "dracut-107-9.el10_2.x86_64"
+      ],
+      [
+        "dracut-config-rescue-107-4.el10.x86_64",
+        "dracut-config-rescue-107-9.el10_2.x86_64"
+      ],
+      [
+        "dracut-network-107-4.el10.x86_64",
+        "dracut-network-107-9.el10_2.x86_64"
+      ],
+      [
+        "dracut-squash-107-4.el10.x86_64",
+        "dracut-squash-107-9.el10_2.x86_64"
+      ],
+      [
+        "expat-2.7.3-1.el10.x86_64",
+        "expat-2.7.3-1.el10_2.7.x86_64"
+      ],
+      [
+        "gawk-5.3.0-6.el10.x86_64",
+        "gawk-5.3.0-6.el10_2.1.x86_64"
+      ],
+      [
+        "glib2-2.80.4-12.el10_2.13.x86_64",
+        "glib2-2.80.4-12.el10_2.22.x86_64"
+      ],
+      [
+        "glibc-2.39-121.el10_2.x86_64",
+        "glibc-2.39-145.el10_2.x86_64"
+      ],
+      [
+        "glibc-all-langpacks-2.39-121.el10_2.x86_64",
+        "glibc-all-langpacks-2.39-145.el10_2.x86_64"
+      ],
+      [
+        "glibc-common-2.39-121.el10_2.x86_64",
+        "glibc-common-2.39-145.el10_2.x86_64"
+      ],
+      [
+        "glibc-gconv-extra-2.39-121.el10_2.x86_64",
+        "glibc-gconv-extra-2.39-145.el10_2.x86_64"
+      ],
+      [
+        "gnutls-3.8.10-3.el10_1.x86_64",
+        "gnutls-3.8.10-5.el10_2.x86_64"
+      ],
+      [
+        "gzip-1.13-3.el10.x86_64",
+        "gzip-1.13-4.el10_2.x86_64"
+      ],
+      [
+        "kernel-tools-6.12.0-211.16.1.el10_2.0.1.x86_64",
+        "kernel-tools-6.12.0-211.74.1.el10_2.x86_64"
+      ],
+      [
+        "kernel-tools-libs-6.12.0-211.16.1.el10_2.0.1.x86_64",
+        "kernel-tools-libs-6.12.0-211.74.1.el10_2.x86_64"
+      ],
+      [
+        "libblkid-2.40.2-18.el10.x86_64",
+        "libblkid-2.40.2-18.el10_2.20.x86_64"
+      ],
+      [
+        "libbrotli-1.1.0-7.el10_1.x86_64",
+        "libbrotli-1.1.0-8.el10_2.1.x86_64"
+      ],
+      [
+        "libcurl-8.12.1-4.el10.x86_64",
+        "libcurl-8.12.1-4.el10_2.7.x86_64"
+      ],
+      [
+        "libevent-2.1.12-16.el10.x86_64",
+        "libevent-2.1.13-1.el10_2.x86_64"
+      ],
+      [
+        "libfdisk-2.40.2-18.el10.x86_64",
+        "libfdisk-2.40.2-18.el10_2.20.x86_64"
+      ],
+      [
+        "libldb-4.23.5-107.el10_2.x86_64",
+        "libldb-4.23.5-111.el10_2.x86_64"
+      ],
+      [
+        "libmount-2.40.2-18.el10.x86_64",
+        "libmount-2.40.2-18.el10_2.20.x86_64"
+      ],
+      [
+        "libsmartcols-2.40.2-18.el10.x86_64",
+        "libsmartcols-2.40.2-18.el10_2.20.x86_64"
+      ],
+      [
+        "libsss_certmap-2.12.0-3.el10_2.x86_64",
+        "libsss_certmap-2.12.0-3.el10_2.2.x86_64"
+      ],
+      [
+        "libsss_idmap-2.12.0-3.el10_2.x86_64",
+        "libsss_idmap-2.12.0-3.el10_2.2.x86_64"
+      ],
+      [
+        "libsss_nss_idmap-2.12.0-3.el10_2.x86_64",
+        "libsss_nss_idmap-2.12.0-3.el10_2.2.x86_64"
+      ],
+      [
+        "libsss_sudo-2.12.0-3.el10_2.x86_64",
+        "libsss_sudo-2.12.0-3.el10_2.2.x86_64"
+      ],
+      [
+        "libuuid-2.40.2-18.el10.x86_64",
+        "libuuid-2.40.2-18.el10_2.20.x86_64"
+      ],
+      [
+        "libxml2-2.12.5-10.el10.x86_64",
+        "libxml2-2.12.5-10.el10_2.4.x86_64"
+      ],
+      [
+        "microcode_ctl-4:20260210-1.el10_2.noarch",
+        "microcode_ctl-4:20260812-0.el10_2.noarch"
+      ],
+      [
+        "openssh-9.9p1-23.el10_2.rocky.0.1.x86_64",
+        "openssh-9.9p1-29.el10_2.rocky.0.1.x86_64"
+      ],
+      [
+        "openssh-clients-9.9p1-23.el10_2.rocky.0.1.x86_64",
+        "openssh-clients-9.9p1-29.el10_2.rocky.0.1.x86_64"
+      ],
+      [
+        "openssh-server-9.9p1-23.el10_2.rocky.0.1.x86_64",
+        "openssh-server-9.9p1-29.el10_2.rocky.0.1.x86_64"
+      ],
+      [
+        "openssl-libs-1:3.5.5-2.el10_2.x86_64",
+        "openssl-libs-1:3.5.8-2.el10_2.x86_64"
+      ],
+      [
+        "pcre2-10.44-1.el10.3.x86_64",
+        "pcre2-10.44-1.5.el10_2.x86_64"
+      ],
+      [
+        "pcre2-syntax-10.44-1.el10.3.noarch",
+        "pcre2-syntax-10.44-1.5.el10_2.noarch"
+      ],
+      [
+        "python3-3.12.13-2.el10_2.x86_64",
+        "python3-3.12.15-1.el10_2.x86_64"
+      ],
+      [
+        "python3-libs-3.12.13-2.el10_2.x86_64",
+        "python3-libs-3.12.15-1.el10_2.x86_64"
+      ],
+      [
+        "rpm-sequoia-1.10.1.1-2.el10.x86_64",
+        "rpm-sequoia-1.10.2.1-1.el10_2.x86_64"
+      ],
+      [
+        "sg3_utils-1.48-7.el10.x86_64",
+        "sg3_utils-1.48-7.el10_2.2.x86_64"
+      ],
+      [
+        "sg3_utils-libs-1.48-7.el10.x86_64",
+        "sg3_utils-libs-1.48-7.el10_2.2.x86_64"
+      ],
+      [
+        "sssd-client-2.12.0-3.el10_2.x86_64",
+        "sssd-client-2.12.0-3.el10_2.2.x86_64"
+      ],
+      [
+        "sssd-common-2.12.0-3.el10_2.x86_64",
+        "sssd-common-2.12.0-3.el10_2.2.x86_64"
+      ],
+      [
+        "sssd-kcm-2.12.0-3.el10_2.x86_64",
+        "sssd-kcm-2.12.0-3.el10_2.2.x86_64"
+      ],
+      [
+        "sssd-krb5-common-2.12.0-3.el10_2.x86_64",
+        "sssd-krb5-common-2.12.0-3.el10_2.2.x86_64"
+      ],
+      [
+        "sudo-1.9.17-4.p2.el10_2.x86_64",
+        "sudo-1.9.17-10.p2.el10_2.7.x86_64"
+      ],
+      [
+        "util-linux-2.40.2-18.el10.x86_64",
+        "util-linux-2.40.2-18.el10_2.20.x86_64"
+      ],
+      [
+        "util-linux-core-2.40.2-18.el10.x86_64",
+        "util-linux-core-2.40.2-18.el10_2.20.x86_64"
+      ],
+      [
+        "vim-data-2:9.1.083-9.el10_2.2.noarch",
+        "vim-data-2:9.1.083-9.el10_2.22.noarch"
+      ],
+      [
+        "vim-minimal-2:9.1.083-9.el10_2.2.x86_64",
+        "vim-minimal-2:9.1.083-9.el10_2.22.x86_64"
+      ],
+      [
+        "xz-1:5.6.2-4.el10_0.x86_64",
+        "xz-1:5.6.2-4.el10_2.1.x86_64"
+      ],
+      [
+        "xz-libs-1:5.6.2-4.el10_0.x86_64",
+        "xz-libs-1:5.6.2-4.el10_2.1.x86_64"
+      ],
+      [
+        "rsyslog-8.2510.0-5.el10.x86_64",
+        "rsyslog-8.2510.0-5.el10_2.2.x86_64"
+      ]
+    ]
+  },
+  "expected": {
+    "additions": 5,
+    "nativeRows": 121,
+    "removals": 0,
+    "resultingPackages": 320,
+    "upgrades": 58
+  },
+  "installed": [
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "NetworkManager",
+      "source": "NetworkManager",
+      "source_version": "1.56.0-1.el10",
+      "version": "1:1.56.0-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "NetworkManager-libnm",
+      "source": "NetworkManager",
+      "source_version": "1.56.0-1.el10",
+      "version": "1:1.56.0-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "NetworkManager-tui",
+      "source": "NetworkManager",
+      "source_version": "1.56.0-1.el10",
+      "version": "1:1.56.0-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "alternatives",
+      "source": "chkconfig",
+      "source_version": "1.30-2.el10",
+      "version": "1.30-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "attr",
+      "source": "attr",
+      "source_version": "2.5.2-5.el10",
+      "version": "2.5.2-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "audit",
+      "source": "audit",
+      "source_version": "4.0.3-5.el10",
+      "version": "4.0.3-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "audit-libs",
+      "source": "audit",
+      "source_version": "4.0.3-5.el10",
+      "version": "4.0.3-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "authselect",
+      "source": "authselect",
+      "source_version": "1.5.2-1.el10",
+      "version": "1.5.2-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "authselect-libs",
+      "source": "authselect",
+      "source_version": "1.5.2-1.el10",
+      "version": "1.5.2-1.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "basesystem",
+      "source": "basesystem",
+      "source_version": "11-22.el10",
+      "version": "11-22.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "bash",
+      "source": "bash",
+      "source_version": "5.2.26-6.el10",
+      "version": "5.2.26-6.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "bzip2-libs",
+      "source": "bzip2",
+      "source_version": "1.0.8-25.el10",
+      "version": "1.0.8-25.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "c-ares",
+      "source": "c-ares",
+      "source_version": "1.34.6-1.el10",
+      "version": "1.34.6-1.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "ca-certificates",
+      "source": "ca-certificates",
+      "source_version": "2025.2.80_v9.0.305-102.el10",
+      "version": "2025.2.80_v9.0.305-102.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "chrony",
+      "source": "chrony",
+      "source_version": "4.8-2.el10",
+      "version": "4.8-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "coreutils",
+      "source": "coreutils",
+      "source_version": "9.5-7.el10",
+      "version": "9.5-7.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "coreutils-common",
+      "source": "coreutils",
+      "source_version": "9.5-7.el10",
+      "version": "9.5-7.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "cpio",
+      "source": "cpio",
+      "source_version": "2.15-3.el10",
+      "version": "2.15-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "cracklib",
+      "source": "cracklib",
+      "source_version": "2.9.11-8.el10",
+      "version": "2.9.11-8.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "cracklib-dicts",
+      "source": "cracklib",
+      "source_version": "2.9.11-8.el10",
+      "version": "2.9.11-8.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "cronie",
+      "source": "cronie",
+      "source_version": "1.7.0-14.el10",
+      "version": "1.7.0-14.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "cronie-anacron",
+      "source": "cronie",
+      "source_version": "1.7.0-14.el10",
+      "version": "1.7.0-14.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "crontabs",
+      "source": "crontabs",
+      "source_version": "1.11^20190603git9e74f2d-6.el10",
+      "version": "1.11^20190603git9e74f2d-6.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "crypto-policies",
+      "source": "crypto-policies",
+      "source_version": "20260216-1.git0e54016.el10",
+      "version": "20260216-1.git0e54016.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "crypto-policies-scripts",
+      "source": "crypto-policies",
+      "source_version": "20260216-1.git0e54016.el10",
+      "version": "20260216-1.git0e54016.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "cryptsetup-libs",
+      "source": "cryptsetup",
+      "source_version": "2.8.1-2.el10",
+      "version": "2.8.1-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "curl",
+      "source": "curl",
+      "source_version": "8.12.1-4.el10",
+      "version": "8.12.1-4.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "cyrus-sasl-gssapi",
+      "source": "cyrus-sasl",
+      "source_version": "2.1.28-29.el10",
+      "version": "2.1.28-29.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "cyrus-sasl-lib",
+      "source": "cyrus-sasl",
+      "source_version": "2.1.28-29.el10",
+      "version": "2.1.28-29.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "dbus",
+      "source": "dbus",
+      "source_version": "1.14.10-5.el10",
+      "version": "1:1.14.10-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "dbus-broker",
+      "source": "dbus-broker",
+      "source_version": "36-4.el10",
+      "version": "36-4.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "dbus-common",
+      "source": "dbus",
+      "source_version": "1.14.10-5.el10",
+      "version": "1:1.14.10-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "dbus-libs",
+      "source": "dbus",
+      "source_version": "1.14.10-5.el10",
+      "version": "1:1.14.10-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "device-mapper",
+      "source": "lvm2",
+      "source_version": "2.03.36-2.el10",
+      "version": "10:1.02.210-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "device-mapper-event",
+      "source": "lvm2",
+      "source_version": "2.03.36-2.el10",
+      "version": "10:1.02.210-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "device-mapper-event-libs",
+      "source": "lvm2",
+      "source_version": "2.03.36-2.el10",
+      "version": "10:1.02.210-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "device-mapper-libs",
+      "source": "lvm2",
+      "source_version": "2.03.36-2.el10",
+      "version": "10:1.02.210-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "device-mapper-persistent-data",
+      "source": "device-mapper-persistent-data",
+      "source_version": "1.3.0-1.el10",
+      "version": "1.3.0-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "diffutils",
+      "source": "diffutils",
+      "source_version": "3.10-8.el10",
+      "version": "3.10-8.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "dnf",
+      "source": "dnf",
+      "source_version": "4.20.0-22.el10_2.rocky.0.1",
+      "version": "4.20.0-22.el10_2.rocky.0.1"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "dnf-data",
+      "source": "dnf",
+      "source_version": "4.20.0-22.el10_2.rocky.0.1",
+      "version": "4.20.0-22.el10_2.rocky.0.1"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "dnf-plugins-core",
+      "source": "dnf-plugins-core",
+      "source_version": "4.7.0-10.el10",
+      "version": "4.7.0-10.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "dracut",
+      "source": "dracut",
+      "source_version": "107-4.el10",
+      "version": "107-4.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "dracut-config-rescue",
+      "source": "dracut",
+      "source_version": "107-4.el10",
+      "version": "107-4.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "dracut-network",
+      "source": "dracut",
+      "source_version": "107-4.el10",
+      "version": "107-4.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "dracut-squash",
+      "source": "dracut",
+      "source_version": "107-4.el10",
+      "version": "107-4.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "e2fsprogs",
+      "source": "e2fsprogs",
+      "source_version": "1.47.1-5.el10",
+      "version": "1.47.1-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "e2fsprogs-libs",
+      "source": "e2fsprogs",
+      "source_version": "1.47.1-5.el10",
+      "version": "1.47.1-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "elfutils-debuginfod-client",
+      "source": "elfutils",
+      "source_version": "0.194-2.el10.rocky.0.1",
+      "version": "0.194-2.el10.rocky.0.1"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "elfutils-default-yama-scope",
+      "source": "elfutils",
+      "source_version": "0.194-2.el10.rocky.0.1",
+      "version": "0.194-2.el10.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "elfutils-libelf",
+      "source": "elfutils",
+      "source_version": "0.194-2.el10.rocky.0.1",
+      "version": "0.194-2.el10.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "elfutils-libs",
+      "source": "elfutils",
+      "source_version": "0.194-2.el10.rocky.0.1",
+      "version": "0.194-2.el10.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "erofs-utils",
+      "source": "erofs-utils",
+      "source_version": "1.8.10-1.el10",
+      "version": "1.8.10-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "ethtool",
+      "source": "ethtool",
+      "source_version": "6.15-2.el10",
+      "version": "2:6.15-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "expat",
+      "source": "expat",
+      "source_version": "2.7.3-1.el10",
+      "version": "2.7.3-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "file",
+      "source": "file",
+      "source_version": "5.45-9.el10",
+      "version": "5.45-9.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "file-libs",
+      "source": "file",
+      "source_version": "5.45-9.el10",
+      "version": "5.45-9.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "filesystem",
+      "source": "filesystem",
+      "source_version": "3.18-17.el10",
+      "version": "3.18-17.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "findutils",
+      "source": "findutils",
+      "source_version": "4.10.0-5.el10",
+      "version": "1:4.10.0-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "fips-provider-next",
+      "source": "fips-provider-next",
+      "source_version": "1.2.0-3.el10_1",
+      "version": "1.2.0-3.el10_1"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "firewalld",
+      "source": "firewalld",
+      "source_version": "2.4.0-1.el10_1",
+      "version": "2.4.0-1.el10_1"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "firewalld-filesystem",
+      "source": "firewalld",
+      "source_version": "2.4.0-1.el10_1",
+      "version": "2.4.0-1.el10_1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "fuse-libs",
+      "source": "fuse",
+      "source_version": "2.9.9-25.el10",
+      "version": "2.9.9-25.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "fuse3-libs",
+      "source": "fuse3",
+      "source_version": "3.16.2-5.el10",
+      "version": "3.16.2-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "gawk",
+      "source": "gawk",
+      "source_version": "5.3.0-6.el10",
+      "version": "5.3.0-6.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "gdbm",
+      "source": "gdbm",
+      "source_version": "1.23-14.el10",
+      "version": "1:1.23-14.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "gdbm-libs",
+      "source": "gdbm",
+      "source_version": "1.23-14.el10",
+      "version": "1:1.23-14.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "gettext-envsubst",
+      "source": "gettext",
+      "source_version": "0.22.5-6.el10",
+      "version": "0.22.5-6.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "gettext-libs",
+      "source": "gettext",
+      "source_version": "0.22.5-6.el10",
+      "version": "0.22.5-6.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "gettext-runtime",
+      "source": "gettext",
+      "source_version": "0.22.5-6.el10",
+      "version": "0.22.5-6.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "glib2",
+      "source": "glib2",
+      "source_version": "2.80.4-12.el10_2.13",
+      "version": "2.80.4-12.el10_2.13"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "glibc",
+      "source": "glibc",
+      "source_version": "2.39-121.el10_2",
+      "version": "2.39-121.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "glibc-all-langpacks",
+      "source": "glibc",
+      "source_version": "2.39-121.el10_2",
+      "version": "2.39-121.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "glibc-common",
+      "source": "glibc",
+      "source_version": "2.39-121.el10_2",
+      "version": "2.39-121.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "glibc-gconv-extra",
+      "source": "glibc",
+      "source_version": "2.39-121.el10_2",
+      "version": "2.39-121.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "gmp",
+      "source": "gmp",
+      "source_version": "6.2.1-12.el10",
+      "version": "1:6.2.1-12.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "gnutls",
+      "source": "gnutls",
+      "source_version": "3.8.10-3.el10_1",
+      "version": "3.8.10-3.el10_1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "gobject-introspection",
+      "source": "gobject-introspection",
+      "source_version": "1.79.1-6.el10",
+      "version": "1.79.1-6.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "grep",
+      "source": "grep",
+      "source_version": "3.11-10.el10",
+      "version": "3.11-10.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "groff-base",
+      "source": "groff",
+      "source_version": "1.23.0-10.el10",
+      "version": "1.23.0-10.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "grub2-common",
+      "source": "grub2",
+      "source_version": "2.12-46.el10_2.rocky.0.1",
+      "version": "1:2.12-46.el10_2.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "grub2-pc",
+      "source": "grub2",
+      "source_version": "2.12-46.el10_2.rocky.0.1",
+      "version": "1:2.12-46.el10_2.rocky.0.1"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "grub2-pc-modules",
+      "source": "grub2",
+      "source_version": "2.12-46.el10_2.rocky.0.1",
+      "version": "1:2.12-46.el10_2.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "grub2-tools",
+      "source": "grub2",
+      "source_version": "2.12-46.el10_2.rocky.0.1",
+      "version": "1:2.12-46.el10_2.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "grub2-tools-minimal",
+      "source": "grub2",
+      "source_version": "2.12-46.el10_2.rocky.0.1",
+      "version": "1:2.12-46.el10_2.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "grubby",
+      "source": "grubby",
+      "source_version": "8.40-83.el10",
+      "version": "8.40-83.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "gzip",
+      "source": "gzip",
+      "source_version": "1.13-3.el10",
+      "version": "1.13-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "hostname",
+      "source": "hostname",
+      "source_version": "3.23-14.el10",
+      "version": "3.23-14.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "hwdata",
+      "source": "hwdata",
+      "source_version": "0.379-10.8.el10",
+      "version": "0.379-10.8.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "ima-evm-utils",
+      "source": "ima-evm-utils",
+      "source_version": "1.6.2-4.el10.rocky.0.2",
+      "version": "1.6.2-4.el10.rocky.0.2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "inih",
+      "source": "inih",
+      "source_version": "58-3.el10",
+      "version": "58-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "initscripts-rename-device",
+      "source": "initscripts",
+      "source_version": "10.26-2.el10",
+      "version": "10.26-2.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "initscripts-service",
+      "source": "initscripts",
+      "source_version": "10.26-2.el10",
+      "version": "10.26-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "iproute",
+      "source": "iproute",
+      "source_version": "6.17.0-2.el10",
+      "version": "6.17.0-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "iproute-tc",
+      "source": "iproute",
+      "source_version": "6.17.0-2.el10",
+      "version": "6.17.0-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "ipset",
+      "source": "ipset",
+      "source_version": "7.22-10.el10",
+      "version": "7.22-10.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "ipset-libs",
+      "source": "ipset",
+      "source_version": "7.22-10.el10",
+      "version": "7.22-10.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "iptables-libs",
+      "source": "iptables",
+      "source_version": "1.8.11-13.el10",
+      "version": "1.8.11-13.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "iputils",
+      "source": "iputils",
+      "source_version": "20240905-5.el10",
+      "version": "20240905-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "irqbalance",
+      "source": "irqbalance",
+      "source_version": "1.9.4-6.el10",
+      "version": "2:1.9.4-6.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "iwlwifi-dvm-firmware",
+      "source": "linux-firmware",
+      "source_version": "20260411-19.5.el10_1",
+      "version": "20260411-19.5.el10_1"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "iwlwifi-mvm-firmware",
+      "source": "linux-firmware",
+      "source_version": "20260411-19.5.el10_1",
+      "version": "20260411-19.5.el10_1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "jansson",
+      "source": "jansson",
+      "source_version": "2.14-3.el10",
+      "version": "2.14-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "jq",
+      "source": "jq",
+      "source_version": "1.7.1-11.el10_2.2",
+      "version": "1.7.1-11.el10_2.2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "json-c",
+      "source": "json-c",
+      "source_version": "0.18-3.el10",
+      "version": "0.18-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "kbd",
+      "source": "kbd",
+      "source_version": "2.6.4-7.el10",
+      "version": "2.6.4-7.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "kbd-legacy",
+      "source": "kbd",
+      "source_version": "2.6.4-7.el10",
+      "version": "2.6.4-7.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "kbd-misc",
+      "source": "kbd",
+      "source_version": "2.6.4-7.el10",
+      "version": "2.6.4-7.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "kdump-utils",
+      "source": "kdump-utils",
+      "source_version": "1.0.58-15.el10",
+      "version": "1.0.58-15.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "kernel",
+      "source": "kernel",
+      "source_version": "6.12.0-211.16.1.el10_2.0.1",
+      "version": "6.12.0-211.16.1.el10_2.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "kernel-core",
+      "source": "kernel",
+      "source_version": "6.12.0-211.16.1.el10_2.0.1",
+      "version": "6.12.0-211.16.1.el10_2.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "kernel-modules",
+      "source": "kernel",
+      "source_version": "6.12.0-211.16.1.el10_2.0.1",
+      "version": "6.12.0-211.16.1.el10_2.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "kernel-modules-core",
+      "source": "kernel",
+      "source_version": "6.12.0-211.16.1.el10_2.0.1",
+      "version": "6.12.0-211.16.1.el10_2.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "kernel-modules-extra",
+      "source": "kernel",
+      "source_version": "6.12.0-211.16.1.el10_2.0.1",
+      "version": "6.12.0-211.16.1.el10_2.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "kernel-tools",
+      "source": "kernel",
+      "source_version": "6.12.0-211.16.1.el10_2.0.1",
+      "version": "6.12.0-211.16.1.el10_2.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "kernel-tools-libs",
+      "source": "kernel",
+      "source_version": "6.12.0-211.16.1.el10_2.0.1",
+      "version": "6.12.0-211.16.1.el10_2.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "kexec-tools",
+      "source": "kexec-tools",
+      "source_version": "2.0.32-3.el10",
+      "version": "2.0.32-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "keyutils",
+      "source": "keyutils",
+      "source_version": "1.6.3-5.el10",
+      "version": "1.6.3-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "keyutils-libs",
+      "source": "keyutils",
+      "source_version": "1.6.3-5.el10",
+      "version": "1.6.3-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "kmod",
+      "source": "kmod",
+      "source_version": "31-13.el10",
+      "version": "31-13.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "kmod-libs",
+      "source": "kmod",
+      "source_version": "31-13.el10",
+      "version": "31-13.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "kpartx",
+      "source": "device-mapper-multipath",
+      "source_version": "0.9.9-18.el10",
+      "version": "0.9.9-18.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "krb5-libs",
+      "source": "krb5",
+      "source_version": "1.21.3-10.el10_2",
+      "version": "1.21.3-10.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "less",
+      "source": "less",
+      "source_version": "661-3.el10",
+      "version": "661-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libacl",
+      "source": "acl",
+      "source_version": "2.3.2-4.el10",
+      "version": "2.3.2-4.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libaio",
+      "source": "libaio",
+      "source_version": "0.3.111-22.el10",
+      "version": "0.3.111-22.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libarchive",
+      "source": "libarchive",
+      "source_version": "3.7.7-8.el10_1",
+      "version": "3.7.7-8.el10_1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libattr",
+      "source": "attr",
+      "source_version": "2.5.2-5.el10",
+      "version": "2.5.2-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libbasicobjects",
+      "source": "ding-libs",
+      "source_version": "0.6.2-58.el10",
+      "version": "0.1.1-58.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libblkid",
+      "source": "util-linux",
+      "source_version": "2.40.2-18.el10",
+      "version": "2.40.2-18.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libbpf",
+      "source": "libbpf",
+      "source_version": "1.7.0-1.el10",
+      "version": "2:1.7.0-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libbrotli",
+      "source": "brotli",
+      "source_version": "1.1.0-7.el10_1",
+      "version": "1.1.0-7.el10_1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libcap",
+      "source": "libcap",
+      "source_version": "2.69-7.el10_1.1",
+      "version": "2.69-7.el10_1.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libcap-ng",
+      "source": "libcap-ng",
+      "source_version": "0.8.4-6.el10",
+      "version": "0.8.4-6.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libcbor",
+      "source": "libcbor",
+      "source_version": "0.11.0-3.el10",
+      "version": "0.11.0-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libcollection",
+      "source": "ding-libs",
+      "source_version": "0.6.2-58.el10",
+      "version": "0.7.0-58.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libcom_err",
+      "source": "e2fsprogs",
+      "source_version": "1.47.1-5.el10",
+      "version": "1.47.1-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libcomps",
+      "source": "libcomps",
+      "source_version": "0.1.21-3.el10",
+      "version": "0.1.21-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libcurl",
+      "source": "curl",
+      "source_version": "8.12.1-4.el10",
+      "version": "8.12.1-4.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libdhash",
+      "source": "ding-libs",
+      "source_version": "0.6.2-58.el10",
+      "version": "0.5.0-58.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libdnf",
+      "source": "libdnf",
+      "source_version": "0.73.1-15.el10_2.rocky.0.1",
+      "version": "0.73.1-15.el10_2.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libeconf",
+      "source": "libeconf",
+      "source_version": "0.6.2-4.el10",
+      "version": "0.6.2-4.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libedit",
+      "source": "libedit",
+      "source_version": "3.1-52.20230828cvs.el10",
+      "version": "3.1-52.20230828cvs.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libestr",
+      "source": "libestr",
+      "source_version": "0.1.11-11.el10",
+      "version": "0.1.11-11.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libevent",
+      "source": "libevent",
+      "source_version": "2.1.12-16.el10",
+      "version": "2.1.12-16.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libfastjson",
+      "source": "libfastjson",
+      "source_version": "1.2304.0-6.el10",
+      "version": "1.2304.0-6.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libfdisk",
+      "source": "util-linux",
+      "source_version": "2.40.2-18.el10",
+      "version": "2.40.2-18.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libffi",
+      "source": "libffi",
+      "source_version": "3.4.4-10.el10",
+      "version": "3.4.4-10.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libfido2",
+      "source": "libfido2",
+      "source_version": "1.14.0-7.el10",
+      "version": "1.14.0-7.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libgcc",
+      "source": "gcc",
+      "source_version": "14.3.1-4.4.el10",
+      "version": "14.3.1-4.4.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libgomp",
+      "source": "gcc",
+      "source_version": "14.3.1-4.4.el10",
+      "version": "14.3.1-4.4.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libidn2",
+      "source": "libidn2",
+      "source_version": "2.3.7-3.el10",
+      "version": "2.3.7-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libini_config",
+      "source": "ding-libs",
+      "source_version": "0.6.2-58.el10",
+      "version": "1.3.1-58.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libkcapi",
+      "source": "libkcapi",
+      "source_version": "1.5.0-3.el10",
+      "version": "1.5.0-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libkcapi-hasher",
+      "source": "libkcapi",
+      "source_version": "1.5.0-3.el10",
+      "version": "1.5.0-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libkcapi-hmaccalc",
+      "source": "libkcapi",
+      "source_version": "1.5.0-3.el10",
+      "version": "1.5.0-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libldb",
+      "source": "samba",
+      "source_version": "4.23.5-107.el10_2",
+      "version": "4.23.5-107.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libmnl",
+      "source": "libmnl",
+      "source_version": "1.0.5-7.el10",
+      "version": "1.0.5-7.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libmodulemd",
+      "source": "libmodulemd",
+      "source_version": "2.15.0-12.el10",
+      "version": "2.15.0-12.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libmount",
+      "source": "util-linux",
+      "source_version": "2.40.2-18.el10",
+      "version": "2.40.2-18.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libndp",
+      "source": "libndp",
+      "source_version": "1.9-2.el10",
+      "version": "1.9-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libnetfilter_conntrack",
+      "source": "libnetfilter_conntrack",
+      "source_version": "1.0.9-12.el10",
+      "version": "1.0.9-12.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libnfnetlink",
+      "source": "libnfnetlink",
+      "source_version": "1.0.2-3.el10",
+      "version": "1.0.2-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libnftnl",
+      "source": "libnftnl",
+      "source_version": "1.3.0-3.el10",
+      "version": "1.3.0-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libnghttp2",
+      "source": "nghttp2",
+      "source_version": "1.68.0-3.el10_2.1",
+      "version": "1.68.0-3.el10_2.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libnl3",
+      "source": "libnl3",
+      "source_version": "3.11.0-1.el10",
+      "version": "3.11.0-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libnvme",
+      "source": "libnvme",
+      "source_version": "1.16.1-3.el10_2",
+      "version": "1.16.1-3.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libpath_utils",
+      "source": "ding-libs",
+      "source_version": "0.6.2-58.el10",
+      "version": "0.2.1-58.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libpipeline",
+      "source": "libpipeline",
+      "source_version": "1.5.7-7.el10",
+      "version": "1.5.7-7.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libpsl",
+      "source": "libpsl",
+      "source_version": "0.21.5-6.el10",
+      "version": "0.21.5-6.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libpwquality",
+      "source": "libpwquality",
+      "source_version": "1.4.5-12.el10",
+      "version": "1.4.5-12.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libref_array",
+      "source": "ding-libs",
+      "source_version": "0.6.2-58.el10",
+      "version": "0.1.5-58.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "librepo",
+      "source": "librepo",
+      "source_version": "1.19.0-1.el10",
+      "version": "1.19.0-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libseccomp",
+      "source": "libseccomp",
+      "source_version": "2.5.6-1.el10",
+      "version": "2.5.6-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libselinux",
+      "source": "libselinux",
+      "source_version": "3.10-1.el10",
+      "version": "3.10-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libselinux-utils",
+      "source": "libselinux",
+      "source_version": "3.10-1.el10",
+      "version": "3.10-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libsemanage",
+      "source": "libsemanage",
+      "source_version": "3.10-1.el10",
+      "version": "3.10-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libsepol",
+      "source": "libsepol",
+      "source_version": "3.10-1.el10",
+      "version": "3.10-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libsmartcols",
+      "source": "util-linux",
+      "source_version": "2.40.2-18.el10",
+      "version": "2.40.2-18.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libsolv",
+      "source": "libsolv",
+      "source_version": "0.7.33-2.el10",
+      "version": "0.7.33-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libss",
+      "source": "e2fsprogs",
+      "source_version": "1.47.1-5.el10",
+      "version": "1.47.1-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libssh",
+      "source": "libssh",
+      "source_version": "0.12.0-2.el10",
+      "version": "0.12.0-2.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "libssh-config",
+      "source": "libssh",
+      "source_version": "0.12.0-2.el10",
+      "version": "0.12.0-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libsss_certmap",
+      "source": "sssd",
+      "source_version": "2.12.0-3.el10_2",
+      "version": "2.12.0-3.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libsss_idmap",
+      "source": "sssd",
+      "source_version": "2.12.0-3.el10_2",
+      "version": "2.12.0-3.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libsss_nss_idmap",
+      "source": "sssd",
+      "source_version": "2.12.0-3.el10_2",
+      "version": "2.12.0-3.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libsss_sudo",
+      "source": "sssd",
+      "source_version": "2.12.0-3.el10_2",
+      "version": "2.12.0-3.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libstdc++",
+      "source": "gcc",
+      "source_version": "14.3.1-4.4.el10",
+      "version": "14.3.1-4.4.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libsysfs",
+      "source": "sysfsutils",
+      "source_version": "2.1.1-15.el10",
+      "version": "2.1.1-15.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libtalloc",
+      "source": "libtalloc",
+      "source_version": "2.4.3-100.el10",
+      "version": "2.4.3-100.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libtasn1",
+      "source": "libtasn1",
+      "source_version": "4.20.0-1.el10",
+      "version": "4.20.0-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libtdb",
+      "source": "libtdb",
+      "source_version": "1.4.14-100.el10",
+      "version": "1.4.14-100.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libtevent",
+      "source": "libtevent",
+      "source_version": "0.17.1-100.el10",
+      "version": "0.17.1-100.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libunistring",
+      "source": "libunistring",
+      "source_version": "1.1-10.el10",
+      "version": "1.1-10.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libutempter",
+      "source": "libutempter",
+      "source_version": "1.2.1-15.el10",
+      "version": "1.2.1-15.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libuuid",
+      "source": "util-linux",
+      "source_version": "2.40.2-18.el10",
+      "version": "2.40.2-18.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libverto",
+      "source": "libverto",
+      "source_version": "0.3.2-10.el10",
+      "version": "0.3.2-10.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libxcrypt",
+      "source": "libxcrypt",
+      "source_version": "4.4.36-10.el10",
+      "version": "4.4.36-10.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libxml2",
+      "source": "libxml2",
+      "source_version": "2.12.5-10.el10",
+      "version": "2.12.5-10.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libyaml",
+      "source": "libyaml",
+      "source_version": "0.2.5-16.el10",
+      "version": "0.2.5-16.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "libzstd",
+      "source": "zstd",
+      "source_version": "1.5.5-9.el10",
+      "version": "1.5.5-9.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "linux-firmware",
+      "source": "linux-firmware",
+      "source_version": "20260411-19.5.el10_1",
+      "version": "20260411-19.5.el10_1"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "linux-firmware-whence",
+      "source": "linux-firmware",
+      "source_version": "20260411-19.5.el10_1",
+      "version": "20260411-19.5.el10_1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "lmdb-libs",
+      "source": "lmdb",
+      "source_version": "0.9.32-4.el10",
+      "version": "0.9.32-4.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "logrotate",
+      "source": "logrotate",
+      "source_version": "3.22.0-5.el10",
+      "version": "3.22.0-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "lshw",
+      "source": "lshw",
+      "source_version": "B.02.20-9.el10",
+      "version": "B.02.20-9.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "lsscsi",
+      "source": "lsscsi",
+      "source_version": "0.32-15.el10",
+      "version": "0.32-15.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "lua-libs",
+      "source": "lua",
+      "source_version": "5.4.6-7.el10",
+      "version": "5.4.6-7.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "lvm2",
+      "source": "lvm2",
+      "source_version": "2.03.36-2.el10",
+      "version": "10:2.03.36-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "lvm2-libs",
+      "source": "lvm2",
+      "source_version": "2.03.36-2.el10",
+      "version": "10:2.03.36-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "lz4-libs",
+      "source": "lz4",
+      "source_version": "1.9.4-8.el10",
+      "version": "1.9.4-8.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "lzo",
+      "source": "lzo",
+      "source_version": "2.10-14.el10",
+      "version": "2.10-14.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "makedumpfile",
+      "source": "makedumpfile",
+      "source_version": "1.7.8-1.el10",
+      "version": "1.7.8-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "man-db",
+      "source": "man-db",
+      "source_version": "2.12.0-10.el10",
+      "version": "2.12.0-10.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "microcode_ctl",
+      "source": "microcode_ctl",
+      "source_version": "20260210-1.el10_2",
+      "version": "4:20260210-1.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "mpdecimal",
+      "source": "mpdecimal",
+      "source_version": "2.5.1-12.el10",
+      "version": "2.5.1-12.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "mpfr",
+      "source": "mpfr",
+      "source_version": "4.2.1-8.el10",
+      "version": "4.2.1-8.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "ncurses",
+      "source": "ncurses",
+      "source_version": "6.4-15.20240127.el10_1",
+      "version": "6.4-15.20240127.el10_1"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "ncurses-base",
+      "source": "ncurses",
+      "source_version": "6.4-15.20240127.el10_1",
+      "version": "6.4-15.20240127.el10_1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "ncurses-libs",
+      "source": "ncurses",
+      "source_version": "6.4-15.20240127.el10_1",
+      "version": "6.4-15.20240127.el10_1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "newt",
+      "source": "newt",
+      "source_version": "0.52.24-5.el10",
+      "version": "0.52.24-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "nftables",
+      "source": "nftables",
+      "source_version": "1.1.5-4.el10",
+      "version": "1:1.1.5-4.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "numactl-libs",
+      "source": "numactl",
+      "source_version": "2.0.19-3.el10",
+      "version": "2.0.19-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "oniguruma",
+      "source": "oniguruma",
+      "source_version": "6.9.9-7.el10",
+      "version": "6.9.9-7.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "openldap",
+      "source": "openldap",
+      "source_version": "2.6.10-1.el10",
+      "version": "2.6.10-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "openssh",
+      "source": "openssh",
+      "source_version": "9.9p1-23.el10_2.rocky.0.1",
+      "version": "9.9p1-23.el10_2.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "openssh-clients",
+      "source": "openssh",
+      "source_version": "9.9p1-23.el10_2.rocky.0.1",
+      "version": "9.9p1-23.el10_2.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "openssh-server",
+      "source": "openssh",
+      "source_version": "9.9p1-23.el10_2.rocky.0.1",
+      "version": "9.9p1-23.el10_2.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "openssl-libs",
+      "source": "openssl",
+      "source_version": "3.5.5-2.el10_2",
+      "version": "1:3.5.5-2.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "os-prober",
+      "source": "os-prober",
+      "source_version": "1.81-9.el10",
+      "version": "1.81-9.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "p11-kit",
+      "source": "p11-kit",
+      "source_version": "0.26.2-1.el10",
+      "version": "0.26.2-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "p11-kit-trust",
+      "source": "p11-kit",
+      "source_version": "0.26.2-1.el10",
+      "version": "0.26.2-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "pam",
+      "source": "pam",
+      "source_version": "1.6.1-9.el10",
+      "version": "1.6.1-9.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "pam-libs",
+      "source": "pam",
+      "source_version": "1.6.1-9.el10",
+      "version": "1.6.1-9.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "parted",
+      "source": "parted",
+      "source_version": "3.6-7.el10",
+      "version": "3.6-7.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "pciutils-libs",
+      "source": "pciutils",
+      "source_version": "3.13.0-6.el10",
+      "version": "3.13.0-6.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "pcre2",
+      "source": "pcre2",
+      "source_version": "10.44-1.el10.3",
+      "version": "10.44-1.el10.3"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "pcre2-syntax",
+      "source": "pcre2",
+      "source_version": "10.44-1.el10.3",
+      "version": "10.44-1.el10.3"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "policycoreutils",
+      "source": "policycoreutils",
+      "source_version": "3.10-1.el10",
+      "version": "3.10-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "popt",
+      "source": "popt",
+      "source_version": "1.19-8.el10",
+      "version": "1.19-8.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "prefixdevname",
+      "source": "rust-prefixdevname",
+      "source_version": "0.2.0-4.el10",
+      "version": "0.2.0-4.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "procps-ng",
+      "source": "procps-ng",
+      "source_version": "4.0.4-11.el10",
+      "version": "4.0.4-11.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "psmisc",
+      "source": "psmisc",
+      "source_version": "23.6-8.el10",
+      "version": "23.6-8.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "publicsuffix-list-dafsa",
+      "source": "publicsuffix-list",
+      "source_version": "20240107-5.el10",
+      "version": "20240107-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "python3",
+      "source": "python3.12",
+      "source_version": "3.12.13-2.el10_2",
+      "version": "3.12.13-2.el10_2"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "python3-attrs",
+      "source": "python-attrs",
+      "source_version": "23.2.0-7.el10",
+      "version": "23.2.0-7.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "python3-dateutil",
+      "source": "python-dateutil",
+      "source_version": "2.9.0.post0-1.el10_0",
+      "version": "1:2.9.0.post0-1.el10_0"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "python3-dbus",
+      "source": "dbus-python",
+      "source_version": "1.3.2-8.el10",
+      "version": "1.3.2-8.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "python3-dnf",
+      "source": "dnf",
+      "source_version": "4.20.0-22.el10_2.rocky.0.1",
+      "version": "4.20.0-22.el10_2.rocky.0.1"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "python3-dnf-plugins-core",
+      "source": "dnf-plugins-core",
+      "source_version": "4.7.0-10.el10",
+      "version": "4.7.0-10.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "python3-firewall",
+      "source": "firewalld",
+      "source_version": "2.4.0-1.el10_1",
+      "version": "2.4.0-1.el10_1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "python3-gobject-base",
+      "source": "pygobject3",
+      "source_version": "3.46.0-7.el10",
+      "version": "3.46.0-7.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "python3-gobject-base-noarch",
+      "source": "pygobject3",
+      "source_version": "3.46.0-7.el10",
+      "version": "3.46.0-7.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "python3-hawkey",
+      "source": "libdnf",
+      "source_version": "0.73.1-15.el10_2.rocky.0.1",
+      "version": "0.73.1-15.el10_2.rocky.0.1"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "python3-jsonschema",
+      "source": "python-jsonschema",
+      "source_version": "4.19.1-7.el10",
+      "version": "4.19.1-7.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "python3-jsonschema-specifications",
+      "source": "python-jsonschema-specifications",
+      "source_version": "2023.11.2-6.el10",
+      "version": "2023.11.2-6.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "python3-libcomps",
+      "source": "libcomps",
+      "source_version": "0.1.21-3.el10",
+      "version": "0.1.21-3.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "python3-libdnf",
+      "source": "libdnf",
+      "source_version": "0.73.1-15.el10_2.rocky.0.1",
+      "version": "0.73.1-15.el10_2.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "python3-libs",
+      "source": "python3.12",
+      "source_version": "3.12.13-2.el10_2",
+      "version": "3.12.13-2.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "python3-libselinux",
+      "source": "libselinux",
+      "source_version": "3.10-1.el10",
+      "version": "3.10-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "python3-nftables",
+      "source": "nftables",
+      "source_version": "1.1.5-4.el10",
+      "version": "1:1.1.5-4.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "python3-pip-wheel",
+      "source": "python-pip",
+      "source_version": "23.3.2-11.el10_2",
+      "version": "23.3.2-11.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "python3-pyyaml",
+      "source": "PyYAML",
+      "source_version": "6.0.1-19.el10",
+      "version": "6.0.1-19.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "python3-referencing",
+      "source": "python-referencing",
+      "source_version": "0.31.1-6.el10",
+      "version": "0.31.1-6.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "python3-rpds-py",
+      "source": "python-rpds-py",
+      "source_version": "0.17.1-6.el10",
+      "version": "0.17.1-6.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "python3-rpm",
+      "source": "rpm",
+      "source_version": "4.19.1.1-23.el10",
+      "version": "4.19.1.1-23.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "python3-six",
+      "source": "python-six",
+      "source_version": "1.16.0-16.el10",
+      "version": "1.16.0-16.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "python3-systemd",
+      "source": "python-systemd",
+      "source_version": "235-11.el10",
+      "version": "235-11.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "readline",
+      "source": "readline",
+      "source_version": "8.2-11.el10",
+      "version": "8.2-11.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "rocky-gpg-keys",
+      "source": "rocky-release",
+      "source_version": "10.2-1.1.el10",
+      "version": "10.2-1.1.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "rocky-release",
+      "source": "rocky-release",
+      "source_version": "10.2-1.1.el10",
+      "version": "10.2-1.1.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "rocky-repos",
+      "source": "rocky-release",
+      "source_version": "10.2-1.1.el10",
+      "version": "10.2-1.1.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "rootfiles",
+      "source": "rootfiles",
+      "source_version": "8.1-54.el10",
+      "version": "8.1-54.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "rpm",
+      "source": "rpm",
+      "source_version": "4.19.1.1-23.el10",
+      "version": "4.19.1.1-23.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "rpm-build-libs",
+      "source": "rpm",
+      "source_version": "4.19.1.1-23.el10",
+      "version": "4.19.1.1-23.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "rpm-libs",
+      "source": "rpm",
+      "source_version": "4.19.1.1-23.el10",
+      "version": "4.19.1.1-23.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "rpm-plugin-audit",
+      "source": "rpm",
+      "source_version": "4.19.1.1-23.el10",
+      "version": "4.19.1.1-23.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "rpm-plugin-selinux",
+      "source": "rpm",
+      "source_version": "4.19.1.1-23.el10",
+      "version": "4.19.1.1-23.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "rpm-sequoia",
+      "source": "rust-rpm-sequoia",
+      "source_version": "1.10.1.1-2.el10",
+      "version": "1.10.1.1-2.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "rpm-sign-libs",
+      "source": "rpm",
+      "source_version": "4.19.1.1-23.el10",
+      "version": "4.19.1.1-23.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "rsyslog",
+      "source": "rsyslog",
+      "source_version": "8.2510.0-5.el10",
+      "version": "8.2510.0-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "sed",
+      "source": "sed",
+      "source_version": "4.9-5.el10",
+      "version": "4.9-5.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "selinux-policy",
+      "source": "selinux-policy",
+      "source_version": "42.1.18-4.el10",
+      "version": "42.1.18-4.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "selinux-policy-targeted",
+      "source": "selinux-policy",
+      "source_version": "42.1.18-4.el10",
+      "version": "42.1.18-4.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "setup",
+      "source": "setup",
+      "source_version": "2.14.5-7.el10",
+      "version": "2.14.5-7.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "sg3_utils",
+      "source": "sg3_utils",
+      "source_version": "1.48-7.el10",
+      "version": "1.48-7.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "sg3_utils-libs",
+      "source": "sg3_utils",
+      "source_version": "1.48-7.el10",
+      "version": "1.48-7.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "shadow-utils",
+      "source": "shadow-utils",
+      "source_version": "4.15.0-11.el10",
+      "version": "2:4.15.0-11.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "slang",
+      "source": "slang",
+      "source_version": "2.3.3-8.el10",
+      "version": "2.3.3-8.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "snappy",
+      "source": "snappy",
+      "source_version": "1.1.10-7.el10",
+      "version": "1.1.10-7.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "sqlite-libs",
+      "source": "sqlite",
+      "source_version": "3.46.1-5.el10_1",
+      "version": "3.46.1-5.el10_1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "sssd-client",
+      "source": "sssd",
+      "source_version": "2.12.0-3.el10_2",
+      "version": "2.12.0-3.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "sssd-common",
+      "source": "sssd",
+      "source_version": "2.12.0-3.el10_2",
+      "version": "2.12.0-3.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "sssd-kcm",
+      "source": "sssd",
+      "source_version": "2.12.0-3.el10_2",
+      "version": "2.12.0-3.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "sssd-krb5-common",
+      "source": "sssd",
+      "source_version": "2.12.0-3.el10_2",
+      "version": "2.12.0-3.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "sudo",
+      "source": "sudo",
+      "source_version": "1.9.17-4.p2.el10_2",
+      "version": "1.9.17-4.p2.el10_2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "systemd",
+      "source": "systemd",
+      "source_version": "257-23.el10_2.1.rocky.0.1",
+      "version": "257-23.el10_2.1.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "systemd-libs",
+      "source": "systemd",
+      "source_version": "257-23.el10_2.1.rocky.0.1",
+      "version": "257-23.el10_2.1.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "systemd-pam",
+      "source": "systemd",
+      "source_version": "257-23.el10_2.1.rocky.0.1",
+      "version": "257-23.el10_2.1.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "systemd-udev",
+      "source": "systemd",
+      "source_version": "257-23.el10_2.1.rocky.0.1",
+      "version": "257-23.el10_2.1.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "tpm2-tools",
+      "source": "tpm2-tools",
+      "source_version": "5.7-5.el10",
+      "version": "5.7-5.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "tpm2-tss",
+      "source": "tpm2-tss",
+      "source_version": "4.1.3-6.el10",
+      "version": "4.1.3-6.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "tpm2-tss-fapi",
+      "source": "tpm2-tss",
+      "source_version": "4.1.3-6.el10",
+      "version": "4.1.3-6.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "tzdata",
+      "source": "tzdata",
+      "source_version": "2026a-1.el10",
+      "version": "2026a-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "userspace-rcu",
+      "source": "userspace-rcu",
+      "source_version": "0.14.0-7.el10",
+      "version": "0.14.0-7.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "util-linux",
+      "source": "util-linux",
+      "source_version": "2.40.2-18.el10",
+      "version": "2.40.2-18.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "util-linux-core",
+      "source": "util-linux",
+      "source_version": "2.40.2-18.el10",
+      "version": "2.40.2-18.el10"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "vim-data",
+      "source": "vim",
+      "source_version": "9.1.083-9.el10_2.2",
+      "version": "2:9.1.083-9.el10_2.2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "vim-minimal",
+      "source": "vim",
+      "source_version": "9.1.083-9.el10_2.2",
+      "version": "2:9.1.083-9.el10_2.2"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "which",
+      "source": "which",
+      "source_version": "2.21-44.el10_0",
+      "version": "2.21-44.el10_0"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "xfsprogs",
+      "source": "xfsprogs",
+      "source_version": "6.16.0-1.el10",
+      "version": "6.16.0-1.el10"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "xz",
+      "source": "xz",
+      "source_version": "5.6.2-4.el10_0",
+      "version": "1:5.6.2-4.el10_0"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "xz-libs",
+      "source": "xz",
+      "source_version": "5.6.2-4.el10_0",
+      "version": "1:5.6.2-4.el10_0"
+    },
+    {
+      "arch": "noarch",
+      "essential": false,
+      "name": "yum",
+      "source": "dnf",
+      "source_version": "4.20.0-22.el10_2.rocky.0.1",
+      "version": "4.20.0-22.el10_2.rocky.0.1"
+    },
+    {
+      "arch": "x86_64",
+      "essential": false,
+      "name": "zlib-ng-compat",
+      "source": "zlib-ng",
+      "source_version": "2.2.3-3.el10_1",
+      "version": "2.2.3-3.el10_1"
+    }
+  ],
+  "metadataSha256": "180892cdd6dd06f5ed7f0267e29cf5d2887f17774dd1195e21106c181609705b",
+  "scope": "Parser regression data from actual native0.0 output; repository trust, source-epoch projection and live adapter remain separate."
+}

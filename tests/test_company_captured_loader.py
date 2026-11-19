@@ -84,7 +84,7 @@ class LoaderControls(unittest.TestCase):
         with self.assertRaises((L.CapturedLoaderUnavailable,ValueError,TypeError)):
             call()
 
-    def test_all15_shared_modules_original_verifier_parent_and_defaults(self):
+    def test_shared_modules_original_verifier_parent_and_defaults(self):
         with self.f.entry() as entry, self.f.source(entry) as (held,guard):
             V,IP=entry.modules[L.V_PATH],entry.modules[L.IP_PATH]
             self.assertIs(V.require_platform_source(held),held)
@@ -100,6 +100,7 @@ class LoaderControls(unittest.TestCase):
                 layout=modules['scripts/runtime_layout.py'];C=modules['scripts/checkpoint_admission.py']
                 self.assertIs(B._layout,layout);self.assertIs(B._identity,I)
                 self.assertIs(B._registry,modules['scripts/registry_manifest.py'])
+                self.assertIs(B._owner_identity,modules['scripts/identity.py'])
                 self.assertIs(B.qualify_registry_manifest,B._registry.qualify)
                 for value in (I.C,A.C,layout.C,S.C,R.C):self.assertIs(value,C)
                 self.assertIs(Q._allocation,A)
@@ -122,7 +123,34 @@ class LoaderControls(unittest.TestCase):
             with (patch('importlib.util.spec_from_file_location',side_effect=AssertionError('sibling loader')),
                   patch('subprocess.Popen',side_effect=AssertionError('native child'))):
                 with L.captured_startup_modules(held,entry=entry,source_guard=guard) as assembly:
-                    self.assertEqual(len(assembly.modules),15)
+                    self.assertEqual(len(assembly.modules),16)
+
+    def test_owner_realm_uses_captured_identity_not_ambient_import(self):
+        ambient=ModuleType('identity')
+        def untrusted(*args):raise AssertionError('ambient identity executed')
+        ambient.owner_recovery_realm=untrusted
+        cfg=dict(sso='none',owner_subject='00000000-0000-4000-8000-000000000001',
+                 admin_origin='https://admin.example.test')
+        with self.f.entry() as entry,self.f.source(entry) as (held,guard):
+            with L.captured_startup_modules(held,entry=entry,source_guard=guard) as assembly:
+                B=assembly.modules['scripts/bootstrap.py']
+                with patch.dict(sys.modules,{'identity':ambient}),patch.object(B,'write') as output:
+                    B.realm(Path('/never-written'),cfg,'fixture-oidc','fixture-owner','fixture-provisioner')
+                output.assert_called_once()
+                realm=output.call_args.args[1]
+                owner=[user for user in realm['users'] if 'platform-owner' in user.get('realmRoles',[])]
+                self.assertEqual(len(owner),1)
+                self.assertEqual(owner[0]['requiredActions'],
+                                 ['UPDATE_PASSWORD','CONFIGURE_TOTP','CONFIGURE_RECOVERY_AUTHN_CODES'])
+                self.assertFalse(realm['registrationAllowed'])
+                self.assertEqual(realm['clients'][1]['redirectUris'],[cfg['admin_origin']+'/auth/callback'])
+                self.assertTrue(any(flow['alias']=='platform-owner-second-factor' for flow in realm['authenticationFlows']))
+
+    def test_identity_member_drift_refuses_before_operational_execution(self):
+        def mutate(q):q.values['scripts/identity.py']+=b'\n# changed owner recovery policy\n'
+        with self.f.entry() as entry,self.f.source(entry,changes=mutate) as (held,guard):
+            with patch.object(L,'_register',side_effect=AssertionError('operational exec')):
+                self.reject(lambda:self._assemble(held,entry,guard))
 
     def test_late_signed_member_drift_executes_zero_operational_modules(self):
         def mutate(q):q.values['scripts/company_source_tree.py']+=b'\n# changed signed member\n'

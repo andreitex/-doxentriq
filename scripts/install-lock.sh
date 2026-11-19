@@ -189,11 +189,12 @@ _il_stage_inventory() {
   IL_MANIFEST=${digest%% *}; [[ "$IL_MANIFEST" =~ ^[0-9a-f]{64}$ ]] || _il_fail malformed_digest
 }
 _il_history() {
-  local directory id request outcome expected count=0
+  local directory id request outcome expected count=0 excluded=${1:-}
   for directory in "$IL_BASE/sessions"/* "$IL_BASE/sessions"/.[!.]* "$IL_BASE/sessions"/..?*; do
     [[ -e "$directory" || -L "$directory" ]] || continue
     ((count+=1)); ((count<=1024)) || _il_fail session_inventory_limit
     id=${directory##*/}; _il_session_intent "$directory" "$id"; request=$IL_FOUND_REQUEST
+    [[ "$id" != "$excluded" ]] || continue
     _il_stage_inventory "$directory" "$id"
     _il_read "$directory/complete"
     outcome=${IL_TEXT#*$'\n'final=}; outcome=${outcome%%$'\n'*}
@@ -261,6 +262,23 @@ install_lock_acquire() {
   _il_write "$directory/intent" "$expected"
   _il_context; _il_session_intent "$directory" "$id"
 }
+# Reattach one explicitly named unfinished session without creating or replaying
+# anything. The fixed company caller must inspect its exact stage inventory and
+# independently verify any interrupted stage before confirming or continuing.
+install_lock_recover() {
+  local base=${1:?namespace required} request=${2:?request digest required} wait=${3:?wait required} session=${4:?session required}
+  _il_root; _il_utilities
+  [[ -z ${IL_ACTIVE:-} && "$request" =~ ^[0-9a-f]{64}$ && "$wait" =~ ^([1-9]|[12][0-9]|30)$ && "$session" =~ ^s-[A-Za-z0-9]{12}$ ]] || _il_fail invalid_recovery
+  IL_BASE=$base; IL_OWNER=$BASHPID; _il_context
+  exec {IL_DIR_FD}<"$base" || _il_fail directory_open_unavailable
+  exec {IL_LOCK_FD}<"$base/install.lock" || _il_fail lock_open_unavailable
+  IL_ACTIVE=true
+  _il_context; _il_take_lock "$wait" || _il_fail lock_wait_unavailable
+  _il_context; _il_history "$session"; _il_context
+  IL_SESSION=$session; IL_REQUEST=$request
+  _il_live "$session"
+}
+
 install_lock_stage() {
   local session=${1:?session required} label=${2:?stage required} action=${3:?action digest required} expected status
   shift 3

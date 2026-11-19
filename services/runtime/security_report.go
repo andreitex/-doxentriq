@@ -126,14 +126,20 @@ func (s *server) releaseSecurity(w http.ResponseWriter, r *http.Request) {
 	finish := func(name, status, detail string) {
 		report.Coverage = append(report.Coverage, securityCoverage{name, status, detail})
 	}
-	if feed, e := cachedFeed(); e == nil {
-		report.FeedUpdatedAt = feed
-		finish("vulnerability-feed", "passed", "Current advisory database is within24hours")
-	} else {
+	ctx, feedCancel, e := s.beginSecurityFeedScope(ctx)
+	if e != nil {
 		finish("vulnerability-feed", "unavailable", "Current vulnerability feed is unavailable or stale")
 		respond(w, report)
 		return
 	}
+	defer feedCancel()
+	report.FeedUpdatedAt, e = securityFeedScopeUpdatedAt(ctx)
+	if e != nil {
+		finish("vulnerability-feed", "unavailable", "Current vulnerability feed could not be bound")
+		respond(w, report)
+		return
+	}
+	finish("vulnerability-feed", "passed", "One fresh advisory snapshot is required for every scan in this report")
 	source := filepath.Join(s.data, "sources", v.AttemptID)
 	digest, e := sourceDigest(source)
 	if e != nil || digest != v.SourceHash {
@@ -142,13 +148,13 @@ func (s *server) releaseSecurity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	finish("immutable-source", "passed", "Exact verified source including actual dependency locks is preserved")
-	findings, feed, e := s.scan(ctx, filepath.Join(s.hostRuntime, "sources", v.AttemptID))
+	findings, feed, e := s.scan(ctx, filepath.Join(s.hostRuntime, "sources", v.AttemptID), sourceScannerInput{v.Template, v.SourceHash, v.SourceBindingVersion})
 	if e != nil {
 		finish("source-dependencies-configuration-secrets", "unavailable", "Source dependency, configuration and secret scanning failed")
 	} else {
 		report.Findings = append(report.Findings, findings...)
 		report.FeedUpdatedAt = feed
-		finish("source-dependencies-configuration-secrets", "passed", "Immutable source and dependency locks scanned against fresh advisories; configuration and secrets scanned")
+		finish("source-dependencies-configuration-secrets", "passed", "Exact supported locked dependency inventory matched against fresh advisories; source secret rules and recognized configuration checks completed")
 	}
 	if e = staticPolicy(source); e != nil {
 		finish("source-security-policy", "failed", "Immutable source violates company security policy")
@@ -168,12 +174,15 @@ func (s *server) releaseSecurity(w http.ResponseWriter, r *http.Request) {
 		finish("scoped-connectors", "unavailable", "The exact verified application's connection references are unavailable")
 	} else if len(manifest.Connections) > 0 {
 		connectorFindings, connectorError := s.scanAppConnectors(ctx, manifest)
+		report.Findings = append(report.Findings, connectorFindings...)
 		if connectorError != nil {
 			finish("scoped-connectors", "unavailable", "Approved connector provenance, access expiry or fresh image coverage is unavailable")
 		} else {
-			report.Findings = append(report.Findings, connectorFindings...)
 			finish("scoped-connectors", "passed", "All approved scoped connector images scanned against current advisories; connection credentials remain separate")
 		}
+	}
+	if _, e = checkSecurityFeedScope(ctx); e != nil {
+		report.Coverage[0] = securityCoverage{"vulnerability-feed", "unavailable", "The advisory snapshot changed, expired or could not be verified across this report; earlier findings are retained"}
 	}
 	report.Status = "passed"
 	for _, c := range report.Coverage {

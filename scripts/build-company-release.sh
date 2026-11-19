@@ -18,6 +18,11 @@ for name in docker openssl python3; do require_command "$name"; done
 [[ "$GO_IMAGE" =~ @sha256:[a-f0-9]{64}$ && "$DOCKER_CLI_IMAGE" =~ @sha256:[a-f0-9]{64}$ ]] || die 'Company builder images must be immutable.'
 [[ "$GIT_VERSION" =~ ^[0-9]+(\.[0-9]+){1,3}-r[0-9]+$ && "$ZLIB_VERSION" =~ ^[0-9]+(\.[0-9]+){1,3}-r[0-9]+$ && ${#GIT_VERSION} -le 64 && ${#ZLIB_VERSION} -le 64 ]] || die 'Git and zlib require exact stable Alpine package versions, such as 2.54.0-r0 and 1.3.2-r1.'
 OUT=$(realpath -m -- "${1:-"$ROOT_DIR/deploy/releases/$RELEASE_VERSION"}")
+if [[ -n "${COMPLETE_PLATFORM_REVISION:-}" ]]; then
+  [[ "$COMPLETE_PLATFORM_REVISION" =~ ^[a-f0-9]{40}$ && "$OUT" != "$ROOT_DIR" && "$OUT" != "$ROOT_DIR/"* ]] || die 'A complete source release requires an exact reviewed Git revision and output outside its clean checkout.'
+  python3 -I -B "$SCRIPT_DIR/release-manifest.py" --producer-preflight
+  export COMPLETE_PLATFORM_REVISION
+fi
 [[ ! -e "$OUT" ]] || die 'Release output must be a new directory; existing releases are never overwritten.'
 install -d -m 0700 "$OUT"
 install -d -m 0700 "$OUT/reports" "$OUT/scan-cache"
@@ -115,5 +120,11 @@ docker push "$COMPANY_REGISTRY/base-node:$RELEASE_VERSION"
 docker tag "$PYTHON_IMAGE" "$COMPANY_REGISTRY/base-python:$RELEASE_VERSION"
 docker push "$COMPANY_REGISTRY/base-python:$RELEASE_VERSION"
 python3 -I -B "$SCRIPT_DIR/release-manifest.py" "$OUT" "$COMPANY_REGISTRY" "$RELEASE_VERSION"
-if [[ -n "${SIGNING_KEY:-}" ]]; then /bin/bash "$SCRIPT_DIR/sign-company-release.sh" "$OUT" "$SIGNING_KEY" --complete-deployment; else printf 'Unsigned complete-deployment release prepared. Move it to the offline signer and run scripts/sign-company-release.sh BUNDLE KEY --complete-deployment.\n'; fi
+if [[ -n "${COMPLETE_PLATFORM_REVISION:-}" ]]; then
+  if [[ -n "${SIGNING_KEY:-}" ]]; then /bin/bash "$SCRIPT_DIR/sign-company-release.sh" "$OUT" "$SIGNING_KEY" --complete-platform-source "$ROOT_DIR"
+  else printf 'Unsigned schema4 source release prepared. Move it to the offline signer and run scripts/sign-company-release.sh BUNDLE KEY --complete-platform-source SOURCE_ROOT.\n'; fi
+else
+  if [[ -n "${SIGNING_KEY:-}" ]]; then /bin/bash "$SCRIPT_DIR/sign-company-release.sh" "$OUT" "$SIGNING_KEY" --complete-deployment
+  else printf 'Unsigned complete-deployment release prepared. Move it to the offline signer and run scripts/sign-company-release.sh BUNDLE KEY --complete-deployment.\n'; fi
+fi
 printf 'Company release prepared at %s. Build reports retain the real scanner output.\n' "$OUT"

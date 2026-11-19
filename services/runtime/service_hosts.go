@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net"
+	"net/netip"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -102,12 +103,44 @@ func serviceAddress(output, id, service, expectedImage string, network serviceNe
 	if labels["com.docker.compose.project"] != "autosoft" || labels["com.docker.compose.service"] != service || labels["com.docker.compose.oneoff"] != "False" || labels["com.docker.compose.container-number"] != "1" || labels["io.autosoft.managed"] != "true" || container.Config.Image != expectedImage || !digestImage.MatchString(container.Config.Image) {
 		return "", errors.New("Company service labels or qualified digest do not match")
 	}
-	if container.HostConfig.NetworkMode == "host" || container.HostConfig.NetworkMode == "none" || container.HostConfig.NetworkMode == "default" || container.HostConfig.NetworkMode == "bridge" || strings.HasPrefix(container.HostConfig.NetworkMode, "container:") || container.HostConfig.NetworkMode == "" {
+	if !isolatedServiceNetworkMode(container.HostConfig.NetworkMode) {
 		return "", errors.New("Company service network isolation is unverified")
 	}
 	endpoint, present := container.NetworkSettings.Networks[network.Name]
 	if !present || endpoint.NetworkID != network.ID {
 		return "", errors.New("Company service is not attached to the exact requested network")
+	}
+	if version := network.Labels["io.autosoft.network-version"]; version != "" {
+		var pinned struct {
+			NetworkSettings struct {
+				Networks map[string]struct {
+					IPAMConfig *struct {
+						IPv4Address, IPv6Address string
+						LinkLocalIPs             []string
+					}
+				}
+			}
+		}
+		if version != "1" || json.Unmarshal([]byte(output), &pinned) != nil {
+			return "", errors.New("Application network address policy is unsupported")
+		}
+		config := pinned.NetworkSettings.Networks[network.Name].IPAMConfig
+		if config == nil || config.IPv4Address != endpoint.IPAddress || config.IPv6Address != "" || len(config.LinkLocalIPs) != 0 {
+			return "", errors.New("Reserved service address lacks persisted static IPAM evidence")
+		}
+		if len(network.IPAM.Config) != 1 {
+			return "", errors.New("Reserved service network subnet evidence is ambiguous")
+		}
+		subnet, err := netip.ParsePrefix(network.IPAM.Config[0].Subnet)
+		index := -1
+		for position, name := range appNetworkServices {
+			if name == service {
+				index = position
+			}
+		}
+		if err != nil || !subnet.Addr().Is4() || subnet != subnet.Masked() || subnet.Bits() != appNetworkPrefix || index < 0 || endpoint.IPAddress != networkOffset(subnet.Addr(), index+2).String() {
+			return "", errors.New("Service address differs from the static application network policy")
+		}
 	}
 	ip := trustedServiceIPv4(endpoint.IPAddress)
 	if ip == nil {
@@ -129,6 +162,10 @@ func serviceAddress(output, id, service, expectedImage string, network serviceNe
 		return "", errors.New("Service IPv4 does not belong to the exact private network subnet")
 	}
 	return endpoint.IPAddress, nil
+}
+
+func isolatedServiceNetworkMode(mode string) bool {
+	return mode != "" && mode != "host" && mode != "none" && mode != "default" && mode != "bridge" && !strings.HasPrefix(mode, "container:")
 }
 
 // Docker's embedded DNS address is not usable by every runsc networking mode.

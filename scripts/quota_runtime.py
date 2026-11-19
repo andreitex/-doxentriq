@@ -4,7 +4,7 @@ Native Linux/XFS behavior needs company qualification. Local tests of this modul
 do not qualify quota enforcement, power loss, or an installed host service.
 """
 from __future__ import annotations
-import hmac,importlib.util,json,os,re,signal,stat,subprocess,threading,time,uuid
+import datetime,hmac,importlib.util,ipaddress,json,os,re,signal,stat,subprocess,threading,time,uuid
 from pathlib import Path
 
 if '__company_captured_dependencies__' in globals():
@@ -48,6 +48,119 @@ def validate_request(value):
     require(type(value['name']) is str and NAME.fullmatch(value['name']) is not None)
     require(type(value['sizeMb']) is int and 1<=value['sizeMb']<=32768)
     return dict(value)
+
+
+def app_network_pool(value):
+    """An IT-selected RFC1918 pool; never guess a route-compatible default."""
+    message = 'Choose an unused RFC1918 IPv4 pool in canonical CIDR form, with a prefix from /16 through /24; ask your network administrator to reserve it.'
+    if type(value) is not str or len(value) > 18:raise ValueError(message)
+    try:pool = ipaddress.ip_network(value, strict=True)
+    except ValueError:raise ValueError(message) from None
+    if pool.version != 4 or str(pool) != value or not 16 <= pool.prefixlen <= 24:raise ValueError(message)
+    if not any(pool.subnet_of(ipaddress.ip_network(private)) for private in
+               ('10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16')):raise ValueError(message)
+    return pool
+
+
+def normalize_network_snapshot(addresses_raw, routes_raw):
+    """Project bounded iproute2 JSON onto the authenticated host API contract."""
+    addresses, routes = (decode(raw, 1024**2) for raw in (addresses_raw, routes_raw))
+    require(type(addresses) is list and 0 < len(addresses) <= 512)
+    require(type(routes) is list and 0 < len(routes) <= 8192)
+    interfaces, projected_routes, names = [], [], set()
+
+    def device(value, optional=False):
+        require(type(value) is str and ((optional and value == '') or
+                re.fullmatch(r'[A-Za-z0-9_.:@-]{1,64}', value) is not None))
+        return value
+
+    def destination(value):
+        require(type(value) is str and len(value) <= 18)
+        network = ipaddress.ip_network('0.0.0.0/0' if value == 'default' else value, strict=True)
+        require(network.version == 4)
+        return str(network)
+
+    for row in addresses:
+        require(type(row) is dict)
+        name = device(row.get('ifname'))
+        require(name not in names); names.add(name)
+        values = row.get('addr_info')
+        require(type(values) is list and len(values) <= 256)
+        prefixes = set()
+        for address in values:
+            require(type(address) is dict and address.get('family') == 'inet')
+            local, prefix = address.get('local'), address.get('prefixlen')
+            require(type(local) is str and type(prefix) is int and 0 <= prefix <= 32)
+            parsed = ipaddress.ip_interface(local + '/' + str(prefix))
+            require(parsed.version == 4)
+            prefixes.add(str(parsed.network))
+        interfaces.append({'name': name, 'addresses': sorted(prefixes)})
+
+    for row in routes:
+        require(type(row) is dict)
+        target = destination(row.get('dst'))
+        kind, table = row.get('type', 'unicast'), row.get('table', 'main')
+        require(type(kind) is str and re.fullmatch(r'[a-z_]{1,32}', kind) is not None)
+        require(type(table) in (str, int) and re.fullmatch(r'[A-Za-z0-9_.-]{1,64}', str(table)) is not None)
+        devices = [device(row.get('dev', ''), optional=True)]
+        if 'nexthops' in row:
+            require(type(row['nexthops']) is list and 0 < len(row['nexthops']) <= 256)
+            for hop in row['nexthops']:
+                require(type(hop) is dict)
+                devices.append(device(hop.get('dev', ''), optional=True))
+        for name in sorted(set(devices)):
+            projected_routes.append({'destination': target, 'interface': name, 'type': kind, 'table': str(table)})
+            require(len(projected_routes) <= 8192)
+    require('lo' in names)
+    return {'schema': 1, 'interfaces': sorted(interfaces, key=lambda value: value['name']),
+            'routes': sorted(projected_routes, key=lambda value: tuple(value[key] for key in ('destination', 'interface', 'type', 'table')))}
+
+
+def host_network_snapshot():
+    """Read the trusted host unit's namespace; no caller supplies a command/device.
+
+    The root-owned service uses PrivateNetwork=false. Do not add ptrace
+    capabilities just to inspect PID1: the installed OS/unit is the trust boundary.
+    """
+    require(os.name == 'posix' and os.geteuid() == 0)
+    executable = None
+    for candidate in ('/usr/sbin/ip', '/usr/bin/ip'):
+        path = Path(candidate)
+        if not path.exists():continue
+        resolved = path.resolve(strict=True)
+        protected_directory(resolved.parent)
+        info = resolved.stat()
+        require(stat.S_ISREG(info.st_mode) and info.st_uid == info.st_gid == 0 and not info.st_mode & 0o022 and info.st_mode & 0o111)
+        executable = str(resolved)
+        break
+    require(executable is not None)
+
+    def read():
+        return normalize_network_snapshot(
+            output([executable, '-j', '-4', 'address', 'show'], seconds=3, maximum=COMMAND_BYTES).encode('ascii'),
+            output([executable, '-j', '-4', 'route', 'show', 'table', 'all'], seconds=3, maximum=COMMAND_BYTES).encode('ascii'))
+
+    before, after = read(), read()
+    require(before == after)  # Refuse observed topology changes during the read.
+    after['observedAt'] = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='seconds').replace('+00:00', 'Z')
+    return after
+
+
+def validate_fresh_network_pool(value, snapshot):
+    """Only for a fresh installation: any existing overlap needs IT review."""
+    pool = app_network_pool(value)
+    require(type(snapshot) is dict and snapshot.get('schema') == 1)
+    for interface in snapshot['interfaces']:
+        for address in interface['addresses']:
+            if pool.overlaps(ipaddress.ip_network(address, strict=True)):
+                raise ValueError(f"Application pool {pool} conflicts with host interface {interface['name']} ({address}). Ask IT to reserve a different unused private pool; host networking was not changed.")
+    for route in snapshot['routes']:
+        network = ipaddress.ip_network(route['destination'], strict=True)
+        # Every host has a default route. VPN /1 routes and policy tables still
+        # matter: they are not mistaken for the default route or filtered out.
+        if network.prefixlen != 0 and pool.overlaps(network):
+            raise ValueError(f"Application pool {pool} conflicts with route {network} in table {route['table']}. Ask IT to check LAN/VPN routes and choose an unused private pool; host networking was not changed.")
+    return str(pool)
 
 def validate_state(value):
     require(type(value) is dict and set(value)=={'nextProjectId','projects'})

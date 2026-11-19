@@ -20,10 +20,10 @@ OPERATION = 'a' * 32
 LOGICAL = ('/opt/autosoft-company/incoming/release', '/opt/autosoft-company/bootstrap/company.pem',
            '/opt/autosoft-company/incoming/source')
 FIXTURE_PINS = {
-    'tests/test_company_signed_execute_preparation.py': '98b07118556242a5c38bba819efd2492dc1d3eb69f36a84b98e14467ece37a3a',
-    'tests/test_authenticated_seed.py': 'a542927968dadce36f7218f7ccb8a0210a8656ad84c8e7182873734d1bce782e',
+    'tests/test_company_signed_execute_preparation.py': '01542a82d04f7c40a3eb64cb53cd4f7dc2bc096f3b80a10a63e7a09a796d9507',
+    'tests/test_authenticated_seed.py': 'bae0596d75470eabbe1407893dbb71a15666b4e78c487dd097fe15a47ae48eaf',
     'scripts/test-installer-parent.py': '7a4cca80c1d0d584d17e3e156d4bcfd496b49d1640011532c7c0156dd662f7a3',
-    'tests/test_company_seed_runner.py': 'fe44538e9f2c120f0dc5022d1f5b862d7283513b704be030214d223ac80f8ea8',
+    'tests/test_company_seed_runner.py': 'fdb1bb10bd63a7106d26505497ccd5e3861adbc2a38dd1a1849b76ebb4b2ce2e',
     'tests/test_company_release_crypto.py': '81fd35ce5e2c509a02025508bfd7b6fc844e8ed79d6fb853f3e7c17be8758807',
     'tests/test_company_cli_record_io.py': '53184cc1c97ea0687ae0b687aaaf33e02bbf57cd229c7765ea77e57ef95e554d',
 }

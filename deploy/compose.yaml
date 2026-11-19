@@ -226,6 +226,7 @@ services:
       APP_TLS_CA_KEY_FILE: /run/secrets/app-issuer.key
       QUOTA_HELPER_SOCKET_FILE: /run/autosoft/quota.sock
       QUOTA_HELPER_TOKEN_FILE: /run/secrets/quota-token
+      APP_NETWORK_POOL: ${APP_NETWORK_POOL:-}
       STORAGE_QUOTA_ENFORCED: "1"
       MYSQL_HOST: mysql
       MYSQL_USER: provisioner

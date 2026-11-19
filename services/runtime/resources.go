@@ -28,26 +28,32 @@ import (
 )
 
 type resources struct {
-	AppID                string            `json:"appId"`
-	Database             string            `json:"database"`
-	User                 string            `json:"user"`
-	Password             string            `json:"password"`
-	MySQLGrantVersion    int               `json:"mysqlGrantVersion,omitempty"`
-	MySQLGrantVerified   bool              `json:"mysqlGrantVerified,omitempty"`
-	RedisPassword        string            `json:"redisPassword"`
-	RabbitPassword       string            `json:"rabbitPassword"`
-	Network              string            `json:"network"`
-	Secrets              string            `json:"secrets"`
-	Schema               int               `json:"schema"`
-	Issuer               string            `json:"issuer"`
-	Audience             string            `json:"audience"`
-	Applied              map[string]string `json:"applied"`
-	StorageHost          string            `json:"storageHost,omitempty"`
-	StorageContainer     string            `json:"storageContainer,omitempty"`
-	ConnectorResourceID  string            `json:"connectorResourceId,omitempty"`
-	ConnectorSecrets     string            `json:"connectorSecrets,omitempty"`
-	ConnectorHostSecrets string            `json:"connectorHostSecrets,omitempty"`
+	AppID                string                `json:"appId"`
+	Database             string                `json:"database"`
+	User                 string                `json:"user"`
+	Password             string                `json:"password"`
+	MySQLGrantVersion    int                   `json:"mysqlGrantVersion,omitempty"`
+	MySQLGrantVerified   bool                  `json:"mysqlGrantVerified,omitempty"`
+	RedisPassword        string                `json:"redisPassword"`
+	RabbitPassword       string                `json:"rabbitPassword"`
+	Network              string                `json:"network"`
+	NetworkAssignment    *appNetworkAssignment `json:"networkAssignment,omitempty"`
+	Secrets              string                `json:"secrets"`
+	Schema               int                   `json:"schema"`
+	Issuer               string                `json:"issuer"`
+	Audience             string                `json:"audience"`
+	Applied              map[string]string     `json:"applied"`
+	StorageHost          string                `json:"storageHost,omitempty"`
+	StorageContainer     string                `json:"storageContainer,omitempty"`
+	ConnectorResourceID  string                `json:"connectorResourceId,omitempty"`
+	ConnectorSecrets     string                `json:"connectorSecrets,omitempty"`
+	ConnectorHostSecrets string                `json:"connectorHostSecrets,omitempty"`
 }
+
+// A reservation inventory must not mistake another app's live atomic-write
+// temporary for abandoned evidence. All encrypted resource writes participate;
+// unrelated connector/receipt encryption does not share this lock.
+var resourceStateFiles sync.RWMutex
 
 func randomSecret() string {
 	b := make([]byte, 32)
@@ -68,6 +74,10 @@ func vaultKey() ([]byte, error) {
 	return k, nil
 }
 func writeEncrypted(file string, v any) error {
+	if filepath.Base(filepath.Dir(file)) == "resources" && strings.HasSuffix(file, ".enc") {
+		resourceStateFiles.Lock()
+		defer resourceStateFiles.Unlock()
+	}
 	k, e := vaultKey()
 	if e != nil {
 		return e
@@ -187,8 +197,9 @@ func (s *server) provision(ctx context.Context, appID string, manifest AppManife
 	if os.IsNotExist(e) {
 		suffix := hashBytes([]byte(appID))[:24]
 		v = resources{AppID: appID, Database: "app_" + suffix, User: "app_" + suffix, Password: randomSecret(), MySQLGrantVersion: mysqlGrantPolicyVersion, RedisPassword: randomSecret(), RabbitPassword: randomSecret(), Network: "autosoft_app_" + suffix, Secrets: filepath.Join(s.data, "secrets", appID), Schema: 1, Applied: map[string]string{}}
-		// Retain the exact initial account/password intent before SQL creation.
-		if e = retainApplicationSQLResources(file, v); e != nil {
+		// Reserve a conflict-free subnet and retain the account/password intent
+		// together before any Docker or SQL creation.
+		if e = s.reserveAppNetwork(ctx, &v, func() error { return retainApplicationSQLResources(file, v) }); e != nil {
 			return v, e
 		}
 	}
@@ -200,6 +211,9 @@ func (s *server) provision(ctx context.Context, appID string, manifest AppManife
 	}
 	if !applicationSQLPassword.MatchString(v.Password) {
 		return v, errors.New("Stored application database credential format is invalid")
+	}
+	if e = s.ensureAssignedAppNetwork(ctx, &v, func() error { return retainApplicationSQLResources(file, v) }); e != nil {
+		return v, e
 	}
 	db, e := mysqlConnection()
 	if e != nil {
@@ -235,9 +249,6 @@ func (s *server) provision(ctx context.Context, appID string, manifest AppManife
 		if e = atomicTLSFile(filepath.Join(v.Secrets, "jwks.json"), jwks); e != nil {
 			return v, e
 		}
-	}
-	if e = s.appNetwork(ctx, v.Network); e != nil {
-		return v, e
 	}
 	if len(manifest.Storage) == 1 {
 		storageName := manifest.Storage[0].Name
@@ -278,30 +289,6 @@ func (s *server) provision(ctx context.Context, appID string, manifest AppManife
 		return v, e
 	}
 	return v, nil
-}
-func (s *server) appNetwork(ctx context.Context, network string) error {
-	if _, e := s.runner(ctx, "docker", "network", "inspect", network); e != nil {
-		if _, e = s.runner(ctx, "docker", "network", "create", "--internal", "--driver", "bridge", "--label", "io.autosoft.managed=true", network); e != nil {
-			return e
-		}
-	}
-	for _, service := range []string{"mysql", "redis", "rabbitmq", "caddy"} {
-		out, e := s.runner(ctx, "docker", "ps", "--filter", "label=com.docker.compose.project=autosoft", "--filter", "label=com.docker.compose.service="+service, "--format", "{{.ID}}")
-		if e != nil {
-			return e
-		}
-		id := strings.TrimSpace(out)
-		if !regexpDockerID(id) {
-			return errors.New("Required private infrastructure service is unavailable")
-		}
-		if _, e = s.runner(ctx, "docker", "network", "connect", "--alias", service, network, id); e != nil {
-			inspect, e2 := s.runner(ctx, "docker", "inspect", "--format", "{{json .NetworkSettings.Networks}}", id)
-			if e2 != nil || !strings.Contains(inspect, `"`+network+`"`) {
-				return e
-			}
-		}
-	}
-	return s.attachDirectoryControl(ctx, network)
 }
 func regexpDockerID(value string) bool {
 	if len(value) < 12 || len(value) > 64 {

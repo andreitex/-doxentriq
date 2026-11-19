@@ -239,7 +239,7 @@ class SeedBackend:
    require(path[len(self.store_root)+1:] in STORE_LEAVES);return 'file'
   if path.startswith(self.source_root+'/source/'):
    return None # A finite typed member; upstream signed inventory decides file/directory.
-  if path in (self.source_root+'/intent.json',self.source_root+'/verified.json'):return 'file'
+  if path in (self.source_root+'/intent.json',self.source_root+'/bytes-verified.json'):return 'file'
   require(False)
 
  def _protected(self,path,info,directory):
@@ -377,7 +377,7 @@ class SeedBackend:
   if path.startswith(self.source_root+'/source/'):
    relative=path[len(self.source_root+'/source/'):];require(len(relative)<=256 and len(PurePosixPath(relative).parts)<=16)
    return 'source',0 if directory else 8*1024**2
-  require(not directory and path in (self.source_root+'/intent.json',self.source_root+'/verified.json'));return 'journal',65536
+  require(not directory and path in (self.source_root+'/intent.json',self.source_root+'/bytes-verified.json'));return 'journal',65536
 
  def _new(self,parent,name,uid,gid,mode,directory):
   row=self._fd(parent);require(row['directory']);component(name);path=str(PurePosixPath(row['path'])/name)

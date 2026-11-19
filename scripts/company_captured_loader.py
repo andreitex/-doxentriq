@@ -20,6 +20,7 @@ ENTRY_PATHS = (V_PATH, IP_PATH, GUARD_PATH)
 OPERATIONAL_PATHS = (
     'scripts/bootstrap.py', 'scripts/checkpoint_admission.py',
     'scripts/company_platform_store.py', 'scripts/company_source_tree.py',
+    'scripts/identity.py',
     'scripts/installation_identity.py', IP_PATH, 'scripts/platform_source.py',
     'scripts/quota_allocation.py', 'scripts/quota_runtime.py',
     'scripts/registry_manifest.py', 'scripts/resolve-images.py',
@@ -27,7 +28,7 @@ OPERATIONAL_PATHS = (
     'scripts/startup_binding.py', V_PATH,
 )
 EDGES = MappingProxyType({
-    'scripts/bootstrap.py': ('scripts/registry_manifest.py', 'scripts/runtime_layout.py', 'scripts/installation_identity.py'),
+    'scripts/bootstrap.py': ('scripts/registry_manifest.py', 'scripts/runtime_layout.py', 'scripts/installation_identity.py', 'scripts/identity.py'),
     'scripts/installation_identity.py': ('scripts/checkpoint_admission.py',),
     'scripts/quota_allocation.py': ('scripts/checkpoint_admission.py',),
     'scripts/quota_runtime.py': ('scripts/quota_allocation.py',),
@@ -38,6 +39,7 @@ EDGES = MappingProxyType({
 COMPILE_ORDER = (
     'scripts/checkpoint_admission.py', 'scripts/registry_manifest.py',
     'scripts/resolve-images.py', 'scripts/platform_source.py',
+    'scripts/identity.py',
     'scripts/installation_identity.py', 'scripts/quota_allocation.py',
     'scripts/quota_runtime.py', 'scripts/runtime_layout.py',
     'scripts/startup_binding.py', 'scripts/runtime_pair_init.py',

@@ -14,8 +14,8 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 HERE = ROOT / 'deploy/installer'
 BASIS = ROOT / 'tests/test_company_authenticated_cli_inputs.py'
-BASIS_PIN = '31678965fbcc4e68864103588dac2c6b9ae27543a10e54ef4af04cd90b98ec7a'
-PROFILE_PIN = '4425bac76c98f1ad63806cd7f429cf8edab7000d18c878876844518a8cf5471a'
+BASIS_PIN = 'c6260d9c99c46e70b43eb6687d9595223e61e94d3f73a13f30bb26b8551658a9'
+PROFILE_PIN = 'c105c94f4482a727c3c161f87d0b450919a121a0e4383fda6ffd2a4ebbc224e8'
 
 
 def fixture_basis():
@@ -39,10 +39,10 @@ T = fixture_basis()
 
 
 def helper_profile():
-    raw = (ROOT / 'tests/fixtures/company_signed_execute_helpers_v4.json').read_bytes()
+    raw = (ROOT / 'tests/fixtures/company_signed_execute_helpers_v5.json').read_bytes()
     assert T.sha(raw) == PROFILE_PIN
     profile = json.loads(raw)
-    assert len(profile['helpers']) == 15 and profile['totalBytes'] == 246382
+    assert len(profile['helpers']) == 15 and profile['totalBytes'] == 246431
     result = {}
     for row in profile['helpers']:
         path = ROOT / row['path']
@@ -136,7 +136,7 @@ class Controls(unittest.TestCase):
         p = f.prepare()
         data = p.capture_preparation()
         self.assertIs(type(data), MappingProxyType)
-        self.assertEqual((data['signedHelperCount'], data['signedHelperBytes']), (15, 246382))
+        self.assertEqual((data['signedHelperCount'], data['signedHelperBytes']), (15, 246431))
         self.assertEqual(set(data['helperPins']), set(HELPERS))
         for path, (body, row) in HELPERS.items():
             self.assertEqual(dict(data['helperPins'][path]), {'bytes': len(body), 'sha256': T.sha(body)})
@@ -172,7 +172,7 @@ class Controls(unittest.TestCase):
                                     'operational_catalog', 'fingerprint', 'full_package_pin'})
         self.assertEqual(auth['delivery_pin']['sha256'], T.sha(data['deliveryRaw']))
         self.assertEqual((len(auth['launch_pins']), len(auth['package_pins']),
-                          len(auth['operational_catalog'])), (11, 9, 15))
+                          len(auth['operational_catalog'])), (11, 9, 16))
         self.assertEqual(auth['fingerprint'], f.base.fingerprint)
         with self.assertRaises(TypeError):
             auth['delivery_pin']['bytes'] = 1

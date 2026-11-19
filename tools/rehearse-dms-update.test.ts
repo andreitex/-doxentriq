@@ -1,11 +1,18 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import test from 'node:test';
 import { inspectCandidate, referenceFiles, rehearse } from './rehearse-dms-update.ts';
-import { modelCatalogSchema } from '../packages/core/src/models.ts';
+import { ModelGateway, modelCatalogSchema } from '../packages/core/src/models.ts';
 
 const root = resolve('templates/dms');
+const fixtureTime = Date.parse('2026-01-15T12:00:00.000Z');
+function syntheticCatalog() {
+  // Mocked orchestration must not depend on real provider prices or current company qualification.
+  return modelCatalogSchema.parse({ schemaVersion: 1, pricesVerifiedAt: new Date(fixtureTime).toISOString(), sources: ['https://pricing.example.test/synthetic'], models: [
+    { id: 'synthetic-openai', provider: 'openai', tier: 'strong', inputUsdPerMillion: 1, outputUsdPerMillion: 2, cachedInputUsdPerMillion: .1, cacheWriteUsdPerMillion: 1.25, effort: 'high', qualified: true, maxInputTokens: 90000, maxOutputTokens: 32768 },
+    { id: 'synthetic-anthropic', provider: 'anthropic', tier: 'strong', inputUsdPerMillion: 2, outputUsdPerMillion: 4, cachedInputUsdPerMillion: .2, cacheWriteUsdPerMillion: 2.5, effort: 'high', qualified: true, maxInputTokens: 90000, maxOutputTokens: 32768 }
+  ] });
+}
 
 test('rehearsal preserves existing auth, storage and locks and allows only focused new tests', () => {
   const before = [{ path: 'src/auth.mjs', content: 'protected auth' }, { path: 'web/main.jsx', content: 'old UI' }];
@@ -17,9 +24,10 @@ test('rehearsal preserves existing auth, storage and locks and allows only focus
   assert.throws(() => inspectCandidate(before, [...after, ui]), /Duplicate/);
 });
 
-test('actual generation orchestration produces a retained artifact without executing model source', async () => {
+test('actual generation orchestration produces a retained artifact without executing model source', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: fixtureTime });
   const baseline = await referenceFiles(root);
-  const catalog = modelCatalogSchema.parse(JSON.parse(await readFile('models/catalog.json', 'utf8')));
+  const catalog = syntheticCatalog();
   const ui = baseline.find(file => file.path === 'web/main.jsx')!.content;
   const before = "metadata: form.elements.department?.value ? { department: form.elements.department.value } : {}";
   assert.ok(ui.includes(before));
@@ -48,9 +56,10 @@ test('actual generation orchestration produces a retained artifact without execu
   assert.equal(JSON.stringify(result).includes('synthetic-openai-key'), false);
 });
 
-test('implementation business questions retain the specification and stop before paid review', async () => {
+test('implementation business questions retain the specification and stop before paid review', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: fixtureTime });
   const baseline=await referenceFiles(root);
-  const catalog=modelCatalogSchema.parse(JSON.parse(await readFile('models/catalog.json','utf8')));
+  const catalog=syntheticCatalog();
   const specification={title:'Project code',summary:'Initial upload only',acceptanceCriteria:['Preserve documents'],questions:[] as string[]};
   const generated={specification:{...specification,questions:['Which business scope should change?']},summary:'Clarification needed',manifest:JSON.parse(baseline.find(f=>f.path==='app.manifest.json')!.content),pipeline:JSON.parse(baseline.find(f=>f.path==='pipeline.json')!.content),migrations:[],files:[{path:'web/main.jsx',content:'Unreviewed implementation must not execute'}]};
   let calls=0;
@@ -64,8 +73,9 @@ test('implementation business questions retain the specification and stop before
   assert.deepEqual(result.artifacts['dms-candidate.json']!.files,[]);
 });
 
-test('clarification pauses after one billed call and retains the specification without a source rewrite', async () => {
-  const catalog = modelCatalogSchema.parse(JSON.parse(await readFile('models/catalog.json', 'utf8')));
+test('clarification pauses after one billed call and retains the specification without a source rewrite', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: fixtureTime });
+  const catalog = syntheticCatalog();
   let calls = 0;
   const request: typeof fetch = async () => {
     calls++;
@@ -78,4 +88,33 @@ test('clarification pauses after one billed call and retains the specification w
   assert.equal(result.clarificationCount, 1);
   assert.deepEqual(result.artifacts['dms-candidate.json']!.files, []);
   assert.deepEqual(result.artifacts['dms-candidate.json']!.changedPaths, []);
+});
+
+test('pricing expiry and future tolerance block spending beyond their exact boundaries', async () => {
+  const lifetime = 31 * 86400000;
+  for (const elapsed of [lifetime - 1, lifetime, lifetime + 1, -59999, -60000, -60001]) {
+    let reservations = 0, calls = 0, settlements = 0;
+    const gateway = new ModelGateway({ catalog: syntheticCatalog(), apiKeys: { openai: 'synthetic-openai-key' }, now: () => new Date(fixtureTime + elapsed), fetch: async () => {
+      calls++;
+      return Response.json({ status: 'completed', service_tier: 'default', usage: { input_tokens: 1, output_tokens: 1 }, output: [{ type: 'message', content: [{ type: 'output_text', text: 'synthetic response' }] }] });
+    } });
+    const result = gateway.complete({ stage: 'design', jobId: 'synthetic-expiry-check', system: 'Synthetic fixture', prompt: 'No external call', maxOutputTokens: 16 }, { reserve: async () => { reservations++; return 'synthetic-reservation'; }, settle: async () => { settlements++; } });
+    const eligible = elapsed <= lifetime && elapsed >= -60000;
+    if (eligible) assert.equal((await result).text, 'synthetic response');
+    else await assert.rejects(result, /Model pricing catalog is stale or invalid; company review is required before further spending/);
+    assert.deepEqual({ reservations, calls, settlements }, eligible ? { reservations: 1, calls: 1, settlements: 1 } : { reservations: 0, calls: 0, settlements: 0 }, `elapsed ${elapsed}`);
+  }
+});
+
+test('rehearsal refuses expired synthetic pricing before spending or retaining a candidate', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: fixtureTime + 31 * 86400000 + 1 });
+  let calls = 0;
+  const result = await rehearse({ reference: root, templateRoot: resolve('templates'), catalog: syntheticCatalog(), maxUsd: 2, suiteMaxUsd: 2, requestMaxUsd: .65, keys: { openai: 'synthetic-openai-key' }, request: async () => { calls++; throw new Error('Expired pricing must not call a provider'); } });
+  assert.equal(calls, 0);
+  assert.equal(result.results[0]!.qualified, false);
+  assert.equal(result.spentUsd, 0);
+  assert.equal(result.heldUsd, 0);
+  assert.equal(result.generationRequests, 0);
+  assert.deepEqual(result.requests, []);
+  assert.deepEqual(result.artifacts, {});
 });

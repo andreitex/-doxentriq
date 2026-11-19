@@ -128,8 +128,10 @@ class SeedRunner:
         out=b'';code=0
         if argv[0]=='/usr/bin/systemctl':
             active=self.active_unit or self.active_timer and argv[-1].endswith('.timer')
-            out=('ActiveState='+('active' if active else 'inactive')+'\nSubState='+('running' if active else 'dead')
-                +'\nMainPID='+('12' if self.lingering_pid else '0')+'\nControlPID=0\nControlGroup=\nLoadState=loaded\n').encode()
+            values=dict(ActiveState='active' if active else 'inactive',SubState='running' if active else 'dead',
+                MainPID='12' if self.lingering_pid else '0',ControlPID='0',ControlGroup='',LoadState='loaded')
+            fields=[item.removeprefix('--property=') for item in argv if item.startswith('--property=')]
+            out=''.join(name+'='+values[name]+'\n' for name in fields).encode()
         elif argv[0]=='/usr/bin/docker':out=b'f'*64+b'\n' if self.container else b''
         elif argv[0]=='/usr/bin/git':
             repo=next(x for x in argv if x.startswith('--work-tree='))[12:]
@@ -417,6 +419,45 @@ class AuthenticatedSeedTests(unittest.TestCase):
             self.assertNotIn('add',argv);self.assertNotIn('status',argv);self.assertNotIn('init',argv)
     def test_legacy_mutable_seed_disabled(self):
         self.assertRaises(ValueError,B.seed_repository,Path('/irrelevant'),Path('/irrelevant'))
+    def test_fast_writes_do_not_repeat_host_process_fanout(self):
+        f=Fixture(); now=[f.storage.last_host_probe];f.files.clock=lambda:now[0]
+        before=len(f.runner.calls);f.seed()
+        # Initial/phase probes remain real; every file does not spawn 17 host tools.
+        self.assertLess(len(f.runner.calls)-before,180)
+        self.assertGreater(f.parent.calls,len(f.backend.effects))
+    def test_changed_host_at_elapsed_checkpoint_stops_next_write(self):
+        f=Fixture();now=[f.storage.last_host_probe];f.files.clock=lambda:now[0];effects=[]
+        def change(path):
+            if path==f.storage.repository+'/.git':
+                f.runner.active_timer=True;now[0]+=5;effects.extend(f.backend.effects)
+        f.backend.after_create=change;self.deny(f,'seed_writer_active')
+        self.assertEqual(f.backend.effects,effects)
+    def test_changed_mount_at_elapsed_checkpoint_stops_next_write(self):
+        f=Fixture();now=[f.storage.last_host_probe];f.files.clock=lambda:now[0];effects=[]
+        def change(path):
+            if path==f.storage.repository+'/.git':
+                f.mount['mapperIdentity'][1]='999';now[0]+=5;effects.extend(f.backend.effects)
+        f.backend.after_create=change;self.deny(f,'seed_mount_changed')
+        self.assertEqual(f.backend.effects,effects)
+    def test_expired_source_is_checked_between_sampled_host_probes(self):
+        f=Fixture();now=f.storage.last_host_probe;f.files.clock=lambda:now;effects=[]
+        def change(path):
+            if path==f.storage.repository+'/.git':f.source.live=False;effects.extend(f.backend.effects)
+        f.backend.after_create=change;self.deny(f)
+        self.assertEqual(f.backend.effects,effects)
+    def test_final_git_boundary_forces_host_probe_without_elapsed_time(self):
+        f=Fixture();now=f.storage.last_host_probe;f.files.clock=lambda:now;original=f.git.verify
+        def changed(*args,**kwargs):
+            result=original(*args,**kwargs);f.runner.container=True;return result
+        f.git.verify=changed;self.deny(f,'seed_writer_present')
+        self.assertFalse(any(p.endswith('objects-verified.json') for p in f.backend.effects))
+    def test_slow_host_probe_never_authorizes_a_write(self):
+        f=Fixture();now=[f.storage.last_host_probe];f.files.clock=lambda:now[0];original=f.S.encrypted_proof
+        def slow(*args,**kwargs):now[0]+=5;return original(*args,**kwargs)
+        f.S.encrypted_proof=slow;self.deny(f,'seed_host_probe_too_slow');self.assertEqual(f.backend.effects,[])
+    def test_host_probe_budget_exhaustion_preserves_zero_effects(self):
+        f=Fixture();f.storage.host_probes=136;self.deny(f,'seed_host_probe_budget')
+        self.assertEqual(f.backend.effects,[])
 
 
 if __name__=='__main__':unittest.main(verbosity=2)

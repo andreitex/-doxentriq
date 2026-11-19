@@ -46,13 +46,13 @@ class PlatformFoundationControls(unittest.TestCase):
         args = dict(verifier=self.V, files=self.files, clock=self.clock); args.update(kw)
         return M.materialized_platform_foundation(held, self.parent, self.name, **args)
 
-    def test_genuine_schema4_projection_keeps_exact_63_bytes_and_no_archive(self):
+    def test_genuine_schema4_projection_keeps_exact_64_bytes_and_no_archive(self):
         with self.q.held() as held:
-            expected = {p: held.files[p] for p in (*M.SOURCES, *M.TEMPLATES)}
+            expected = {p: held.files[p] for p in (*M.SOURCES, *M.PLATFORM_FOUNDATION_EXTRA_SOURCES, *M.TEMPLATES)}
             expected.update({'company-release/' + p: b for p,b in {**held.configs, **held.provenance}.items()})
             with patch.object(M, 'NativeFiles', side_effect=AssertionError('native fallback')):
                 with self.context(held) as tree:
-                    self.assertEqual(len(tree.files), 63)
+                    self.assertEqual(len(tree.files), 64)
                     self.assertEqual(set(tree.files), set(expected))
                     self.assertNotIn('company-release/platform-sources.tar.gz', tree.files)
                     for name, raw in expected.items(): self.assertEqual((tree.root/name).read_bytes(), raw)
@@ -71,6 +71,34 @@ class PlatformFoundationControls(unittest.TestCase):
         with self.q.held() as held, patch('subprocess.Popen', side_effect=AssertionError('child')):
             with self.context(held) as tree:
                 self.assertEqual((tree.root/'scripts/bootstrap.py').read_bytes(), self.q.values['scripts/bootstrap.py'])
+
+    def test_status_is_signed_schema4_projection_only_and_legacy_catalog_stays_exact(self):
+        self.assertEqual(M.SOURCES, self.V.COMPANY_SOURCES)
+        self.assertEqual(len(M.SOURCES), 44)
+        self.assertNotIn('scripts/installation-status.py', M.SOURCES)
+        self.assertEqual(M.PLATFORM_FOUNDATION_EXTRA_SOURCES, ('scripts/installation-status.py',))
+        raw = (ROOT/'scripts/installation-status.py').read_bytes()
+        self.q.values['scripts/installation-status.py'] = raw
+        self.q.refresh_platform()
+        with self.q.held() as held:
+            rows, release = M.capture_platform_foundation(held, verifier=self.V)
+            self.assertEqual(rows['scripts/installation-status.py'], raw)
+            self.assertEqual(len(rows), 64)
+            self.assertEqual(held.metadata['sourceFileCount'], 44)
+        self.assertEqual(self.files.effects, [])
+
+    def test_status_requires_its_exact_signed_platform_row_before_output(self):
+        with self.q.held() as held:
+            original = json.loads(held.configs['platform-sources.json'])
+            for kind in ('missing', 'hash', 'mode', 'boolean'):
+                bad = json.loads(json.dumps(original))
+                row = next(r for r in bad['files'] if r['path'] == 'scripts/installation-status.py')
+                if kind == 'missing': bad['files'].remove(row)
+                else: row['sha256' if kind == 'hash' else 'gitMode' if kind == 'mode' else 'bytes'] = '0'*64 if kind == 'hash' else '100755' if kind == 'mode' else True
+                with patch.object(self.V, 'decode', return_value=bad):
+                    with self.assertRaises(ValueError):
+                        with self.context(held): self.fail('yield')
+                self.assertEqual(self.files.effects, [])
 
     def test_unissued_original_class_clone_refuses_without_callback_or_effect(self):
         with self.q.held() as held:

@@ -55,6 +55,15 @@ def fixture():
 
 def prior_feed_boundary_source(source):
     """Invert only the reviewed feed refusal for historical preservation checks."""
+    begin=source.index(b'_FEED_LOCKS = ');end=source.index(b'class MaintenanceScanner:')
+    if hashlib.sha256(source[begin:end]).hexdigest() != 'b43c64079678c9344e2d75497c96d568915857913f8a6034d74a92c4f8ccfe8f':
+        raise AssertionError('Reviewed feed lease fragment changed')
+    source=source[:begin]+source[end:]
+    for current,previous in (
+        (b'        with self.serialized(), SecurityFeedLease(self.cache) as feed:\n',b'        with self.serialized():\n'),
+        (b"                        'feedLease':feed.check,\n",b'')):
+        if source.count(current)!=1:raise AssertionError('Reviewed reader integration changed')
+        source=source.replace(current,previous)
     changes = (
         (b"        # A container memory limit does not bound writes through a cache bind.\n"
          b"        # Enable refresh only after bounded acquisition and activation qualify.\n"
@@ -446,6 +455,7 @@ class LifecycleInterop(unittest.TestCase):
             for key,path in kwargs['outputs'].items():path.write_bytes(b'{}' if key=='stdout' else b'')
             return types.SimpleNamespace(returncode=0)
         patches=contextlib.ExitStack()
+        patches.enter_context(patch.object(M,'SecurityFeedLease',side_effect=lambda _:contextlib.nullcontext(types.SimpleNamespace(check=lambda:True))))
         patches.enter_context(patch.object(M,'protected',side_effect=lambda path,**kwargs:Path(path)))
         patches.enter_context(patch.object(M,'tree_hashes',return_value={}))
         patches.enter_context(patch.object(M,'fsync_directory'))

@@ -2,10 +2,17 @@
 
 This is an executable bridge for `company-platform-store` and
 `company-source-materialize`. It does **not** complete a Doxentriq installation.
-It does not configure identity, render customer settings, activate services,
+The retention-only command does not configure identity, render customer settings, activate services,
 initialize backups, issue parent confirmations, or reconcile an interrupted
 operation. The ordinary installer remains unavailable until those paths and
 the supported clean-VM matrix are completed.
+
+The same packaged worker now also supports the separately authenticated
+[`company-configure.sh` prerequisite](native-configuration-stage.md). That
+command collects the protected IT questionnaire and prepares actual
+configuration/runtime placement before Store/Source. The `--retention-only`
+command retains its original two-stage scope. The new prerequisite's signed
+native execution has not yet been qualified on a fresh VM.
 
 ## Trust and prerequisites
 
